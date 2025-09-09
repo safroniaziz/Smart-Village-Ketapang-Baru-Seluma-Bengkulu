@@ -1,0 +1,1975 @@
+@extends('layouts.app')
+
+@section('title', 'Beranda - Smart Village Ketapang Baru')
+
+@section('content')
+<!-- Hero Section -->
+<section class="relative text-white overflow-hidden pt-8 py-8 lg:py-12 pb-24 lg:pb-20" style="background-color: #0086c9;">
+    <!-- Background Pattern -->
+    <div class="absolute inset-0 bg-white/5"></div>
+
+    <!-- Particle.js Container -->
+    <div id="particles-js" class="absolute inset-0"></div>
+
+    <div class="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10 pt-20">
+        <div class="flex flex-col lg:flex-row items-start justify-between gap-8">
+            <!-- Hero Content (Left Side) -->
+            <div class="flex-1 space-y-8 relative z-10">
+                <div class="space-y-6">
+                    <!-- Badge -->
+                    <div class="flex items-center space-x-3 mb-6" data-aos="fade-up" data-aos-delay="200">
+                        <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-building text-white text-xl"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-semibold text-blue-100">DESA KETAPANG BARU</h2>
+                            <p class="text-sm text-blue-100">Kecamatan Semidang Alas Maras</p>
+                        </div>
+                    </div>
+
+                    <!-- Main Title -->
+                    <h1 class="text-4xl lg:text-6xl font-black leading-tight mb-6" data-aos="fade-up" data-aos-delay="400">
+                        <span class="text-white">Smart Village</span><br>
+                        <span class="text-yellow-400 font-extrabold">Ketapang Baru</span>
+                    </h1>
+
+                    <!-- Badge Desa Digital -->
+                    <div class="mb-6" data-aos="fade-up" data-aos-delay="500">
+                        <div class="inline-flex items-center bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg">
+                            <i class="fas fa-star mr-2 text-yellow-300 text-xs"></i>
+                            Desa Digital Terdepan
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <p class="text-lg lg:text-xl text-blue-100 leading-relaxed max-w-2xl font-light" data-aos="fade-up" data-aos-delay="600">
+                        Revolusi digital untuk pelayanan publik yang
+                        <span class="font-semibold text-yellow-300">cepat, transparan, dan terpercaya</span>
+                        bagi seluruh masyarakat Ketapang Baru
+                    </p>
+                </div>
+
+                <!-- Enhanced Search Bar -->
+                <div class="max-w-xl mb-6 relative z-20" data-aos="fade-up" data-aos-delay="700">
+                    <div class="relative">
+                        <div class="absolute inset-0 bg-gradient-to-r from-white/20 to-white/10 rounded-xl blur-lg"></div>
+                        <div class="relative bg-white/15 backdrop-blur-md border border-white/30 rounded-xl p-2 shadow-xl z-20">
+                            <div class="flex items-center">
+                                <div class="flex-1 flex items-center">
+                                    <i class="fas fa-search text-white/70 text-base ml-4 mr-3"></i>
+                                    <input type="text" placeholder="Cari layanan desa..."
+                                           class="w-full bg-transparent text-white placeholder-white/60 text-base font-medium py-3 pr-3 border-0 outline-0 focus:outline-none focus:ring-0 focus:border-0">
+                                </div>
+                                <button class="bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white font-semibold px-6 py-3 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg">
+                                    <i class="fas fa-arrow-right text-sm"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Search Tags -->
+                    <div class="flex flex-wrap gap-2 mt-4">
+                        <span class="bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 rounded-full px-3 py-1 text-xs text-white/90 cursor-pointer transition-all duration-300 hover:scale-105">
+                            📄 Surat Domisili
+                        </span>
+                        <span class="bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 rounded-full px-3 py-1 text-xs text-white/90 cursor-pointer transition-all duration-300 hover:scale-105">
+                            👥 Data Warga
+                        </span>
+                        <span class="bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 rounded-full px-3 py-1 text-xs text-white/90 cursor-pointer transition-all duration-300 hover:scale-105">
+                            🗺️ Peta Desa
+                        </span>
+                    </div>
+                </div>
+
+                <!-- CTA Buttons -->
+                <div class="flex flex-col sm:flex-row gap-3 relative z-20" data-aos="fade-up" data-aos-delay="800">
+                    <a href="{{ route('surat.online') }}" class="group relative overflow-hidden bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 hover:from-yellow-500 hover:via-orange-600 hover:to-red-600 text-white font-semibold px-6 py-3 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-yellow-500/25">
+                        <div class="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <div class="relative flex items-center justify-center">
+                            <i class="fas fa-envelope mr-2 text-base"></i>
+                            <span class="text-base">Layanan Surat Online</span>
+                        </div>
+                    </a>
+
+                    <a href="{{ route('tentang') }}" class="group bg-white/15 hover:bg-white/25 backdrop-blur-md border-2 border-white/30 hover:border-white/50 text-white font-semibold px-6 py-3 rounded-xl transition-all duration-300 transform hover:scale-105">
+                        <div class="flex items-center justify-center">
+                            <i class="fas fa-info-circle mr-2 text-base"></i>
+                            <span class="text-base">Profil Desa</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Clean Statistics (Right Side) -->
+            <div class="lg:w-[420px] flex-shrink-0 relative z-10" data-aos="fade-left" data-aos-delay="600">
+                <!-- Enhanced Statistics Grid -->
+                <div class="grid grid-cols-2 gap-3 mb-4">
+                    <div class="group text-center p-4 bg-white/95 backdrop-blur-sm border-2 border-blue-200 rounded-2xl hover:scale-105 transition-all duration-500 shadow-xl hover:shadow-2xl hover:border-blue-300 hover:bg-white hover:shadow-blue-500/10">
+                        <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform duration-300 shadow-lg group-hover:shadow-blue-500/30">
+                            <i class="fas fa-users text-white text-base"></i>
+                        </div>
+                        <div class="text-2xl font-black text-gray-800 mb-1">
+                            <span class="counter" data-count="2847">0</span>
+                        </div>
+                        <div class="text-gray-700 font-bold text-xs mb-1">Total Warga</div>
+                        <div class="text-xs text-green-600 flex items-center justify-center font-semibold bg-green-50 rounded-full px-2 py-1">
+                            <i class="fas fa-arrow-up mr-1"></i>+5.2%
+                        </div>
+                    </div>
+
+                    <div class="group text-center p-4 bg-white/95 backdrop-blur-sm border-2 border-green-200 rounded-2xl hover:scale-105 transition-all duration-500 shadow-xl hover:shadow-2xl hover:border-green-300 hover:bg-white hover:shadow-green-500/10">
+                        <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform duration-300 shadow-lg group-hover:shadow-green-500/30">
+                            <i class="fas fa-map-marked-alt text-white text-base"></i>
+                        </div>
+                        <div class="text-2xl font-black text-gray-800 mb-1">
+                            <span class="counter" data-count="8">0</span>
+                        </div>
+                        <div class="text-gray-700 font-bold text-xs mb-1">Dusun</div>
+                        <div class="text-xs text-gray-600 font-semibold bg-gray-50 rounded-full px-2 py-1">24 RT/RW</div>
+                    </div>
+
+                    <div class="group text-center p-4 bg-white/95 backdrop-blur-sm border-2 border-purple-200 rounded-2xl hover:scale-105 transition-all duration-500 shadow-xl hover:shadow-2xl hover:border-purple-300 hover:bg-white hover:shadow-purple-500/10">
+                        <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform duration-300 shadow-lg group-hover:shadow-purple-500/30">
+                            <i class="fas fa-home text-white text-base"></i>
+                        </div>
+                        <div class="text-2xl font-black text-gray-800 mb-1">
+                            <span class="counter" data-count="1250">0</span>
+                        </div>
+                        <div class="text-gray-700 font-bold text-xs mb-1">Keluarga</div>
+                        <div class="text-xs text-green-600 flex items-center justify-center font-semibold bg-green-50 rounded-full px-2 py-1">
+                            <i class="fas fa-arrow-up mr-1"></i>Aktif
+                        </div>
+                    </div>
+
+                    <div class="group text-center p-4 bg-white/95 backdrop-blur-sm border-2 border-orange-200 rounded-2xl hover:scale-105 transition-all duration-500 shadow-xl hover:shadow-2xl hover:border-orange-300 hover:bg-white hover:shadow-orange-500/10">
+                        <div class="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-600 rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform duration-300 shadow-lg group-hover:shadow-orange-500/30">
+                            <i class="fas fa-seedling text-white text-base"></i>
+                        </div>
+                        <div class="text-2xl font-black text-gray-800 mb-1">
+                            <span class="counter" data-count="450">0</span>
+                        </div>
+                        <div class="text-gray-700 font-bold text-xs mb-1">Hektar</div>
+                        <div class="text-xs text-gray-600 font-semibold bg-gray-50 rounded-full px-2 py-1">Luas Wilayah</div>
+                    </div>
+                </div>
+
+                <!-- Compact Info Summary Card -->
+                <div class="bg-white/95 backdrop-blur-sm border border-gray-200 rounded-2xl p-4 shadow-lg" data-aos="fade-up" data-aos-delay="800">
+                    <div class="text-center mb-3">
+                        <h3 class="text-base font-bold text-gray-800 mb-1">Desa Ketapang Baru</h3>
+                        <p class="text-xs text-gray-600">Kec. Semidang Alas Maras, Seluma, Bengkulu</p>
+                    </div>
+
+                    <div class="space-y-2 text-xs">
+                        <div class="flex items-center text-gray-700">
+                            <i class="fas fa-user-tie text-indigo-500 w-4 mr-2"></i>
+                            <div>
+                                <span class="font-semibold">Kepala Desa:</span> H. Ahmad Supriyadi, S.Pd
+                            </div>
+                        </div>
+
+                        <div class="flex items-center text-gray-700">
+                            <i class="fas fa-calendar text-indigo-500 w-4 mr-2"></i>
+                            <div>
+                                <span class="font-semibold">Periode:</span> 2021 - 2027
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-3 text-center">
+                        <div class="inline-flex items-center bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-md">
+                            <i class="fas fa-award mr-1"></i>
+                            Desa Mandiri 2024
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Animated Wave -->
+    <div class="absolute bottom-0 left-0 w-full overflow-hidden">
+        <svg class="relative w-full h-32" viewBox="0 0 1200 200" preserveAspectRatio="none">
+            <path fill="#ffffff" fill-opacity="0.6" d="M0,150 C300,100 400,200 600,150 C800,100 900,200 1200,150 L1200,200 L0,200 Z" class="animate-wave-slow"></path>
+            <path fill="#ffffff" fill-opacity="0.8" d="M0,160 C200,120 400,180 600,140 C800,100 1000,160 1200,120 L1200,200 L0,200 Z" class="animate-wave-medium" style="animation-delay: -3s;"></path>
+            <path fill="#ffffff" fill-opacity="1" d="M0,170 C250,130 450,190 650,150 C850,110 1050,170 1200,130 L1200,200 L0,200 Z" class="animate-wave-fast" style="animation-delay: -6s;"></path>
+        </svg>
+    </div>
+</section>
+
+<!-- Services Section -->
+<section class="py-20 bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+    <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <!-- Modern Badge with Gradient -->
+            <div class="inline-flex items-center relative mb-6">
+                <div class="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full blur-lg opacity-20"></div>
+                <div class="relative bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-full text-sm font-semibold shadow-lg">
+                    <i class="fas fa-sparkles mr-2"></i>
+                    Layanan Digital Terdepan
+                </div>
+            </div>
+
+            <!-- Enhanced Title with Gradient Text -->
+            <div class="mb-8">
+                <h2 class="text-5xl lg:text-6xl font-black mb-4">
+                    <span class="bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
+                        Layanan Unggulan
+                    </span>
+                </h2>
+                <div class="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto rounded-full"></div>
+            </div>
+
+                        <!-- Modern Description with Highlight -->
+            <div class="max-w-4xl mx-auto">
+                <p class="text-xl lg:text-2xl text-gray-700 leading-relaxed">
+                    <span class="font-semibold text-blue-700">Platform digital terintegrasi</span> untuk kemudahan akses layanan publik yang
+                    <span class="relative inline-block">
+                        <span class="relative z-10 font-semibold text-purple-700">modern, cepat, dan terpercaya</span>
+                        <span class="absolute bottom-0 left-0 w-full h-3 bg-gradient-to-r from-blue-200 to-purple-200 opacity-60 rounded"></span>
+                    </span>
+                </p>
+            </div>
+        </div>
+
+        <!-- Services Grid & CTA -->
+        <div data-aos="fade-up" data-aos-duration="600">
+            <!-- Services Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 lg:gap-6">
+                <!-- Row 1 -->
+                <a href="{{ route('surat.online') }}" class="service-card-modern group">
+                    <div class="service-icon-modern bg-gradient-to-br from-blue-500 to-blue-600">
+                        <i class="fas fa-file-alt text-white text-3xl"></i>
+                    </div>
+                    <h3 class="service-title-modern">Pelayanan</h3>
+                    <p class="service-desc-modern">Surat & Dokumen</p>
+                </a>
+
+                <a href="#" class="service-card-modern group">
+                    <div class="service-icon-modern bg-gradient-to-br from-orange-500 to-orange-600">
+                        <i class="fas fa-store text-white text-3xl"></i>
+                    </div>
+                    <h3 class="service-title-modern">Desamart</h3>
+                    <p class="service-desc-modern">UMKM Desa</p>
+                </a>
+
+                <a href="{{ route('pengaduan') }}" class="service-card-modern group">
+                    <div class="service-icon-modern bg-gradient-to-br from-yellow-500 to-yellow-600">
+                        <i class="fas fa-comment-alt text-white text-3xl"></i>
+                    </div>
+                    <h3 class="service-title-modern">Pengaduan</h3>
+                    <p class="service-desc-modern">Kritik & Saran</p>
+                </a>
+
+                <a href="#" class="service-card-modern group">
+                    <div class="service-icon-modern bg-gradient-to-br from-green-500 to-green-600">
+                        <i class="fas fa-images text-white text-3xl"></i>
+                    </div>
+                    <h3 class="service-title-modern">Galeri Desa</h3>
+                    <p class="service-desc-modern">Foto & Video</p>
+                </a>
+
+                <a href="#" class="service-card-modern group">
+                    <div class="service-icon-modern bg-gradient-to-br from-indigo-500 to-indigo-600">
+                        <i class="fas fa-chart-pie text-white text-3xl"></i>
+                    </div>
+                    <h3 class="service-title-modern">Dana Desa</h3>
+                    <p class="service-desc-modern">Transparansi APB</p>
+                </a>
+
+                <!-- Row 2 -->
+                <a href="{{ route('peta.desa') }}" class="service-card-modern group">
+                    <div class="service-icon-modern bg-gradient-to-br from-purple-500 to-purple-600">
+                        <i class="fas fa-map-marked-alt text-white text-3xl"></i>
+                    </div>
+                    <h3 class="service-title-modern">Geodeskel</h3>
+                    <p class="service-desc-modern">Peta Digital</p>
+                </a>
+
+                <a href="#" class="service-card-modern group">
+                    <div class="service-icon-modern bg-gradient-to-br from-teal-500 to-teal-600">
+                        <i class="fas fa-map text-white text-3xl"></i>
+                    </div>
+                    <h3 class="service-title-modern">Wilayah Administratif</h3>
+                    <p class="service-desc-modern">Batas Desa</p>
+                </a>
+
+                <a href="#" class="service-card-modern group">
+                    <div class="service-icon-modern bg-gradient-to-br from-cyan-500 to-cyan-600">
+                        <i class="fas fa-cloud text-white text-3xl"></i>
+                    </div>
+                    <h3 class="service-title-modern">Produk Hukum & Informasi Publik</h3>
+                    <p class="service-desc-modern">Peraturan Desa</p>
+                </a>
+
+                <a href="#" class="service-card-modern group">
+                    <div class="service-icon-modern bg-gradient-to-br from-red-500 to-red-600">
+                        <i class="fas fa-cogs text-white text-3xl"></i>
+                    </div>
+                    <h3 class="service-title-modern">Pembangunan</h3>
+                    <p class="service-desc-modern">Proyek Desa</p>
+                </a>
+
+                <a href="#" class="service-card-modern group">
+                    <div class="service-icon-modern bg-gradient-to-br from-pink-500 to-pink-600">
+                        <i class="fas fa-users text-white text-3xl"></i>
+                    </div>
+                    <h3 class="service-title-modern">Lembaga & Kelompok</h3>
+                    <p class="service-desc-modern">Organisasi Desa</p>
+                </a>
+            </div>
+
+            <!-- CTA Section -->
+            <div class="text-center mt-16">
+                <p class="text-gray-600 mb-6">Butuh bantuan atau informasi lebih lanjut?</p>
+                <a href="https://wa.me/6282177123456?text=Halo,%20saya%20ingin%20bertanya%20tentang%20layanan%20desa" target="_blank" class="inline-flex items-center bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold px-8 py-4 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-green-500/25">
+                    <i class="fab fa-whatsapp mr-3 text-xl"></i>
+                    WhatsApp Pemerintahan
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Statistics Section -->
+<section class="py-20 bg-gradient-to-br from-gray-50 via-white to-slate-50">
+    <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <!-- Modern Badge with Gradient -->
+            <div class="inline-flex items-center relative mb-6">
+                <div class="absolute inset-0 bg-gradient-to-r from-slate-600 to-blue-600 rounded-full blur-lg opacity-20"></div>
+                <div class="relative bg-gradient-to-r from-slate-600 to-blue-600 text-white px-6 py-3 rounded-full text-sm font-semibold shadow-lg">
+                    <i class="fas fa-chart-bar mr-2"></i>
+                    Data Real-time Desa
+                </div>
+            </div>
+
+            <!-- Enhanced Title with Gradient Text -->
+            <div class="mb-8">
+                <h2 class="text-5xl lg:text-6xl font-black mb-4">
+                    <span class="bg-gradient-to-r from-gray-900 via-slate-800 to-blue-800 bg-clip-text text-transparent">
+                        Statistik Desa
+                    </span>
+                </h2>
+                <div class="w-24 h-1 bg-gradient-to-r from-slate-500 to-blue-500 mx-auto rounded-full"></div>
+            </div>
+
+            <!-- Modern Description with Highlight -->
+            <div class="max-w-4xl mx-auto">
+                <p class="text-xl lg:text-2xl text-gray-700 leading-relaxed">
+                    <span class="font-semibold text-slate-700">Data statistik terkini</span> tentang perkembangan dan kondisi
+                    <span class="relative inline-block">
+                        <span class="relative z-10 font-semibold text-blue-700">Desa Ketapang Baru</span>
+                        <span class="absolute bottom-0 left-0 w-full h-3 bg-gradient-to-r from-slate-200 to-blue-200 opacity-60 rounded"></span>
+                    </span>
+                </p>
+            </div>
+        </div>
+
+        <!-- Statistics Grid -->
+        <div data-aos="fade-up" data-aos-duration="600">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="stat-card-modern">
+                    <div class="stat-icon-modern bg-gradient-to-br from-blue-500 to-blue-600">
+                        <i class="fas fa-users text-white text-3xl"></i>
+                    </div>
+                    <div class="stat-content-modern">
+                        <div class="text-4xl lg:text-5xl font-black text-blue-700 counter" data-count="2500">0</div>
+                        <div class="text-gray-600 font-semibold">Total Warga</div>
+                    </div>
+                </div>
+
+                <div class="stat-card-modern">
+                    <div class="stat-icon-modern bg-gradient-to-br from-green-500 to-green-600">
+                        <i class="fas fa-home text-white text-3xl"></i>
+                    </div>
+                    <div class="stat-content-modern">
+                        <div class="text-4xl lg:text-5xl font-black text-green-700 counter" data-count="8">0</div>
+                        <div class="text-gray-600 font-semibold">Dusun</div>
+                    </div>
+                </div>
+
+                <div class="stat-card-modern">
+                    <div class="stat-icon-modern bg-gradient-to-br from-purple-500 to-purple-600">
+                        <i class="fas fa-map-marked-alt text-white text-3xl"></i>
+                    </div>
+                    <div class="stat-content-modern">
+                        <div class="text-4xl lg:text-5xl font-black text-purple-700 counter" data-count="250">0</div>
+                        <div class="text-gray-600 font-semibold">Hektar Luas</div>
+                    </div>
+                </div>
+
+                <div class="stat-card-modern">
+                    <div class="stat-icon-modern bg-gradient-to-br from-orange-500 to-orange-600">
+                        <i class="fas fa-graduation-cap text-white text-3xl"></i>
+                    </div>
+                    <div class="stat-content-modern">
+                        <div class="text-4xl lg:text-5xl font-black text-orange-700 counter" data-count="95">0</div>
+                        <div class="text-gray-600 font-semibold">% Literasi</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Advanced Demographic Dashboard -->
+            <div class="mt-20">
+                <!-- Dashboard Title -->
+                <div class="text-center mb-12">
+                    <div class="inline-flex items-center bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-3 rounded-full text-sm font-bold shadow-lg mb-4">
+                        <i class="fas fa-chart-line mr-2"></i>
+                        Analytics Dashboard
+                    </div>
+                    <h3 class="text-3xl lg:text-4xl font-black text-gray-900 mb-3">
+                        <span class="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                            Data Demografis Terkini
+                        </span>
+                    </h3>
+                    <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                        Visualisasi interaktif data kependudukan dengan insights mendalam
+                    </p>
+                </div>
+
+                <!-- Enhanced Charts Grid -->
+                <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+                    <!-- Gender Distribution - Enhanced Pie Chart -->
+                    <div class="chart-card-premium">
+                        <div class="chart-header-premium">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="flex items-center">
+                                    <div class="chart-icon-premium bg-gradient-to-br from-pink-500 to-rose-600">
+                                        <i class="fas fa-venus-mars text-white text-xl"></i>
+                                    </div>
+                                    <div class="ml-3">
+                                        <h3 class="chart-title-premium">Distribusi Gender</h3>
+                                        <p class="chart-subtitle-premium">Perbandingan jenis kelamin</p>
+                                    </div>
+                                </div>
+                                <div class="chart-metric-premium">
+                                    <span class="text-2xl font-black text-gray-800">2,500</span>
+                                    <p class="text-xs text-gray-500 mt-1">Total Warga</p>
+                                </div>
+                            </div>
+
+                            <!-- Gender Stats Mini Cards -->
+                            <div class="grid grid-cols-2 gap-3 mb-4">
+                                <div class="mini-stat-card bg-gradient-to-br from-blue-50 to-blue-100 border-l-4 border-blue-500">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-mars text-blue-600 text-lg mr-2"></i>
+                                        <div>
+                                            <p class="text-xs text-blue-600 font-semibold">Laki-laki</p>
+                                            <p class="text-lg font-black text-blue-800">1,280</p>
+                                            <p class="text-xs text-blue-500">51.2%</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mini-stat-card bg-gradient-to-br from-pink-50 to-pink-100 border-l-4 border-pink-500">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-venus text-pink-600 text-lg mr-2"></i>
+                                        <div>
+                                            <p class="text-xs text-pink-600 font-semibold">Perempuan</p>
+                                            <p class="text-lg font-black text-pink-800">1,220</p>
+                                            <p class="text-xs text-pink-500">48.8%</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chart-container-premium">
+                            <canvas id="genderChart" width="300" height="300"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Age Distribution - Enhanced Bar Chart -->
+                    <div class="chart-card-premium xl:col-span-2">
+                        <div class="chart-header-premium">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="flex items-center">
+                                    <div class="chart-icon-premium bg-gradient-to-br from-indigo-500 to-purple-600">
+                                        <i class="fas fa-users text-white text-xl"></i>
+                                    </div>
+                                    <div class="ml-3">
+                                        <h3 class="chart-title-premium">Distribusi Usia</h3>
+                                        <p class="chart-subtitle-premium">Kelompok usia dan produktivitas</p>
+                                    </div>
+                                </div>
+                                <div class="chart-controls-premium">
+                                    <button class="chart-btn-premium active" data-view="absolute">Angka</button>
+                                    <button class="chart-btn-premium" data-view="percentage">%</button>
+                                </div>
+                            </div>
+
+                            <!-- Age Group Quick Stats -->
+                            <div class="grid grid-cols-5 gap-2 mb-4">
+                                <div class="age-quick-stat" data-age="0-17">
+                                    <div class="age-indicator bg-gradient-to-r from-green-400 to-green-500"></div>
+                                    <p class="text-xs font-semibold text-gray-700">0-17</p>
+                                    <p class="text-sm font-black text-green-700">520</p>
+                                    <p class="text-xs text-gray-500">Anak</p>
+                                </div>
+                                <div class="age-quick-stat" data-age="18-30">
+                                    <div class="age-indicator bg-gradient-to-r from-blue-400 to-blue-500"></div>
+                                    <p class="text-xs font-semibold text-gray-700">18-30</p>
+                                    <p class="text-sm font-black text-blue-700">680</p>
+                                    <p class="text-xs text-gray-500">Muda</p>
+                                </div>
+                                <div class="age-quick-stat active" data-age="31-45">
+                                    <div class="age-indicator bg-gradient-to-r from-purple-400 to-purple-500"></div>
+                                    <p class="text-xs font-semibold text-gray-700">31-45</p>
+                                    <p class="text-sm font-black text-purple-700">750</p>
+                                    <p class="text-xs text-gray-500">Produktif</p>
+                                </div>
+                                <div class="age-quick-stat" data-age="46-60">
+                                    <div class="age-indicator bg-gradient-to-r from-orange-400 to-orange-500"></div>
+                                    <p class="text-xs font-semibold text-gray-700">46-60</p>
+                                    <p class="text-sm font-black text-orange-700">420</p>
+                                    <p class="text-xs text-gray-500">Dewasa</p>
+                                </div>
+                                <div class="age-quick-stat" data-age="60+">
+                                    <div class="age-indicator bg-gradient-to-r from-red-400 to-red-500"></div>
+                                    <p class="text-xs font-semibold text-gray-700">60+</p>
+                                    <p class="text-sm font-black text-red-700">130</p>
+                                    <p class="text-xs text-gray-500">Lansia</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chart-container-premium">
+                            <canvas id="ageChart" width="600" height="300"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Insights Panel -->
+                <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="insight-card">
+                        <div class="insight-icon bg-gradient-to-br from-emerald-500 to-teal-600">
+                            <i class="fas fa-chart-line text-white text-xl"></i>
+                        </div>
+                        <div class="insight-content">
+                            <h4 class="insight-title">Pertumbuhan Positif</h4>
+                            <p class="insight-desc">Tingkat kelahiran mengalami peningkatan 5.2% dibanding tahun lalu</p>
+                            <div class="insight-trend">
+                                <i class="fas fa-arrow-up text-emerald-500 mr-1"></i>
+                                <span class="text-emerald-600 font-semibold">+5.2%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="insight-card">
+                        <div class="insight-icon bg-gradient-to-br from-blue-500 to-indigo-600">
+                            <i class="fas fa-users text-white text-xl"></i>
+                        </div>
+                        <div class="insight-content">
+                            <h4 class="insight-title">Usia Produktif Dominan</h4>
+                            <p class="insight-desc">68% penduduk berada di usia produktif (18-60 tahun)</p>
+                            <div class="insight-trend">
+                                <i class="fas fa-star text-blue-500 mr-1"></i>
+                                <span class="text-blue-600 font-semibold">Excellent</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="insight-card">
+                        <div class="insight-icon bg-gradient-to-br from-purple-500 to-pink-600">
+                            <i class="fas fa-balance-scale text-white text-xl"></i>
+                        </div>
+                        <div class="insight-content">
+                            <h4 class="insight-title">Rasio Gender Seimbang</h4>
+                            <p class="insight-desc">Perbandingan laki-laki dan perempuan hampir 1:1 (ideal)</p>
+                            <div class="insight-trend">
+                                <i class="fas fa-check text-purple-500 mr-1"></i>
+                                <span class="text-purple-600 font-semibold">Balanced</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- News Section -->
+<section class="py-24 bg-white">
+    <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-20" data-aos="fade-up" data-aos-duration="800">
+            <h2 class="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">Berita Terbaru</h2>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                Dapatkan informasi terbaru seputar kegiatan dan perkembangan Desa Ketapang Baru.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="news-card" data-aos="fade-up" data-aos-delay="100" data-aos-duration="800">
+                <div class="news-image">
+                    <div class="w-full h-48 bg-gradient-to-br from-blue-500 to-blue-600 rounded-t-xl flex items-center justify-center">
+                        <div class="text-center text-white">
+                            <svg class="w-16 h-16 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"></path>
+                            </svg>
+                            <p class="text-sm font-medium">Berita Desa</p>
+                        </div>
+                    </div>
+                    <div class="news-badge">Berita</div>
+                </div>
+                <div class="news-content">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">Pembangunan Jalan Desa Selesai</h3>
+                    <p class="text-gray-600 mb-4">Pembangunan jalan desa sepanjang 2 km telah selesai dan siap digunakan warga untuk akses transportasi yang lebih lancar.</p>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center text-sm text-gray-500">
+                            <i class="fas fa-calendar mr-2"></i>
+                            <span>2 hari yang lalu</span>
+                        </div>
+                        <a href="#" class="text-blue-600 hover:text-blue-700 font-medium">Baca Selengkapnya</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="news-card" data-aos="fade-up" data-aos-delay="200" data-aos-duration="800">
+                <div class="news-image">
+                    <div class="w-full h-48 bg-gradient-to-br from-green-500 to-green-600 rounded-t-xl flex items-center justify-center">
+                        <div class="text-center text-white">
+                            <svg class="w-16 h-16 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v3.57A22.952 22.952 0 0110 13a22.95 22.95 0 01-8-1.43V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5zm1 5a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z" clip-rule="evenodd"></path>
+                                <path d="M2 13.692V16a2 2 0 002 2h12a2 2 0 002-2v-2.308A24.974 24.974 0 0110 15c-2.796 0-5.487-.46-8-1.308z"></path>
+                            </svg>
+                            <p class="text-sm font-medium">Kegiatan Desa</p>
+                        </div>
+                    </div>
+                    <div class="news-badge">Kegiatan</div>
+                </div>
+                <div class="news-content">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">Pelatihan Pertanian Modern</h3>
+                    <p class="text-gray-600 mb-4">Program pelatihan pertanian modern untuk meningkatkan produktivitas petani dan kesejahteraan warga desa.</p>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center text-sm text-gray-500">
+                            <i class="fas fa-calendar mr-2"></i>
+                            <span>1 minggu yang lalu</span>
+                        </div>
+                        <a href="#" class="text-blue-600 hover:text-blue-700 font-medium">Baca Selengkapnya</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="news-card" data-aos="fade-up" data-aos-delay="300" data-aos-duration="800">
+                <div class="news-image">
+                    <div class="w-full h-48 bg-gradient-to-br from-purple-500 to-purple-600 rounded-t-xl flex items-center justify-center">
+                        <div class="text-center text-white">
+                            <svg class="w-16 h-16 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                            </svg>
+                            <p class="text-sm font-medium">Pengumuman</p>
+                        </div>
+                    </div>
+                    <div class="news-badge">Pengumuman</div>
+                </div>
+                <div class="news-content">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">Pelatihan UMKM Desa</h3>
+                    <p class="text-gray-600 mb-4">Pelatihan UMKM untuk warga desa dalam rangka meningkatkan ekonomi dan kesejahteraan masyarakat.</p>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center text-sm text-gray-500">
+                            <i class="fas fa-calendar mr-2"></i>
+                            <span>3 hari yang lalu</span>
+                        </div>
+                        <a href="#" class="text-blue-600 hover:text-blue-700 font-medium">Baca Selengkapnya</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-12" data-aos="fade-up" data-aos-delay="400" data-aos-duration="800">
+            <a href="{{ route('berita') }}" class="btn-primary text-lg px-8 py-4">
+                <i class="fas fa-newspaper mr-2"></i>Lihat Semua Berita
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Announcements Section -->
+<section class="py-24 bg-gray-50">
+    <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-20" data-aos="fade-up" data-aos-duration="800">
+            <h2 class="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">Pengumuman Penting</h2>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                Informasi penting dan pengumuman resmi dari pemerintah desa untuk warga.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="announcement-card" data-aos="fade-right" data-aos-duration="800">
+                <div class="announcement-icon bg-yellow-500">
+                    <i class="fas fa-exclamation-triangle text-white text-2xl"></i>
+                </div>
+                <div class="announcement-content">
+                    <div class="announcement-badge">Penting</div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">Jadwal Vaksinasi COVID-19</h3>
+                    <p class="text-gray-600 mb-4">Vaksinasi COVID-19 akan dilaksanakan pada hari Senin, 15 Januari 2024. Semua warga diharapkan hadir sesuai jadwal yang telah ditentukan.</p>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center text-sm text-gray-500">
+                            <i class="fas fa-calendar mr-2"></i>
+                            <span>Hari ini</span>
+                        </div>
+                        <a href="#" class="text-yellow-600 hover:text-yellow-700 font-medium">Selengkapnya</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="announcement-card" data-aos="fade-left" data-aos-duration="800">
+                <div class="announcement-icon bg-blue-500">
+                    <i class="fas fa-info-circle text-white text-2xl"></i>
+                </div>
+                <div class="announcement-content">
+                    <div class="announcement-badge">Informasi</div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">Pendaftaran Kartu Keluarga</h3>
+                    <p class="text-gray-600 mb-4">Pendaftaran kartu keluarga baru akan dibuka mulai minggu depan. Persiapkan dokumen yang diperlukan untuk pendaftaran.</p>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center text-sm text-gray-500">
+                            <i class="fas fa-calendar mr-2"></i>
+                            <span>3 hari yang lalu</span>
+                        </div>
+                        <a href="#" class="text-blue-600 hover:text-blue-700 font-medium">Selengkapnya</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-12" data-aos="fade-up" data-aos-delay="200" data-aos-duration="800">
+            <a href="{{ route('pengumuman') }}" class="btn-secondary text-lg px-8 py-4">
+                <i class="fas fa-bullhorn mr-2"></i>Lihat Semua Pengumuman
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-24 text-white" style="background-color: #0086c9;">
+    <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-4xl mx-auto text-center" data-aos="fade-up" data-aos-duration="800">
+            <h2 class="text-3xl lg:text-4xl font-bold mb-6">Siap Bergabung dengan Smart Village?</h2>
+            <p class="text-xl text-blue-100 mb-8 leading-relaxed">
+                Mari bersama-sama membangun desa yang lebih maju dan sejahtera melalui teknologi digital.
+                Daftar sekarang dan nikmati berbagai layanan digital yang memudahkan.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="{{ route('register') }}" class="btn-accent text-lg px-8 py-4 animate-hover-bounce">
+                    <i class="fas fa-user-plus mr-2"></i>Daftar Sekarang
+                </a>
+                <a href="{{ route('kontak') }}" class="btn-secondary text-lg px-8 py-4 animate-hover-bounce">
+                    <i class="fas fa-phone mr-2"></i>Hubungi Kami
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+@endsection
+
+@push('styles')
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" />
+<style>
+/* Wave Animation - Ripple Effect */
+@keyframes wave-slow {
+    0% {
+        transform: scaleY(1);
+    }
+    50% {
+        transform: scaleY(1.3);
+    }
+    100% {
+        transform: scaleY(1);
+    }
+}
+
+@keyframes wave-medium {
+    0% {
+        transform: scaleY(1);
+    }
+    50% {
+        transform: scaleY(1.2);
+    }
+    100% {
+        transform: scaleY(1);
+    }
+}
+
+@keyframes wave-fast {
+    0% {
+        transform: scaleY(1);
+    }
+    50% {
+        transform: scaleY(1.15);
+    }
+    100% {
+        transform: scaleY(1);
+    }
+}
+
+.animate-wave-slow {
+    animation: wave-slow 5s ease-in-out infinite;
+}
+
+.animate-wave-medium {
+    animation: wave-medium 4s ease-in-out infinite;
+}
+
+.animate-wave-fast {
+    animation: wave-fast 3s ease-in-out infinite;
+}
+
+/* Gradient Text Effects */
+.bg-gradient-to-r.from-white.via-blue-100.to-cyan-200 {
+    background: linear-gradient(135deg, #ffffff, #e0f2fe, #81d4fa);
+}
+
+.bg-gradient-to-r.from-yellow-400.via-orange-400.to-red-400 {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b, #dc2626);
+}
+
+.bg-clip-text {
+    -webkit-background-clip: text;
+    background-clip: text;
+}
+
+.text-transparent {
+    -webkit-text-fill-color: transparent;
+}
+
+/* Enhanced Glass Morphism */
+.backdrop-blur-md {
+    backdrop-filter: blur(16px);
+}
+
+/* Search Bar Enhanced Effects */
+.search-input:focus {
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+    border-color: rgba(59, 130, 246, 0.5);
+}
+
+/* Button Ripple Effect */
+.btn-ripple {
+    position: relative;
+    overflow: hidden;
+}
+
+@keyframes ripple {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+/* Enhanced Hover Effects */
+.hover\\:shadow-yellow-500\\/25:hover {
+    box-shadow: 0 25px 50px -12px rgba(251, 191, 36, 0.25);
+}
+
+/* Progress Bar Animation */
+@keyframes progressLoad {
+    from { width: 0%; }
+    to { width: var(--progress-width); }
+}
+
+.progress-bar {
+    animation: progressLoad 2s ease-out forwards;
+    animation-delay: 1s;
+}
+
+/* Performance Optimizations */
+.gpu-accelerated {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000;
+}
+
+/* Modern Service Cards - Unique Shape Design */
+.service-card-modern {
+    background: white;
+    border-radius: 2rem 0.5rem 2rem 0.5rem;
+    padding: 2rem 1.5rem;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    border: 2px solid #f1f5f9;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    min-height: 160px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.service-card-modern::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    width: 30px;
+    height: 30px;
+    background: linear-gradient(45deg, #3b82f6, #8b5cf6);
+    border-radius: 50% 0 50% 0;
+    opacity: 0.8;
+}
+
+.service-card-modern::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, var(--card-color, #3b82f6), transparent);
+    border-radius: 0 0 2rem 0.5rem;
+}
+
+.service-card-modern:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.12);
+    border-color: var(--card-color, #3b82f6);
+}
+
+.service-icon-modern {
+    width: 4.5rem;
+    height: 4.5rem;
+    border-radius: 50% 20% 50% 20%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.service-card-modern:hover .service-icon-modern {
+    transform: scale(1.02);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.18);
+}
+
+/* Individual card colors */
+.service-card-modern:nth-child(1) { --card-color: #3b82f6; }
+.service-card-modern:nth-child(2) { --card-color: #f59e0b; }
+.service-card-modern:nth-child(3) { --card-color: #eab308; }
+.service-card-modern:nth-child(4) { --card-color: #10b981; }
+.service-card-modern:nth-child(5) { --card-color: #6366f1; }
+.service-card-modern:nth-child(6) { --card-color: #8b5cf6; }
+.service-card-modern:nth-child(7) { --card-color: #06b6d4; }
+.service-card-modern:nth-child(8) { --card-color: #0891b2; }
+.service-card-modern:nth-child(9) { --card-color: #ef4444; }
+.service-card-modern:nth-child(10) { --card-color: #ec4899; }
+
+/* Modern Statistics Cards */
+.stat-card-modern {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem 1.5rem;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08), 0 8px 32px rgba(0, 0, 0, 0.06);
+    border: 1px solid #f1f5f9;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.stat-card-modern:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12), 0 20px 60px rgba(0, 0, 0, 0.08);
+    border-color: #e2e8f0;
+}
+
+.stat-icon-modern {
+    width: 5rem;
+    height: 5rem;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.stat-card-modern:hover .stat-icon-modern {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
+}
+
+.stat-content-modern {
+    text-align: center;
+}
+
+.stat-content-modern .counter {
+    background: linear-gradient(135deg, currentColor 0%, currentColor 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+}
+
+.stat-content-modern div:last-child {
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #64748b;
+}
+
+/* Responsive adjustments for stat cards */
+@media (max-width: 768px) {
+    .stat-card-modern {
+        min-height: 180px;
+        padding: 1.5rem 1rem;
+        border-radius: 16px;
+    }
+
+    .stat-icon-modern {
+        width: 4rem;
+        height: 4rem;
+        margin-bottom: 1.25rem;
+        border-radius: 16px;
+    }
+
+    .stat-content-modern .counter {
+        font-size: 2.5rem !important;
+    }
+
+    .stat-content-modern div:last-child {
+        font-size: 0.875rem;
+    }
+}
+
+.service-title-modern {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 0.25rem;
+    line-height: 1.2;
+}
+
+.service-desc-modern {
+    font-size: 0.75rem;
+    color: #6b7280;
+    line-height: 1.2;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .service-card-modern {
+        min-height: 140px;
+        padding: 1.5rem 1rem;
+        border-radius: 1.5rem 0.3rem 1.5rem 0.3rem;
+    }
+
+    .service-card-modern:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .service-card-modern::before {
+        width: 20px;
+        height: 20px;
+        top: -3px;
+        right: -3px;
+    }
+
+    .service-icon-modern {
+        width: 3.5rem;
+        height: 3.5rem;
+        margin-bottom: 0.75rem;
+        border-radius: 50% 15% 50% 15%;
+    }
+
+    .service-card-modern:hover .service-icon-modern {
+        transform: scale(1.01);
+    }
+
+    .service-icon-modern i {
+        font-size: 1.5rem !important;
+    }
+
+    .service-title-modern {
+        font-size: 0.8rem;
+    }
+
+    .service-desc-modern {
+        font-size: 0.7rem;
+    }
+}
+
+/* Glow effect for CTA */
+@keyframes glow {
+    0%, 100% { box-shadow: 0 0 5px rgba(59, 130, 246, 0.3); }
+    50% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.6), 0 0 30px rgba(59, 130, 246, 0.4); }
+}
+
+.animate-glow {
+    animation: glow 2s ease-in-out infinite;
+}
+
+/* Premium Chart Cards Styling */
+.chart-card-premium {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border-radius: 24px;
+    padding: 2rem;
+    box-shadow:
+        0 4px 6px -1px rgba(0, 0, 0, 0.1),
+        0 2px 4px -1px rgba(0, 0, 0, 0.06),
+        0 20px 25px -5px rgba(0, 0, 0, 0.1),
+        0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    border: 1px solid #e2e8f0;
+    transition: all 0.2s ease-out;
+    min-height: 500px;
+    position: relative;
+    overflow: hidden;
+}
+
+.chart-card-premium::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #8b5cf6, #3b82f6, #06b6d4, #10b981);
+    border-radius: 24px 24px 0 0;
+}
+
+.chart-card-premium:hover {
+    transform: translateY(-4px);
+    box-shadow:
+        0 12px 24px -4px rgba(0, 0, 0, 0.15),
+        0 0 0 1px rgba(139, 92, 246, 0.1);
+    border-color: rgba(139, 92, 246, 0.2);
+}
+
+.chart-header-premium {
+    position: relative;
+    z-index: 10;
+}
+
+.chart-icon-premium {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    flex-shrink: 0;
+    position: relative;
+}
+
+.chart-icon-premium::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 18px;
+    padding: 2px;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+}
+
+.chart-title-premium {
+    font-size: 1.375rem;
+    font-weight: 800;
+    color: #111827;
+    margin-bottom: 0.25rem;
+    line-height: 1.2;
+    background: linear-gradient(135deg, #111827, #4f46e5);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.chart-subtitle-premium {
+    font-size: 0.875rem;
+    color: #64748b;
+    line-height: 1.3;
+    font-weight: 500;
+}
+
+.chart-metric-premium {
+    text-align: center;
+    padding: 1rem;
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+}
+
+.chart-container-premium {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    min-height: 320px;
+    margin-top: 1rem;
+}
+
+.chart-container-premium canvas {
+    max-width: 100%;
+    max-height: 100%;
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.07));
+    will-change: auto;
+}
+
+/* Mini Stats Cards */
+.mini-stat-card {
+    padding: 1rem;
+    border-radius: 12px;
+    transition: transform 0.15s ease-out, box-shadow 0.15s ease-out;
+    cursor: pointer;
+}
+
+.mini-stat-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Chart Controls */
+.chart-controls-premium {
+    display: flex;
+    gap: 0.5rem;
+    background: #f1f5f9;
+    padding: 0.25rem;
+    border-radius: 12px;
+}
+
+.chart-btn-premium {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    border: none;
+    background: transparent;
+    color: #64748b;
+    cursor: pointer;
+}
+
+.chart-btn-premium.active {
+    background: white;
+    color: #4f46e5;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.chart-btn-premium:hover:not(.active) {
+    color: #374151;
+    background: rgba(255, 255, 255, 0.5);
+}
+
+/* Age Quick Stats */
+.age-quick-stat {
+    text-align: center;
+    padding: 0.75rem;
+    border-radius: 12px;
+    background: white;
+    border: 2px solid #f1f5f9;
+    transition: transform 0.15s ease-out, border-color 0.15s ease-out, box-shadow 0.15s ease-out;
+    cursor: pointer;
+    position: relative;
+}
+
+.age-quick-stat:hover {
+    transform: translateY(-1px);
+    border-color: #e2e8f0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.age-quick-stat.active {
+    border-color: #8b5cf6;
+    background: linear-gradient(135deg, #faf5ff, #f3e8ff);
+}
+
+.age-indicator {
+    height: 4px;
+    border-radius: 2px;
+    margin-bottom: 0.5rem;
+}
+
+/* Insights Panel */
+.insight-card {
+    background: white;
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border: 1px solid #f1f5f9;
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+    position: relative;
+    overflow: hidden;
+}
+
+.insight-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--insight-color-1, #10b981), var(--insight-color-2, #059669));
+}
+
+.insight-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.12);
+}
+
+.insight-icon {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.insight-content {
+    flex: 1;
+}
+
+.insight-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 0.5rem;
+}
+
+.insight-desc {
+    font-size: 0.875rem;
+    color: #6b7280;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+}
+
+.insight-trend {
+    display: flex;
+    align-items: center;
+    font-size: 0.875rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1280px) {
+    .chart-card-premium.xl\\:col-span-2 {
+        grid-column: span 1;
+    }
+}
+
+@media (max-width: 768px) {
+    .chart-card-premium {
+        min-height: 400px;
+        padding: 1.5rem;
+        border-radius: 20px;
+    }
+
+    .chart-icon-premium {
+        width: 3rem;
+        height: 3rem;
+        border-radius: 12px;
+    }
+
+    .chart-title-premium {
+        font-size: 1.25rem;
+    }
+
+    .chart-container-premium {
+        min-height: 280px;
+    }
+
+    .age-quick-stat {
+        padding: 0.5rem;
+    }
+
+    .age-quick-stat p {
+        font-size: 0.75rem !important;
+    }
+
+    .mini-stat-card {
+        padding: 0.75rem;
+    }
+
+    .insight-card {
+        padding: 1.25rem;
+    }
+}
+
+/* Responsive wave height */
+@media (max-width: 768px) {
+    .animate-wave-slow {
+        animation-duration: 3s;
+    }
+    .animate-wave-medium {
+        animation-duration: 2.5s;
+    }
+    .animate-wave-fast {
+        animation-duration: 2s;
+    }
+}
+</style>
+@endpush
+
+@push('scripts')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+<script>
+$(document).ready(function() {
+    // Initialize AOS
+    AOS.init({
+        duration: 800,
+        easing: 'ease-out',
+        once: true,
+        offset: 100
+    });
+
+    // Initialize Particles.js
+    particlesJS('particles-js', {
+        particles: {
+            number: {
+                value: 80,
+                density: {
+                    enable: true,
+                    value_area: 800
+                }
+            },
+            color: {
+                value: '#ffffff'
+            },
+            shape: {
+                type: 'circle',
+                stroke: {
+                    width: 0,
+                    color: '#000000'
+                }
+            },
+            opacity: {
+                value: 0.5,
+                random: false,
+                anim: {
+                    enable: false,
+                    speed: 1,
+                    opacity_min: 0.1,
+                    sync: false
+                }
+            },
+            size: {
+                value: 3,
+                random: true,
+                anim: {
+                    enable: false,
+                    speed: 40,
+                    size_min: 0.1,
+                    sync: false
+                }
+            },
+            line_linked: {
+                enable: true,
+                distance: 150,
+                color: '#ffffff',
+                opacity: 0.4,
+                width: 1
+            },
+            move: {
+                enable: true,
+                speed: 6,
+                direction: 'none',
+                random: false,
+                straight: false,
+                out_mode: 'out',
+                bounce: false,
+                attract: {
+                    enable: false,
+                    rotateX: 600,
+                    rotateY: 1200
+                }
+            }
+        },
+        interactivity: {
+            detect_on: 'canvas',
+            events: {
+                onhover: {
+                    enable: true,
+                    mode: 'repulse'
+                },
+                onclick: {
+                    enable: true,
+                    mode: 'push'
+                },
+                resize: true
+            },
+            modes: {
+                grab: {
+                    distance: 400,
+                    line_linked: {
+                        opacity: 1
+                    }
+                },
+                bubble: {
+                    distance: 400,
+                    size: 40,
+                    duration: 2,
+                    opacity: 8,
+                    speed: 3
+                },
+                repulse: {
+                    distance: 200,
+                    duration: 0.4
+                },
+                push: {
+                    particles_nb: 4
+                },
+                remove: {
+                    particles_nb: 2
+                }
+            }
+        },
+        retina_detect: true
+    });
+
+    // Optimized Counter Animation
+    function animateCounter(element) {
+        const target = parseInt(element.dataset.count);
+        const duration = 1200;
+        const startTime = performance.now();
+
+        function easeOutCubic(t) {
+            return 1 - Math.pow(1 - t, 3);
+        }
+
+        function updateCounter(currentTime) {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            const easedProgress = easeOutCubic(progress);
+            const current = Math.floor(target * easedProgress);
+
+            element.textContent = current.toLocaleString();
+
+            if (progress < 1) {
+                requestAnimationFrame(updateCounter);
+            } else {
+                element.textContent = target.toLocaleString();
+            }
+        }
+
+        requestAnimationFrame(updateCounter);
+    }
+
+    // Initialize counters with Intersection Observer for better performance
+    const counters = document.querySelectorAll('.counter');
+    const observerOptions = {
+        threshold: 0.3,
+        rootMargin: '0px 0px -100px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting && !entry.target.classList.contains('animated')) {
+                entry.target.classList.add('animated');
+                setTimeout(() => animateCounter(entry.target), 300);
+            }
+        });
+    }, observerOptions);
+
+    counters.forEach(counter => observer.observe(counter));
+
+    // Search functionality with enhanced UX
+    const searchInput = document.querySelector('input[placeholder*="Cari layanan"]');
+    const searchSuggestions = document.querySelectorAll('span[class*="cursor-pointer"]');
+
+    if (searchInput) {
+        // Add search input class for styling
+        searchInput.classList.add('search-input');
+
+        // Search input focus effects
+        searchInput.addEventListener('focus', function() {
+            this.closest('.relative').classList.add('animate-glow');
+        });
+
+        searchInput.addEventListener('blur', function() {
+            this.closest('.relative').classList.remove('animate-glow');
+        });
+
+        // Search suggestions click handler
+        searchSuggestions.forEach(suggestion => {
+            suggestion.addEventListener('click', function() {
+                const text = this.textContent.trim().replace(/^📄|👥|🗺️\s/, '');
+                searchInput.value = text;
+                searchInput.focus();
+            });
+        });
+    }
+
+    // Enhanced button ripple effects
+    document.querySelectorAll('button, a[class*="bg-gradient"]').forEach(button => {
+        button.classList.add('btn-ripple');
+
+        button.addEventListener('click', function(e) {
+            const ripple = document.createElement('span');
+            const rect = this.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = e.clientX - rect.left - size / 2;
+            const y = e.clientY - rect.top - size / 2;
+
+            ripple.style.cssText = `
+                position: absolute;
+                width: ${size}px;
+                height: ${size}px;
+                left: ${x}px;
+                top: ${y}px;
+                background: rgba(255, 255, 255, 0.3);
+                border-radius: 50%;
+                transform: scale(0);
+                animation: ripple 0.6s linear;
+                pointer-events: none;
+                z-index: 0;
+            `;
+
+            this.style.position = 'relative';
+            this.style.overflow = 'hidden';
+            this.appendChild(ripple);
+
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        });
+    });
+
+    // Add performance optimizations
+    document.querySelectorAll('.animate-pulse, .animate-bounce, .animate-spin').forEach(el => {
+        el.style.transform = 'translateZ(0)';
+        el.style.backfaceVisibility = 'hidden';
+    });
+
+    // Optimize hover elements for better performance
+    document.querySelectorAll('.chart-card-premium, .mini-stat-card, .age-quick-stat, .insight-card').forEach(el => {
+        el.style.transform = 'translateZ(0)';
+        el.style.backfaceVisibility = 'hidden';
+        el.style.willChange = 'transform, box-shadow';
+    });
+
+    // Initialize Charts
+    function initializeCharts() {
+        // Check if Chart.js is loaded
+        if (typeof Chart === 'undefined') {
+            setTimeout(initializeCharts, 500);
+            return;
+        }
+
+        // Enhanced Gender Distribution Chart
+        const genderCtx = document.getElementById('genderChart');
+        if (genderCtx) {
+            new Chart(genderCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Laki-laki', 'Perempuan'],
+                    datasets: [{
+                        data: [1280, 1220],
+                        backgroundColor: [
+                            'rgba(59, 130, 246, 0.8)',
+                            'rgba(236, 72, 153, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgb(59, 130, 246)',
+                            'rgb(236, 72, 153)'
+                        ],
+                        borderWidth: 3,
+                        hoverOffset: 15,
+                        hoverBorderWidth: 4,
+                        hoverBackgroundColor: [
+                            'rgba(59, 130, 246, 0.9)',
+                            'rgba(236, 72, 153, 0.9)'
+                        ],
+                        cutout: '65%',
+                        borderRadius: 8,
+                        spacing: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 25,
+                                usePointStyle: true,
+                                pointStyle: 'rectRounded',
+                                font: {
+                                    size: 13,
+                                    weight: '600',
+                                    family: 'Inter'
+                                },
+                                generateLabels: function(chart) {
+                                    const data = chart.data;
+                                    const total = data.datasets[0].data.reduce((a, b) => a + b, 0);
+                                    return data.labels.map((label, i) => {
+                                        const value = data.datasets[0].data[i];
+                                        const percentage = ((value / total) * 100).toFixed(1);
+                                        return {
+                                            text: `${label} (${percentage}%)`,
+                                            fillStyle: data.datasets[0].backgroundColor[i],
+                                            strokeStyle: data.datasets[0].borderColor[i],
+                                            lineWidth: 2,
+                                            hidden: false,
+                                            index: i
+                                        };
+                                    });
+                                }
+                            }
+                        },
+                        tooltip: {
+                            enabled: true,
+                            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                            titleColor: 'white',
+                            bodyColor: 'white',
+                            borderColor: 'rgba(255, 255, 255, 0.1)',
+                            borderWidth: 1,
+                            cornerRadius: 12,
+                            displayColors: true,
+                            padding: 12,
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.parsed;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    return ` ${label}: ${value.toLocaleString()} orang (${percentage}%)`;
+                                },
+                                afterLabel: function(context) {
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    return `Total: ${total.toLocaleString()} warga`;
+                                }
+                            }
+                        }
+                    },
+                    animation: {
+                        animateRotate: true,
+                        duration: 1200,
+                        easing: 'easeOutCubic'
+                    },
+                    elements: {
+                        arc: {
+                            borderJoinStyle: 'round'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Enhanced Age Distribution Chart with Interactive Features
+        const ageCtx = document.getElementById('ageChart');
+        let ageChart;
+        if (ageCtx) {
+            const ageData = {
+                absolute: [520, 680, 750, 420, 130],
+                percentage: [20.8, 27.2, 30.0, 16.8, 5.2]
+            };
+
+            ageChart = new Chart(ageCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['0-17 Tahun', '18-30 Tahun', '31-45 Tahun', '46-60 Tahun', '60+ Tahun'],
+                    datasets: [{
+                        label: 'Jumlah Warga',
+                        data: ageData.absolute,
+                        backgroundColor: [
+                            'rgba(34, 197, 94, 0.85)',
+                            'rgba(59, 130, 246, 0.85)',
+                            'rgba(168, 85, 247, 0.85)',
+                            'rgba(249, 115, 22, 0.85)',
+                            'rgba(239, 68, 68, 0.85)'
+                        ],
+                        borderColor: [
+                            'rgb(34, 197, 94)',
+                            'rgb(59, 130, 246)',
+                            'rgb(168, 85, 247)',
+                            'rgb(249, 115, 22)',
+                            'rgb(239, 68, 68)'
+                        ],
+                        borderWidth: 3,
+                        borderRadius: 12,
+                        borderSkipped: false,
+                        hoverBackgroundColor: [
+                            'rgba(34, 197, 94, 0.95)',
+                            'rgba(59, 130, 246, 0.95)',
+                            'rgba(168, 85, 247, 0.95)',
+                            'rgba(249, 115, 22, 0.95)',
+                            'rgba(239, 68, 68, 0.95)'
+                        ],
+                        hoverBorderWidth: 4,
+                        hoverBorderColor: [
+                            'rgb(21, 128, 61)',
+                            'rgb(37, 99, 235)',
+                            'rgb(124, 58, 237)',
+                            'rgb(234, 88, 12)',
+                            'rgb(220, 38, 38)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                            titleColor: 'white',
+                            bodyColor: 'white',
+                            borderColor: 'rgba(255, 255, 255, 0.1)',
+                            borderWidth: 1,
+                            cornerRadius: 12,
+                            displayColors: true,
+                            padding: 15,
+                            callbacks: {
+                                title: function(context) {
+                                    return `Kelompok Usia: ${context[0].label}`;
+                                },
+                                label: function(context) {
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((context.parsed.y / total) * 100).toFixed(1);
+                                    return ` Jumlah: ${context.parsed.y.toLocaleString()} orang (${percentage}%)`;
+                                },
+                                afterLabel: function(context) {
+                                    const categories = ['Anak-anak', 'Dewasa Muda', 'Produktif Utama', 'Dewasa', 'Lansia'];
+                                    return `Kategori: ${categories[context.dataIndex]}`;
+                                },
+                                footer: function(context) {
+                                    const total = context[0].dataset.data.reduce((a, b) => a + b, 0);
+                                    return `Total Penduduk: ${total.toLocaleString()} warga`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.04)',
+                                borderWidth: 0,
+                                drawBorder: false
+                            },
+                            ticks: {
+                                font: {
+                                    size: 12,
+                                    weight: '500',
+                                    family: 'Inter'
+                                },
+                                color: '#64748b',
+                                padding: 10,
+                                callback: function(value) {
+                                    return value.toLocaleString();
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false,
+                                drawBorder: false
+                            },
+                            ticks: {
+                                font: {
+                                    size: 12,
+                                    weight: '600',
+                                    family: 'Inter'
+                                },
+                                color: '#374151',
+                                padding: 10
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 1000,
+                        easing: 'easeOutCubic'
+                    },
+                                        onHover: (event, activeElements) => {
+                        event.native.target.style.cursor = activeElements.length > 0 ? 'pointer' : 'default';
+                    }
+                }
+            });
+
+            // Chart toggle functionality
+            document.querySelectorAll('.chart-btn-premium').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.chart-btn-premium').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+
+                    const view = this.getAttribute('data-view');
+                    if (view === 'percentage') {
+                        ageChart.data.datasets[0].data = ageData.percentage;
+                        ageChart.options.scales.y.ticks.callback = function(value) {
+                            return value + '%';
+                        };
+                        ageChart.options.plugins.tooltip.callbacks.label = function(context) {
+                            return ` Persentase: ${context.parsed.y}%`;
+                        };
+                    } else {
+                        ageChart.data.datasets[0].data = ageData.absolute;
+                        ageChart.options.scales.y.ticks.callback = function(value) {
+                            return value.toLocaleString();
+                        };
+                        ageChart.options.plugins.tooltip.callbacks.label = function(context) {
+                            const total = ageData.absolute.reduce((a, b) => a + b, 0);
+                            const percentage = ((context.parsed.y / total) * 100).toFixed(1);
+                            return ` Jumlah: ${context.parsed.y.toLocaleString()} orang (${percentage}%)`;
+                        };
+                    }
+                    ageChart.update('none');
+                });
+            });
+
+            // Age quick stat click handlers
+            document.querySelectorAll('.age-quick-stat').forEach((stat, index) => {
+                stat.addEventListener('click', function() {
+                    document.querySelectorAll('.age-quick-stat').forEach(s => s.classList.remove('active'));
+                    this.classList.add('active');
+
+                    // Highlight specific bar
+                    ageChart.setActiveElements([{datasetIndex: 0, index: index}]);
+                    ageChart.update('none');
+                });
+            });
+        }
+    }
+
+    // Initialize charts when page loads
+    setTimeout(initializeCharts, 1000);
+});
+
+// Additional CSS for ripple effect
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes ripple {
+        to {
+            transform: scale(4);
+            opacity: 0;
+        }
+    }
+
+    .search-input:focus {
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+        border-color: rgba(59, 130, 246, 0.5);
+    }
+`;
+document.head.appendChild(style);
+</script>
+@endpush
+
+
+
+
