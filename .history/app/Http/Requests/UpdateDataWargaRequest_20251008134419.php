@@ -81,8 +81,6 @@ class UpdateDataWargaRequest extends FormRequest
             'nama_lengkap.required' => 'Nama lengkap wajib diisi.',
             'nama_lengkap.regex' => 'Nama lengkap hanya boleh berisi huruf dan spasi.',
             'no_kk.regex' => 'No. KK hanya boleh berisi angka.',
-            'no_hp.regex' => 'Nomor HP hanya boleh berisi angka, +, -, dan spasi.',
-            'no_hp.max' => 'Nomor HP maksimal 20 karakter.',
             'tanggal_lahir.before' => 'Tanggal lahir harus sebelum hari ini.',
             'rt_rw.regex' => 'Format RT/RW harus seperti: 001/002.',
             'foto.image' => 'File harus berupa gambar.',
