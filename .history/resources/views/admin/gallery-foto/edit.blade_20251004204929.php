@@ -1,0 +1,422 @@
+@extends('layouts.dashboard.dashboard')
+
+@section('title', 'Admin - Edit Foto Gallery')
+
+@section('menu')
+    Edit Foto Gallery
+@endsection
+
+@section('link')
+    <li class="breadcrumb-item text-muted">
+        <a href="{{ route('dashboard') }}" class="text-muted text-hover-primary">Dashboard</a>
+    </li>
+    <li class="breadcrumb-item">
+        <span class="bullet bg-gray-500 w-5px h-2px"></span>
+    </li>
+    <li class="breadcrumb-item text-muted">
+        <a href="{{ route('admin.gallery-foto.index') }}" class="text-muted text-hover-primary">Manajemen Gallery Foto</a>
+    </li>
+    <li class="breadcrumb-item">
+        <span class="bullet bg-gray-500 w-5px h-2px"></span>
+    </li>
+    <li class="breadcrumb-item text-muted">Edit Foto Gallery</li>
+@endsection
+
+@section('content')
+    <div id="kt_app_content" class="app-content flex-column-fluid">
+        <div id="kt_app_content_container" class="app-container container-xxl">
+
+            <!-- Header Card -->
+            <div class="card shadow-sm mb-8">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center">
+                                <div class="symbol symbol-50px me-5">
+                                    <div class="symbol-label bg-light-primary">
+                                        <i class="ki-duotone ki-pencil fs-2x text-primary-600">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                        </i>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h2 class="fw-bold text-gray-900 mb-1">Edit Foto Gallery</h2>
+                                    <p class="text-muted mb-0">Edit informasi foto gallery</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <a href="{{ route('admin.gallery-foto.index') }}" class="btn btn-light">
+                                <i class="ki-duotone ki-arrow-left fs-5">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                </i>
+                                Kembali
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-5 g-xl-8">
+                <div class="col-xl-8">
+                    <div class="card shadow-sm">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <h3>Form Edit Foto</h3>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <form action="{{ route('admin.gallery-foto.update', $galleryFoto) }}" method="POST" enctype="multipart/form-data">
+                                @csrf
+                                @method('PUT')
+
+                                <div class="row g-5">
+                                    <div class="col-md-6">
+                                        <!-- Judul -->
+                                        <div class="mb-5">
+                                            <label for="judul" class="form-label fw-semibold required">Judul Foto</label>
+                                            <input type="text" class="form-control form-control-solid @error('judul') is-invalid @enderror"
+                                                   id="judul" name="judul" value="{{ old('judul', $galleryFoto->judul) }}" required>
+                                            @error('judul')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <!-- Kategori -->
+                                        <div class="mb-5">
+                                            <label for="kategori" class="form-label fw-semibold required">Kategori</label>
+                                            <select class="form-select form-select-solid @error('kategori') is-invalid @enderror"
+                                                    id="kategori" name="kategori" required>
+                                                <option value="">Pilih Kategori</option>
+                                                @foreach($categories as $key => $label)
+                                                    <option value="{{ $key }}" {{ old('kategori', $galleryFoto->kategori) == $key ? 'selected' : '' }}>
+                                                        {{ $label }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            @error('kategori')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Deskripsi -->
+                                <div class="mb-5">
+                                    <label for="deskripsi" class="form-label fw-semibold">Deskripsi</label>
+                                    <textarea class="form-control form-control-solid @error('deskripsi') is-invalid @enderror"
+                                              id="deskripsi" name="deskripsi" rows="3">{{ old('deskripsi', $galleryFoto->deskripsi) }}</textarea>
+                                    @error('deskripsi')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <!-- URL Foto -->
+                                <div class="mb-5">
+                                    <label for="url_foto" class="form-label fw-semibold required">URL Foto</label>
+                                    <input type="url" class="form-control form-control-solid @error('url_foto') is-invalid @enderror"
+                                           id="url_foto" name="url_foto" value="{{ old('url_foto', $galleryFoto->url_foto) }}"
+                                           placeholder="https://images.unsplash.com/photo..." required>
+                                    @error('url_foto')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                    <div class="form-text">Gunakan URL dari Google Images, Unsplash, atau hosting lainnya</div>
+                                </div>
+
+                                <!-- Current Image Preview -->
+                                <div class="mb-5">
+                                    <label class="form-label fw-semibold">Foto Saat Ini</label>
+                                    <div class="border rounded p-3 text-center">
+                                        <img src="{{ $galleryFoto->url_foto }}" alt="{{ $galleryFoto->judul }}" class="img-fluid" style="max-height: 300px;">
+                                    </div>
+                                </div>
+
+                                <!-- New Image Preview -->
+                                <div class="mb-5" id="image-preview-container" style="display: none;">
+                                    <label class="form-label fw-semibold">Preview Baru</label>
+                                    <div class="border rounded p-3 text-center">
+                                        <img id="image-preview" src="" alt="Preview" class="img-fluid" style="max-height: 300px;">
+                                    </div>
+                                </div>
+
+                                <div class="row g-5">
+                                    <div class="col-md-6">
+                                        <!-- Alt Text -->
+                                        <div class="mb-5">
+                                            <label for="alt_text" class="form-label fw-semibold">Alt Text</label>
+                                            <input type="text" class="form-control form-control-solid @error('alt_text') is-invalid @enderror"
+                                                   id="alt_text" name="alt_text" value="{{ old('alt_text', $galleryFoto->alt_text) }}">
+                                            @error('alt_text')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                            <div class="form-text">Deskripsi singkat untuk aksesibilitas</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <!-- Photographer -->
+                                        <div class="mb-5">
+                                            <label for="photographer" class="form-label fw-semibold">Photographer</label>
+                                            <input type="text" class="form-control form-control-solid @error('photographer') is-invalid @enderror"
+                                                   id="photographer" name="photographer" value="{{ old('photographer', $galleryFoto->photographer) }}">
+                                            @error('photographer')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row g-5">
+                                    <div class="col-md-6">
+                                        <!-- Urutan -->
+                                        <div class="mb-5">
+                                            <label for="urutan" class="form-label fw-semibold">Urutan</label>
+                                            <input type="number" class="form-control form-control-solid @error('urutan') is-invalid @enderror"
+                                                   id="urutan" name="urutan" value="{{ old('urutan', $galleryFoto->urutan) }}" min="1">
+                                            @error('urutan')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                            <div class="form-text">Kosongkan untuk urutan otomatis</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <!-- Tanggal Foto -->
+                                        <div class="mb-5">
+                                            <label for="tanggal_foto" class="form-label fw-semibold">Tanggal Foto</label>
+                                            <input type="date" class="form-control form-control-solid @error('tanggal_foto') is-invalid @enderror"
+                                                   id="tanggal_foto" name="tanggal_foto" value="{{ old('tanggal_foto', $galleryFoto->tanggal_foto?->format('Y-m-d')) }}">
+                                            @error('tanggal_foto')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Hero Photo Option -->
+                                <div class="mb-8">
+                                    <div class="form-check form-check-custom form-check-solid">
+                                        <input class="form-check-input" type="checkbox" id="is_hero" name="is_hero" value="1"
+                                               {{ old('is_hero', $galleryFoto->is_hero) ? 'checked' : '' }}>
+                                        <label class="form-check-label fw-semibold" for="is_hero">
+                                            Set sebagai Hero Photo
+                                            <div class="form-text">Foto ini akan ditampilkan sebagai gambar utama di halaman potensi wisata. Hanya satu foto yang bisa menjadi hero.</div>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Status Aktif -->
+                                <div class="mb-8">
+                                    <div class="form-check form-check-custom form-check-solid">
+                                        <input class="form-check-input" type="checkbox" id="status_aktif" name="status_aktif" value="1"
+                                               {{ old('status_aktif', $galleryFoto->status_aktif) ? 'checked' : '' }}>
+                                        <label class="form-check-label fw-semibold" for="status_aktif">
+                                            Status Aktif
+                                            <div class="form-text">Foto akan ditampilkan di frontend jika aktif</div>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex gap-2">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="ki-duotone ki-check fs-2">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                        </i>
+                                        Update
+                                    </button>
+                                    <a href="{{ route('admin.gallery-foto.index') }}" class="btn btn-light">
+                                        <i class="ki-duotone ki-cross fs-2">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                        </i>
+                                        Batal
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-4">
+                    <!-- Photo Stats -->
+                    <div class="card shadow-sm mb-8">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <h3>Statistik Foto</h3>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <div class="border-end">
+                                        <div class="h4 mb-0 text-primary">{{ $galleryFoto->views }}</div>
+                                        <div class="text-muted fs-7">Views</div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="h4 mb-0 text-success">{{ $galleryFoto->created_at->format('d M Y') }}</div>
+                                    <div class="text-muted fs-7">Dibuat</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hero Photo Info -->
+                    <div class="card shadow-sm mb-8">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <h3 class="text-warning">Hero Photo</h3>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            @if($galleryFoto->is_hero)
+                                <div class="alert alert-warning">
+                                    <i class="ki-duotone ki-star fs-2 me-2">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                    </i>
+                                    <strong>Foto ini adalah Hero Photo</strong>
+                                </div>
+                            @else
+                                <p class="text-muted fs-7">
+                                    Hero photo akan ditampilkan sebagai gambar utama di halaman potensi wisata.
+                                    Hanya satu foto yang bisa menjadi hero pada satu waktu.
+                                </p>
+                                @if($currentHero && $currentHero->id != $galleryFoto->id)
+                                    <div class="alert alert-info">
+                                        <strong>Hero saat ini:</strong><br>
+                                        {{ $currentHero->judul }}
+                                    </div>
+                                @endif
+                            @endif
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="card shadow-sm">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <h3>Aksi Cepat</h3>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                @if(!$galleryFoto->is_hero)
+                                    <button type="button" class="btn btn-warning" onclick="setAsHero({{ $galleryFoto->id }})">
+                                        <i class="ki-duotone ki-star fs-2">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                        </i>
+                                        Set sebagai Hero
+                                    </button>
+                                @endif
+
+                                <button type="button" class="btn btn-danger" onclick="deletePhoto({{ $galleryFoto->id }})">
+                                    <i class="ki-duotone ki-trash fs-2">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                        <span class="path3"></span>
+                                        <span class="path4"></span>
+                                        <span class="path5"></span>
+                                    </i>
+                                    Hapus Foto
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Konfirmasi Hapus</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Apakah Anda yakin ingin menghapus foto ini?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <form id="deleteForm" method="POST" style="display: inline;">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-danger">Hapus</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const urlInput = document.getElementById('url_foto');
+    const previewContainer = document.getElementById('image-preview-container');
+    const previewImage = document.getElementById('image-preview');
+
+    urlInput.addEventListener('input', function() {
+        const url = this.value;
+        if (url && isValidUrl(url) && url !== '{{ $galleryFoto->url_foto }}') {
+            previewImage.src = url;
+            previewImage.onload = function() {
+                previewContainer.style.display = 'block';
+            };
+            previewImage.onerror = function() {
+                previewContainer.style.display = 'none';
+            };
+        } else {
+            previewContainer.style.display = 'none';
+        }
+    });
+
+    function isValidUrl(string) {
+        try {
+            new URL(string);
+            return true;
+        } catch (_) {
+            return false;
+        }
+    }
+});
+
+function setAsHero(id) {
+    if (confirm('Set foto ini sebagai hero? Foto hero sebelumnya akan diubah.')) {
+        fetch(`/admin/gallery-foto/${id}/set-hero`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Gagal mengatur hero photo');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Terjadi kesalahan');
+        });
+    }
+}
+
+function deletePhoto(id) {
+    document.getElementById('deleteForm').action = `/admin/gallery-foto/${id}`;
+    new bootstrap.Modal(document.getElementById('deleteModal')).show();
+}
+</script>
+@endpush

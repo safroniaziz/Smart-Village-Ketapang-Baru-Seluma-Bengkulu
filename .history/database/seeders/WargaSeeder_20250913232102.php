@@ -1,0 +1,875 @@
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Seeder;
+use App\Models\Warga;
+use App\Models\PenerimaBantuan;
+use Illuminate\Support\Facades\File;
+
+class WargaSeeder extends Seeder
+{
+    public function run(): void
+    {
+        // Load data dari file JSON
+        $this->loadDataFromJsonFiles();
+        
+        // Load data real yang sudah ada sebelumnya
+        $this->loadExistingRealData();
+    }
+
+    private function loadDataFromJsonFiles(): void
+    {
+        $jsonFiles = ['kadun1.json', 'kadun2.json', 'kadun3.json'];
+        
+        foreach ($jsonFiles as $index => $fileName) {
+            $filePath = public_path('assets/files/' . $fileName);
+            
+            if (File::exists($filePath)) {
+                echo "Loading data from {$fileName}...\n";
+                
+                $jsonContent = File::get($filePath);
+                $data = json_decode($jsonContent, true);
+                
+                if (json_last_error() === JSON_ERROR_NONE && is_array($data)) {
+                    $dusunNumber = $index + 1; // kadun1 = dusun 1, dst
+                    
+                    foreach ($data as $item) {
+                        $this->processWargaData($item, $dusunNumber);
+                    }
+                    
+                    echo "Successfully loaded " . count($data) . " records from {$fileName}\n";
+                } else {
+                    echo "Error: Invalid JSON format in {$fileName}\n";
+                }
+            } else {
+                echo "Warning: File {$fileName} not found in public/assets/files/\n";
+            }
+        }
+    }
+
+    private function processWargaData(array $item, int $dusunNumber): void
+    {
+        // Extract bantuan before processing main data
+        $bantuan = $item['bantuan'] ?? [];
+        unset($item['bantuan']);
+        
+        // Set dusun sesuai file JSON
+        $item['dusun'] = $dusunNumber;
+        
+        // Set default values jika tidak ada
+        $wargaData = array_merge([
+            'desa' => 'Ketapang Baru',
+            'kabupaten' => 'Seluma',
+            'provinsi' => 'Bengkulu',
+            'kewarganegaraan' => 'WNI',
+            'status_aktif' => true,
+        ], $item);
+        
+        try {
+            // Create warga record
+            $warga = Warga::create($wargaData);
+            
+            // Create bantuan records if exist
+            if (!empty($bantuan) && is_array($bantuan)) {
+                foreach ($bantuan as $jenisBantuanItem) {
+                    PenerimaBantuan::create([
+                        'warga_id' => $warga->id,
+                        'program' => $jenisBantuanItem,
+                        'tahun' => 2023,
+                        'nominal' => 1000000,
+                        'status' => 'Aktif'
+                    ]);
+                }
+            }
+        } catch (\Exception $e) {
+            echo "Error creating warga record: " . $e->getMessage() . "\n";
+            echo "Data: " . json_encode($wargaData) . "\n";
+        }
+    }
+
+    private function loadExistingRealData(): void
+    {
+        $realData = [
+            [
+                //No.1
+                'no_kk' => '1705052810210002',
+                'nik' => '1705052806980002',
+                'nama_lengkap' => 'BENI HARIO',
+                'jenis_kelamin' => 'Laki-laki',
+                'tempat_lahir' => null,
+                'tanggal_lahir' => null,
+                'alamat' => null,
+                'rt_rw' => null,
+                'dusun' => 1,
+                'desa' => 'Ketapang Baru',
+                'kecamatan' => null,
+                'kabupaten' => 'Seluma',
+                'provinsi' => 'Bengkulu',
+                'agama' => 'ISLAM',
+                'status_perkawinan' => null,
+                'pekerjaan' => null,
+                'pendidikan' => 'SLTP',
+                'kewarganegaraan' => 'WNI',
+                'status_aktif' => true,
+                'is_kepala_keluarga' => true,
+                'status_rumah' => 'MS',
+                'status_sosial' => 'MISKIN',
+                'kelayakan_rumah' => 'LH',
+                'mata_pencaharian' => 'PETANI',
+                'jumlah_jiwa_kk' => 2,
+                'bantuan' => [
+                    
+                ],
+                'lat' => '',
+                'long' => '',
+            ],
+            [
+                'no_kk' => '1705052810210002',
+                'nik' => '1703134909980003',
+                'nama_lengkap' => 'WIRA RUSITA SARI',
+                'jenis_kelamin' => 'Perempuan',
+                'tempat_lahir' => null,
+                'tanggal_lahir' => null,
+                'alamat' => null,
+                'rt_rw' => null,
+                'dusun' => 1,
+                'desa' => 'Ketapang Baru',
+                'kecamatan' => null,
+                'kabupaten' => 'Seluma',
+                'provinsi' => 'Bengkulu',
+                'agama' => 'ISLAM',
+                'status_perkawinan' => null,
+                'pekerjaan' => null,
+                'pendidikan' => 'SLTA',
+                'kewarganegaraan' => 'WNI',
+                'status_aktif' => true,
+                'is_kepala_keluarga' => false,
+                'status_rumah' => '',
+                'status_sosial' => '',
+                'kelayakan_rumah' => '',
+                'mata_pencaharian' => '',
+                'jumlah_jiwa_kk' => '',
+                'bantuan' => [
+                    
+                ],
+                'lat' => '',
+                'long' => '',
+            ],
+            // Tambahkan data lainnya di sini...
+        ];
+
+        echo "Loading existing real data...\n";
+
+        // Insert data real 
+        foreach ($realData as $data) {
+            $bantuan = $data['bantuan'] ?? [];
+            unset($data['bantuan']);
+
+            // Clean up empty string values
+            foreach ($data as $key => $value) {
+                if ($value === '') {
+                    $data[$key] = null;
+                }
+            }
+
+            try {
+                $warga = Warga::create($data);
+
+                // Buat record bantuan hanya jika ada data bantuan
+                if (!empty($bantuan)) {
+                    foreach ($bantuan as $jenisBantuanItem) {
+                        PenerimaBantuan::create([
+                            'warga_id' => $warga->id,
+                            'program' => $jenisBantuanItem,
+                            'tahun' => 2023,
+                            'nominal' => 1000000,
+                            'status' => 'Aktif'
+                        ]);
+                    }
+                }
+            } catch (\Exception $e) {
+                echo "Error creating existing real data: " . $e->getMessage() . "\n";
+            }
+        }
+
+        echo "Successfully loaded " . count($realData) . " existing records\n";
+                'jenis_kelamin' => 'Laki-laki',
+                'tempat_lahir' => null,
+                'tanggal_lahir' => null,
+                'alamat' => null,
+                'rt_rw' => null,
+                'dusun' => 2,
+                'desa' => 'Ketapang Baru',
+                'kecamatan' => null,
+                'kabupaten' => 'Seluma',
+                'provinsi' => 'Bengkulu',
+                'agama' => null,
+                'status_perkawinan' => null,
+                'pekerjaan' => 'PETANI',
+                'pendidikan' => 'SD',
+                'kewarganegaraan' => 'WNI',
+                'status_aktif' => true,
+                'is_kepala_keluarga' => true,
+                'status_rumah' => 'MS',
+                'status_sosial' => 'MISKIN',
+                'kelayakan_rumah' => 'LH',
+                'mata_pencaharian' => 'PETANI',
+                'jumlah_jiwa_kk' => 2,
+                'bantuan' => [],
+            ],
+            [
+                'no_kk' => '1705050205082307',
+                'nik' => '1705054107450009',
+                'nama_lengkap' => 'NIJA',
+                'jenis_kelamin' => 'Perempuan',
+                'tempat_lahir' => null,
+                'tanggal_lahir' => null,
+                'alamat' => null,
+                'rt_rw' => null,
+                'dusun' => 2,
+                'desa' => 'Ketapang Baru',
+                'kecamatan' => null,
+                'kabupaten' => 'Seluma',
+                'provinsi' => 'Bengkulu',
+                'agama' => null,
+                'status_perkawinan' => null,
+                'pekerjaan' => null,
+                'pendidikan' => 'SD',
+                'kewarganegaraan' => 'WNI',
+                'status_aktif' => true,
+                'is_kepala_keluarga' => false,
+                'status_rumah' => null,
+                'status_sosial' => null,
+                'kelayakan_rumah' => null,
+                'mata_pencaharian' => null,
+                'jumlah_jiwa_kk' => 2,
+                'bantuan' => [],
+            ],
+            [
+                'no_kk' => '1705051111150004',
+                'nik' => '1705050107870003',
+                'nama_lengkap' => 'SUHARMAN',
+                'jenis_kelamin' => 'Laki-laki',
+                'tempat_lahir' => null,
+                'tanggal_lahir' => null,
+                'alamat' => null,
+                'rt_rw' => null,
+                'dusun' => 2,
+                'desa' => 'Ketapang Baru',
+                'kecamatan' => null,
+                'kabupaten' => 'Seluma',
+                'provinsi' => 'Bengkulu',
+                'agama' => null,
+                'status_perkawinan' => null,
+                'pekerjaan' => 'PETANI',
+                'pendidikan' => 'SLTA',
+                'kewarganegaraan' => 'WNI',
+                'status_aktif' => true,
+                'is_kepala_keluarga' => true,
+                'status_rumah' => 'MS',
+                'status_sosial' => 'MISKIN',
+                'kelayakan_rumah' => 'LH',
+                'mata_pencaharian' => 'PETANI',
+                'jumlah_jiwa_kk' => 2,
+                'bantuan' => [
+                    'BLT COVID',
+                ],
+            ],
+            [
+                'no_kk' => '1705051111150004',
+                'nik' => '1701115607870003',
+                'nama_lengkap' => 'HELESMI',
+                'jenis_kelamin' => 'Perempuan',
+                'tempat_lahir' => null,
+                'tanggal_lahir' => null,
+                'alamat' => null,
+                'rt_rw' => null,
+                'dusun' => 2,
+                'desa' => 'Ketapang Baru',
+                'kecamatan' => null,
+                'kabupaten' => 'Seluma',
+                'provinsi' => 'Bengkulu',
+                'agama' => null,
+                'status_perkawinan' => null,
+                'pekerjaan' => null,
+                'pendidikan' => 'SLTA',
+                'kewarganegaraan' => 'WNI',
+                'status_aktif' => true,
+                'is_kepala_keluarga' => false,
+                'status_rumah' => null,
+                'status_sosial' => null,
+                'kelayakan_rumah' => null,
+                'mata_pencaharian' => null,
+                'jumlah_jiwa_kk' => 2,
+                'bantuan' => [],
+            ],
+            [
+                'no_kk' => '1705052309190001',
+                'nik' => '1705050107800070',
+                'nama_lengkap' => 'MOHAMMAD JUAHIR',
+                'jenis_kelamin' => 'Laki-laki',
+                'tempat_lahir' => null,
+                'tanggal_lahir' => null,
+                'alamat' => null,
+                'rt_rw' => null,
+                'dusun' => 2,
+                'desa' => 'Ketapang Baru',
+                'kecamatan' => null,
+                'kabupaten' => 'Seluma',
+                'provinsi' => 'Bengkulu',
+                'agama' => null,
+                'status_perkawinan' => null,
+                'pekerjaan' => 'PETANI',
+                'pendidikan' => 'SD',
+                'kewarganegaraan' => 'WNI',
+                'status_aktif' => true,
+                'is_kepala_keluarga' => true,
+                'status_rumah' => 'MS',
+                'status_sosial' => 'MISKIN',
+                'kelayakan_rumah' => 'LH',
+                'mata_pencaharian' => 'PETANI',
+                'jumlah_jiwa_kk' => 2,
+                'bantuan' => [],
+            ],
+            [
+                'no_kk' => '1705052309190001',
+                'nik' => '1705054107850069',
+                'nama_lengkap' => 'NURBAYA',
+                'jenis_kelamin' => 'Perempuan',
+                'tempat_lahir' => null,
+                'tanggal_lahir' => null,
+                'alamat' => null,
+                'rt_rw' => null,
+                'dusun' => 2,
+                'desa' => 'Ketapang Baru',
+                'kecamatan' => null,
+                'kabupaten' => 'Seluma',
+                'provinsi' => 'Bengkulu',
+                'agama' => null,
+                'status_perkawinan' => null,
+                'pekerjaan' => null,
+                'pendidikan' => 'SD',
+                'kewarganegaraan' => 'WNI',
+                'status_aktif' => true,
+                'is_kepala_keluarga' => false,
+                'status_rumah' => null,
+                'status_sosial' => null,
+                'kelayakan_rumah' => null,
+                'mata_pencaharian' => null,
+                'jumlah_jiwa_kk' => 2,
+                'bantuan' => [],
+            ],
+            [
+                'no_kk' => '1705050205082299',
+                'nik' => '1705050107870001',
+                'nama_lengkap' => 'RUSMAN',
+                'jenis_kelamin' => 'Laki-laki',
+                'tempat_lahir' => null,
+                'tanggal_lahir' => null,
+                'alamat' => null,
+                'rt_rw' => null,
+                'dusun' => 2,
+                'desa' => 'Ketapang Baru',
+                'kecamatan' => null,
+                'kabupaten' => 'Seluma',
+                'provinsi' => 'Bengkulu',
+                'agama' => null,
+                'status_perkawinan' => null,
+                'pekerjaan' => 'PETANI',
+                'pendidikan' => 'SLTP',
+                'kewarganegaraan' => 'WNI',
+                'status_aktif' => true,
+                'is_kepala_keluarga' => true,
+                'status_rumah' => 'MS',
+                'status_sosial' => 'MISKIN',
+                'kelayakan_rumah' => 'LH',
+                'mata_pencaharian' => 'PETANI',
+                'jumlah_jiwa_kk' => 5,
+                'bantuan' => [],
+            ],
+            [
+                'no_kk' => '1705050205082299',
+                'nik' => '1705055205930001',
+                'nama_lengkap' => 'YUYUN',
+                'jenis_kelamin' => 'Perempuan',
+                'tempat_lahir' => null,
+                'tanggal_lahir' => null,
+                'alamat' => null,
+                'rt_rw' => null,
+                'dusun' => 2,
+                'desa' => 'Ketapang Baru',
+                'kecamatan' => null,
+                'kabupaten' => 'Seluma',
+                'provinsi' => 'Bengkulu',
+                'agama' => null,
+                'status_perkawinan' => null,
+                'pekerjaan' => null,
+                'pendidikan' => 'SLTP',
+                'kewarganegaraan' => 'WNI',
+                'status_aktif' => true,
+                'is_kepala_keluarga' => false,
+                'status_rumah' => null,
+                'status_sosial' => null,
+                'kelayakan_rumah' => null,
+                'mata_pencaharian' => null,
+                'jumlah_jiwa_kk' => 5,
+                'bantuan' => [],
+            ],
+            [
+                'no_kk' => '1705050205082299',
+                'nik' => '1705051804120002',
+                'nama_lengkap' => 'M. ALFARIZI',
+                'jenis_kelamin' => 'Laki-laki',
+                'tempat_lahir' => null,
+                'tanggal_lahir' => null,
+                'alamat' => null,
+                'rt_rw' => null,
+                'dusun' => 2,
+                'desa' => 'Ketapang Baru',
+                'kecamatan' => null,
+                'kabupaten' => 'Seluma',
+                'provinsi' => 'Bengkulu',
+                'agama' => null,
+                'status_perkawinan' => null,
+                'pekerjaan' => null,
+                'pendidikan' => 'SD',
+                'kewarganegaraan' => 'WNI',
+                'status_aktif' => true,
+                'is_kepala_keluarga' => false,
+                'status_rumah' => null,
+                'status_sosial' => null,
+                'kelayakan_rumah' => null,
+                'mata_pencaharian' => null,
+                'jumlah_jiwa_kk' => 5,
+                'bantuan' => [],
+            ],
+            [
+                'no_kk' => '1705050205082299',
+                'nik' => '1705055101150001',
+                'nama_lengkap' => 'MUTIARA',
+                'jenis_kelamin' => 'Perempuan',
+                'tempat_lahir' => null,
+                'tanggal_lahir' => null,
+                'alamat' => null,
+                'rt_rw' => null,
+                'dusun' => 2,
+                'desa' => 'Ketapang Baru',
+                'kecamatan' => null,
+                'kabupaten' => 'Seluma',
+                'provinsi' => 'Bengkulu',
+                'agama' => null,
+                'status_perkawinan' => null,
+                'pekerjaan' => null,
+                'pendidikan' => 'SD',
+                'kewarganegaraan' => 'WNI',
+                'status_aktif' => true,
+                'is_kepala_keluarga' => false,
+                'status_rumah' => null,
+                'status_sosial' => null,
+                'kelayakan_rumah' => null,
+                'mata_pencaharian' => null,
+                'jumlah_jiwa_kk' => 5,
+                'bantuan' => [],
+            ],
+            [
+                'no_kk' => '1705050205082299',
+                'nik' => '1705050608180001',
+                'nama_lengkap' => 'M. HABIBI',
+                'jenis_kelamin' => 'Laki-laki',
+                'tempat_lahir' => null,
+                'tanggal_lahir' => null,
+                'alamat' => null,
+                'rt_rw' => null,
+                'dusun' => 2,
+                'desa' => 'Ketapang Baru',
+                'kecamatan' => null,
+                'kabupaten' => 'Seluma',
+                'provinsi' => 'Bengkulu',
+                'agama' => null,
+                'status_perkawinan' => null,
+                'pekerjaan' => null,
+                'pendidikan' => 'TS',
+                'kewarganegaraan' => 'WNI',
+                'status_aktif' => true,
+                'is_kepala_keluarga' => false,
+                'status_rumah' => null,
+                'status_sosial' => null,
+                'kelayakan_rumah' => null,
+                'mata_pencaharian' => null,
+                'jumlah_jiwa_kk' => 5,
+                'bantuan' => [],
+            ],
+            [
+                'no_kk' => '1705051912170002',
+                'nik' => '1705052104990001',
+                'nama_lengkap' => 'MIGO',
+                'jenis_kelamin' => 'Laki-laki',
+                'tempat_lahir' => null,
+                'tanggal_lahir' => null,
+                'alamat' => null,
+                'rt_rw' => null,
+                'dusun' => 2,
+                'desa' => 'Ketapang Baru',
+                'kecamatan' => null,
+                'kabupaten' => 'Seluma',
+                'provinsi' => 'Bengkulu',
+                'agama' => null,
+                'status_perkawinan' => null,
+                'pekerjaan' => 'PETANI',
+                'pendidikan' => 'SLTA',
+                'kewarganegaraan' => 'WNI',
+                'status_aktif' => true,
+                'is_kepala_keluarga' => true,
+                'status_rumah' => 'MS',
+                'status_sosial' => 'MISKIN',
+                'kelayakan_rumah' => 'LH',
+                'mata_pencaharian' => 'PETANI',
+                'jumlah_jiwa_kk' => 2,
+                'bantuan' => [
+                    'BLTDD',
+                    'BLT COVID',
+                ],
+            ],
+            [
+                'no_kk' => '1705051912170002',
+                'nik' => '1705055403020002',
+                'nama_lengkap' => 'WIDIA',
+                'jenis_kelamin' => 'Perempuan',
+                'tempat_lahir' => null,
+                'tanggal_lahir' => null,
+                'alamat' => null,
+                'rt_rw' => null,
+                'dusun' => 2,
+                'desa' => 'Ketapang Baru',
+                'kecamatan' => null,
+                'kabupaten' => 'Seluma',
+                'provinsi' => 'Bengkulu',
+                'agama' => null,
+                'status_perkawinan' => null,
+                'pekerjaan' => null,
+                'pendidikan' => 'SLTA',
+                'kewarganegaraan' => 'WNI',
+                'status_aktif' => true,
+                'is_kepala_keluarga' => false,
+                'status_rumah' => null,
+                'status_sosial' => null,
+                'kelayakan_rumah' => null,
+                'mata_pencaharian' => null,
+                'jumlah_jiwa_kk' => 2,
+                'bantuan' => [],
+            ],
+            [
+                'no_kk' => '1705050901200001',
+                'nik' => '1705050107850066',
+                'nama_lengkap' => 'SAHARUDIN',
+                'jenis_kelamin' => 'Laki-laki',
+                'tempat_lahir' => null,
+                'tanggal_lahir' => null,
+                'alamat' => null,
+                'rt_rw' => null,
+                'dusun' => 2,
+                'desa' => 'Ketapang Baru',
+                'kecamatan' => null,
+                'kabupaten' => 'Seluma',
+                'provinsi' => 'Bengkulu',
+                'agama' => null,
+                'status_perkawinan' => null,
+                'pekerjaan' => 'PETANI',
+                'pendidikan' => 'SD',
+                'kewarganegaraan' => 'WNI',
+                'status_aktif' => true,
+                'is_kepala_keluarga' => true,
+                'status_rumah' => 'MS',
+                'status_sosial' => 'MISKIN',
+                'kelayakan_rumah' => 'LH',
+                'mata_pencaharian' => 'PETANI',
+                'jumlah_jiwa_kk' => 2,
+                'bantuan' => [
+                    'BLTDD',
+                ],
+            ],
+            [
+                'no_kk' => '1705050901200001',
+                'nik' => '1705054107900030',
+                'nama_lengkap' => 'MARleni',
+                'jenis_kelamin' => 'Perempuan',
+                'tempat_lahir' => null,
+                'tanggal_lahir' => null,
+                'alamat' => null,
+                'rt_rw' => null,
+                'dusun' => 2,
+                'desa' => 'Ketapang Baru',
+                'kecamatan' => null,
+                'kabupaten' => 'Seluma',
+                'provinsi' => 'Bengkulu',
+                'agama' => null,
+                'status_perkawinan' => null,
+                'pekerjaan' => null,
+                'pendidikan' => 'SD',
+                'kewarganegaraan' => 'WNI',
+                'status_aktif' => true,
+                'is_kepala_keluarga' => false,
+                'status_rumah' => null,
+                'status_sosial' => null,
+                'kelayakan_rumah' => null,
+                'mata_pencaharian' => null,
+                'jumlah_jiwa_kk' => 2,
+                'bantuan' => [],
+            ],
+            [
+                'no_kk' => '1705050205082255',
+                'nik' => '1705050107840012',
+                'nama_lengkap' => 'Yuhardi',
+                'jenis_kelamin' => 'Laki-laki',
+                'tempat_lahir' => null,
+                'tanggal_lahir' => null,
+                'alamat' => null,
+                'rt_rw' => null,
+                'dusun' => 1,
+                'desa' => 'Ketapang Baru',
+                'kecamatan' => null,
+                'kabupaten' => 'Seluma',
+                'provinsi' => 'Bengkulu',
+                'agama' => null,
+                'status_perkawinan' => null,
+                'pekerjaan' => 'SWASTA',
+                'pendidikan' => 'SLTA',
+                'kewarganegaraan' => 'WNI',
+                'status_aktif' => true,
+                'is_kepala_keluarga' => true,
+                'status_rumah' => 'MS',
+                'status_sosial' => 'RM',
+                'kelayakan_rumah' => 'LH',
+                'mata_pencaharian' => 'SWASTA',
+                'jumlah_jiwa_kk' => 4,
+                'bantuan' => [],
+            ],
+            [
+                'no_kk' => '1705050205082255',
+                'nik' => '1705055605900001',
+                'nama_lengkap' => 'Harni',
+                'jenis_kelamin' => 'Perempuan',
+                'tempat_lahir' => null,
+                'tanggal_lahir' => null,
+                'alamat' => null,
+                'rt_rw' => null,
+                'dusun' => 1,
+                'desa' => 'Ketapang Baru',
+                'kecamatan' => null,
+                'kabupaten' => 'Seluma',
+                'provinsi' => 'Bengkulu',
+                'agama' => null,
+                'status_perkawinan' => null,
+                'pekerjaan' => null,
+                'pendidikan' => 'SLTA',
+                'kewarganegaraan' => 'WNI',
+                'status_aktif' => true,
+                'is_kepala_keluarga' => false,
+                'status_rumah' => null,
+                'status_sosial' => null,
+                'kelayakan_rumah' => null,
+                'mata_pencaharian' => null,
+                'jumlah_jiwa_kk' => 4,
+                'bantuan' => [],
+            ],
+            [
+                'no_kk' => '1705050205082255',
+                'nik' => '1705051804120002',
+                'nama_lengkap' => 'M. Alfarizi',
+                'jenis_kelamin' => 'Laki-laki',
+                'tempat_lahir' => null,
+                'tanggal_lahir' => null,
+                'alamat' => null,
+                'rt_rw' => null,
+                'dusun' => 1,
+                'desa' => 'Ketapang Baru',
+                'kecamatan' => null,
+                'kabupaten' => 'Seluma',
+                'provinsi' => 'Bengkulu',
+                'agama' => null,
+                'status_perkawinan' => null,
+                'pekerjaan' => null,
+                'pendidikan' => 'TS',
+                'kewarganegaraan' => 'WNI',
+                'status_aktif' => true,
+                'is_kepala_keluarga' => false,
+                'status_rumah' => null,
+                'status_sosial' => null,
+                'kelayakan_rumah' => null,
+                'mata_pencaharian' => null,
+                'jumlah_jiwa_kk' => 4,
+                'bantuan' => [],
+            ],
+            [
+                'no_kk' => '1705050205082255',
+                'nik' => '1705050608180001',
+                'nama_lengkap' => 'M. habibi',
+                'jenis_kelamin' => 'Laki-laki',
+                'tempat_lahir' => null,
+                'tanggal_lahir' => null,
+                'alamat' => null,
+                'rt_rw' => null,
+                'dusun' => 1,
+                'desa' => 'Ketapang Baru',
+                'kecamatan' => null,
+                'kabupaten' => 'Seluma',
+                'provinsi' => 'Bengkulu',
+                'agama' => null,
+                'status_perkawinan' => null,
+                'pekerjaan' => null,
+                'pendidikan' => 'TS',
+                'kewarganegaraan' => 'WNI',
+                'status_aktif' => true,
+                'is_kepala_keluarga' => false,
+                'status_rumah' => null,
+                'status_sosial' => null,
+                'kelayakan_rumah' => null,
+                'mata_pencaharian' => null,
+                'jumlah_jiwa_kk' => 4,
+                'bantuan' => [],
+            ],
+            [
+                'no_kk' => '1705050205082242',
+                'nik' => '1705050107800084',
+                'nama_lengkap' => 'MARTA JAYA',
+                'jenis_kelamin' => 'Laki-laki',
+                'tempat_lahir' => null,
+                'tanggal_lahir' => null,
+                'alamat' => null,
+                'rt_rw' => null,
+                'dusun' => 1,
+                'desa' => 'Ketapang Baru',
+                'kecamatan' => null,
+                'kabupaten' => 'Seluma',
+                'provinsi' => 'Bengkulu',
+                'agama' => null,
+                'status_perkawinan' => null,
+                'pekerjaan' => 'PETANI',
+                'pendidikan' => 'SLTP',
+                'kewarganegaraan' => 'WNI',
+                'status_aktif' => true,
+                'is_kepala_keluarga' => true,
+                'status_rumah' => 'MS',
+                'status_sosial' => 'MISKIN',
+                'kelayakan_rumah' => 'LH',
+                'mata_pencaharian' => 'PETANI',
+                'jumlah_jiwa_kk' => 4,
+                'bantuan' => [
+                    'PKH',
+                    'BLT COVID',
+                ],
+            ],
+            [
+                'no_kk' => '1705050205082242',
+                'nik' => '1705054107810051',
+                'nama_lengkap' => 'HASNAINI',
+                'jenis_kelamin' => 'Perempuan',
+                'tempat_lahir' => null,
+                'tanggal_lahir' => null,
+                'alamat' => null,
+                'rt_rw' => null,
+                'dusun' => 1,
+                'desa' => 'Ketapang Baru',
+                'kecamatan' => null,
+                'kabupaten' => 'Seluma',
+                'provinsi' => 'Bengkulu',
+                'agama' => null,
+                'status_perkawinan' => null,
+                'pekerjaan' => null,
+                'pendidikan' => 'SLTP',
+                'kewarganegaraan' => 'WNI',
+                'status_aktif' => true,
+                'is_kepala_keluarga' => false,
+                'status_rumah' => null,
+                'status_sosial' => null,
+                'kelayakan_rumah' => null,
+                'mata_pencaharian' => null,
+                'jumlah_jiwa_kk' => 4,
+                'bantuan' => [],
+            ],
+            [
+                'no_kk' => '1705050205082242',
+                'nik' => '1705052702020002',
+                'nama_lengkap' => 'PERDI WENDA MARTIN',
+                'jenis_kelamin' => 'Laki-laki',
+                'tempat_lahir' => null,
+                'tanggal_lahir' => null,
+                'alamat' => null,
+                'rt_rw' => null,
+                'dusun' => 1,
+                'desa' => 'Ketapang Baru',
+                'kecamatan' => null,
+                'kabupaten' => 'Seluma',
+                'provinsi' => 'Bengkulu',
+                'agama' => null,
+                'status_perkawinan' => null,
+                'pekerjaan' => null,
+                'pendidikan' => 'SLTP',
+                'kewarganegaraan' => 'WNI',
+                'status_aktif' => true,
+                'is_kepala_keluarga' => false,
+                'status_rumah' => null,
+                'status_sosial' => null,
+                'kelayakan_rumah' => null,
+                'mata_pencaharian' => null,
+                'jumlah_jiwa_kk' => 4,
+                'bantuan' => [],
+            ],
+            [
+                'no_kk' => '1705050205082242',
+                'nik' => '1705052402170002',
+                'nama_lengkap' => 'KARLOS PRANSISKO',
+                'jenis_kelamin' => 'Laki-laki',
+                'tempat_lahir' => null,
+                'tanggal_lahir' => null,
+                'alamat' => null,
+                'rt_rw' => null,
+                'dusun' => 1,
+                'desa' => 'Ketapang Baru',
+                'kecamatan' => null,
+                'kabupaten' => 'Seluma',
+                'provinsi' => 'Bengkulu',
+                'agama' => null,
+                'status_perkawinan' => null,
+                'pekerjaan' => null,
+                'pendidikan' => 'TS',
+                'kewarganegaraan' => 'WNI',
+                'status_aktif' => true,
+                'is_kepala_keluarga' => false,
+                'status_rumah' => null,
+                'status_sosial' => null,
+                'kelayakan_rumah' => null,
+                'mata_pencaharian' => null,
+                'jumlah_jiwa_kk' => 4,
+                'bantuan' => [],
+            ],
+        ];
+
+        // Insert data real dari gambar
+        foreach ($realData as $data) {
+            $bantuan = $data['bantuan'] ?? [];
+            unset($data['bantuan']);
+
+            try {
+                $warga = Warga::create($data);
+
+                // Buat record bantuan hanya jika ada data bantuan
+                if (!empty($bantuan)) {
+                    foreach ($bantuan as $jenisBantuanItem) {
+                        PenerimaBantuan::create([
+                            'warga_id' => $warga->id,
+                            'program' => $jenisBantuanItem,
+                            'tahun' => 2023,
+                            'nominal' => 1000000,
+                            'status' => 'Aktif'
+                        ]);
+                    }
+                }
+            } catch (\Exception $e) {
+                echo "Error creating existing real data: " . $e->getMessage() . "\n";
+            }
+        }
+    }
+}

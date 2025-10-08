@@ -1,0 +1,714 @@
+@extends('layouts.dashboard.dashboard')
+
+@section('title', 'Edit Data Warga')
+
+@push('styles')
+<style>
+/* Enhanced Edit Page Styling */
+.edit-container {
+    background: linear-gradient(135deg, #e8f4f8 0%, #f0f9ff 100%);
+    border-radius: 1rem;
+    padding: 2rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+.profile-section {
+    background: white;
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    height: fit-content;
+    position: sticky;
+    top: 2rem;
+}
+
+.current-photo {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 5px solid #e1e5e9;
+    margin: 0 auto 1rem;
+    display: block;
+    transition: all 0.3s ease;
+}
+
+.current-photo:hover {
+    transform: scale(1.05);
+    border-color: #3b82f6;
+}
+
+.photo-upload-wrapper {
+    position: relative;
+    text-align: center;
+}
+
+.change-photo-btn {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.form-section {
+    background: white;
+    border-radius: 1rem;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+}
+
+.form-section:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+}
+
+.section-header {
+    border-bottom: 2px solid #f1f3f4;
+    padding-bottom: 1rem;
+    margin-bottom: 2rem;
+}
+
+.section-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-right: 1rem;
+}
+
+/* Enhanced Form Controls */
+.form-floating {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.form-floating .form-control,
+.form-floating .form-select {
+    height: 58px;
+    border-radius: 0.75rem;
+    border: 2px solid #e1e5e9;
+    padding: 1rem 0.75rem 0.25rem;
+    transition: all 0.3s ease;
+    background: #fafafa;
+}
+
+.form-floating .form-control:focus,
+.form-floating .form-select:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.1);
+    transform: translateY(-2px);
+    background: white;
+}
+
+.form-floating label {
+    color: #6b7280;
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+
+/* Animated Icons */
+.floating-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus + .floating-icon {
+    color: #3b82f6;
+    transform: translateY(-50%) scale(1.1);
+}
+
+/* Progress Indicator */
+.progress-indicator {
+    background: linear-gradient(90deg, #3b82f6 0%, #1d4ed8 100%);
+    height: 4px;
+    border-radius: 2px;
+    margin-bottom: 2rem;
+}
+
+/* Action Buttons */
+.action-buttons {
+    background: white;
+    border-radius: 1rem;
+    padding: 1.5rem 2rem;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    bottom: 2rem;
+    z-index: 100;
+}
+
+.btn-enhanced {
+    padding: 0.75rem 2rem;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    border: none;
+}
+
+.btn-enhanced:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+/* Changes Tracker */
+.changes-indicator {
+    position: fixed;
+    top: 50%;
+    right: 2rem;
+    transform: translateY(-50%);
+    background: #fef3c7;
+    border: 2px solid #f59e0b;
+    border-radius: 1rem;
+    padding: 1rem;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    display: none;
+    z-index: 1000;
+}
+
+.changes-indicator.show {
+    display: block;
+    animation: slideInRight 0.5s ease;
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateY(-50%) translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(-50%) translateX(0);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .edit-container {
+        padding: 1rem;
+    }
+    
+    .form-section {
+        padding: 1.5rem;
+    }
+    
+    .current-photo {
+        width: 150px;
+        height: 150px;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+        gap: 1rem;
+    }
+}
+</style>
+@endpush
+
+@section('content')
+<div class="d-flex flex-column flex-column-fluid">
+    <!--begin::Toolbar-->
+    <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+        <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+            <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+                <h1 class="page-heading d-flex text-dark fw-bold fs-3 flex-column justify-content-center my-0">
+                    Edit Data Warga
+                </h1>
+                <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
+                    <li class="breadcrumb-item text-muted">
+                        <a href="{{ route('dashboard') }}" class="text-muted text-hover-primary">Dashboard</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <span class="bullet bg-gray-400 w-5px h-2px"></span>
+                    </li>
+                    <li class="breadcrumb-item text-muted">
+                        <a href="{{ route('data-warga.index') }}" class="text-muted text-hover-primary">Data Warga</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <span class="bullet bg-gray-400 w-5px h-2px"></span>
+                    </li>
+                    <li class="breadcrumb-item text-muted">Edit</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!--end::Toolbar-->
+
+<div class="d-flex flex-column flex-column-fluid">
+    <!--begin::Toolbar-->
+    <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+        <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+            <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+                <h1 class="page-heading d-flex text-dark fw-bold fs-3 flex-column justify-content-center my-0">
+                    Edit Data Warga
+                </h1>
+                <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
+                    <li class="breadcrumb-item text-muted">
+                        <a href="{{ route('dashboard') }}" class="text-muted text-hover-primary">Dashboard</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <span class="bullet bg-gray-400 w-5px h-2px"></span>
+                    </li>
+                    <li class="breadcrumb-item text-muted">
+                        <a href="{{ route('data-warga.index') }}" class="text-muted text-hover-primary">Data Warga</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <span class="bullet bg-gray-400 w-5px h-2px"></span>
+                    </li>
+                    <li class="breadcrumb-item text-muted">Edit</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!--end::Toolbar-->
+
+    <!--begin::Content-->
+    <div id="kt_app_content" class="app-content flex-column-fluid">
+        <div id="kt_app_content_container" class="app-container container-xxl">
+            
+            <!--begin::Header-->
+            <div class="edit-container">
+                <div class="text-center mb-4">
+                    <h1 class="text-dark fw-bold fs-1 mb-2">Edit Data Warga</h1>
+                    <p class="text-muted fs-5">Perbarui informasi warga dengan mudah dan cepat</p>
+                </div>
+                <div class="progress-indicator"></div>
+            </div>
+            <!--end::Header-->
+            
+            <form action="{{ route('data-warga.update', $dataWarga) }}" method="POST" enctype="multipart/form-data" id="kt_warga_form">
+                @csrf
+                @method('PUT')
+                
+                <div class="row g-5">
+                    <!--begin::Left Column - Profile-->
+                    <div class="col-lg-4">
+                        <div class="profile-section">
+                            <div class="text-center mb-4">
+                                <h3 class="fw-bold text-dark mb-2">Profil Warga</h3>
+                                <p class="text-muted">Foto dan informasi dasar</p>
+                            </div>
+                            
+                            <div class="photo-upload-wrapper mb-4">
+                                @if($dataWarga->foto)
+                                    <img src="{{ asset('storage/' . $dataWarga->foto) }}" 
+                                         alt="Foto {{ $dataWarga->nama_lengkap }}" 
+                                         class="current-photo" id="current-photo">
+                                @else
+                                    <div class="current-photo bg-light d-flex align-items-center justify-content-center" id="current-photo">
+                                        <i class="ki-duotone ki-user fs-3x text-muted">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                        </i>
+                                    </div>
+                                @endif
+                                
+                                <button type="button" class="btn btn-primary change-photo-btn" onclick="$('#foto').click()">
+                                    <i class="ki-duotone ki-camera fs-6">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                    </i>
+                                </button>
+                            </div>
+                            
+                            <input type="file" class="d-none @error('foto') is-invalid @enderror" 
+                                   id="foto" name="foto" accept="image/*" onchange="previewPhoto(this)">
+                            @error('foto')
+                                <div class="text-danger text-center mb-3">{{ $message }}</div>
+                            @enderror
+                            
+                            <div class="text-center text-muted small mb-4">
+                                <i class="ki-duotone ki-information fs-6 me-1">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                    <span class="path3"></span>
+                                </i>
+                                Format: JPEG, PNG, JPG. Maks 2MB
+                            </div>
+                            
+                            <!--begin::Quick Info-->
+                            <div class="card bg-light-info mb-4">
+                                <div class="card-body p-4">
+                                    <h6 class="text-info fw-bold mb-3">
+                                        <i class="ki-duotone ki-information-5 fs-5 me-2">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                            <span class="path3"></span>
+                                        </i>
+                                        Info Singkat
+                                    </h6>
+                                    <div class="mb-2">
+                                        <small class="text-muted">NIK:</small>
+                                        <div class="fw-bold">{{ $dataWarga->nik }}</div>
+                                    </div>
+                                    <div class="mb-2">
+                                        <small class="text-muted">Dusun:</small>
+                                        <div class="fw-bold">{{ $dataWarga->dusun }}</div>
+                                    </div>
+                                    <div class="mb-2">
+                                        <small class="text-muted">Pekerjaan:</small>
+                                        <div class="fw-bold">{{ $dataWarga->pekerjaan }}</div>
+                                    </div>
+                                    <div>
+                                        <small class="text-muted">Status:</small>
+                                        <span class="badge badge-{{ $dataWarga->is_kepala_keluarga ? 'success' : 'secondary' }}">
+                                            {{ $dataWarga->is_kepala_keluarga ? 'Kepala Keluarga' : 'Anggota Keluarga' }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--end::Quick Info-->
+                            
+                            <!--begin::Quick Stats-->
+                            <div class="d-flex justify-content-center">
+                                <div class="text-center px-3">
+                                    <div class="fs-2 fw-bold text-primary" id="completion-percentage">85%</div>
+                                    <div class="text-muted small">Kelengkapan</div>
+                                </div>
+                            </div>
+                            <!--end::Quick Stats-->
+                        </div>
+                    </div>
+                    <!--end::Left Column-->
+                    
+                    <!--begin::Right Column - Form-->
+                    <div class="col-lg-8">
+                        
+                        <!--begin::Personal Information-->
+                        <div class="form-section">
+                            <div class="section-header d-flex align-items-center">
+                                <div class="section-icon bg-light-primary text-primary">
+                                    <i class="ki-duotone ki-profile-circle">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                        <span class="path3"></span>
+                                    </i>
+                                </div>
+                                <div>
+                                    <h3 class="fw-bold text-dark mb-1">Informasi Personal</h3>
+                                    <p class="text-muted mb-0">Data pribadi dan identitas warga</p>
+                                </div>
+                            </div>
+                            
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control @error('nik') is-invalid @enderror" 
+                                               id="nik" name="nik" placeholder="NIK" 
+                                               value="{{ old('nik', $dataWarga->nik) }}" maxlength="16" required>
+                                        <label for="nik">NIK (16 digit) *</label>
+                                        <i class="ki-duotone ki-badge fs-6 floating-icon">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                            <span class="path3"></span>
+                                        </i>
+                                        @error('nik')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control @error('nama_lengkap') is-invalid @enderror" 
+                                               id="nama_lengkap" name="nama_lengkap" placeholder="Nama Lengkap" 
+                                               value="{{ old('nama_lengkap', $dataWarga->nama_lengkap) }}" required>
+                                        <label for="nama_lengkap">Nama Lengkap *</label>
+                                        <i class="ki-duotone ki-user fs-6 floating-icon">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                        </i>
+                                        @error('nama_lengkap')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control @error('no_kk') is-invalid @enderror" 
+                                               id="no_kk" name="no_kk" placeholder="No. KK" 
+                                               value="{{ old('no_kk', $dataWarga->no_kk) }}" maxlength="16">
+                                        <label for="no_kk">No. Kartu Keluarga</label>
+                                        <i class="ki-duotone ki-home-2 fs-6 floating-icon">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                        </i>
+                                        @error('no_kk')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control @error('tempat_lahir') is-invalid @enderror" 
+                                               id="tempat_lahir" name="tempat_lahir" placeholder="Tempat Lahir" 
+                                               value="{{ old('tempat_lahir', $dataWarga->tempat_lahir) }}">
+                                        <label for="tempat_lahir">Tempat Lahir</label>
+                                        <i class="ki-duotone ki-geolocation fs-6 floating-icon">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                        </i>
+                                        @error('tempat_lahir')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input type="date" class="form-control @error('tanggal_lahir') is-invalid @enderror" 
+                                               id="tanggal_lahir" name="tanggal_lahir" placeholder="Tanggal Lahir" 
+                                               value="{{ old('tanggal_lahir', $dataWarga->tanggal_lahir ? $dataWarga->tanggal_lahir->format('Y-m-d') : '') }}">
+                                        <label for="tanggal_lahir">Tanggal Lahir</label>
+                                        <i class="ki-duotone ki-calendar fs-6 floating-icon">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                        </i>
+                                        @error('tanggal_lahir')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <select class="form-select @error('jenis_kelamin') is-invalid @enderror" 
+                                                id="jenis_kelamin" name="jenis_kelamin" required>
+                                            <option value="">Pilih Jenis Kelamin</option>
+                                            <option value="Laki-laki" {{ old('jenis_kelamin', $dataWarga->jenis_kelamin) == 'Laki-laki' ? 'selected' : '' }}>Laki-laki</option>
+                                            <option value="Perempuan" {{ old('jenis_kelamin', $dataWarga->jenis_kelamin) == 'Perempuan' ? 'selected' : '' }}>Perempuan</option>
+                                        </select>
+                                        <label for="jenis_kelamin">Jenis Kelamin *</label>
+                                        @error('jenis_kelamin')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--end::Personal Information-->
+
+                <!--begin::Card-->
+                <div class="card mb-8">
+                    <!--begin::Card header-->
+                    <div class="card-header">
+                        <div class="card-title">
+                            <h2>Informasi Sosial</h2>
+                        </div>
+                    </div>
+                    <!--end::Card header-->
+
+                    <!--begin::Card body-->
+                    <div class="card-body">
+                        <div class="row g-9">
+                            <!--begin::Col-->
+                            <div class="col-md-6 fv-row">
+                                <label class="required fs-6 fw-semibold mb-2">Agama</label>
+                                <select class="form-select @error('agama') is-invalid @enderror" name="agama">
+                                    <option value="">Pilih agama</option>
+                                    <option value="Islam" {{ old('agama', $dataWarga->agama) == 'Islam' ? 'selected' : '' }}>Islam</option>
+                                    <option value="Kristen" {{ old('agama', $dataWarga->agama) == 'Kristen' ? 'selected' : '' }}>Kristen</option>
+                                    <option value="Katolik" {{ old('agama', $dataWarga->agama) == 'Katolik' ? 'selected' : '' }}>Katolik</option>
+                                    <option value="Hindu" {{ old('agama', $dataWarga->agama) == 'Hindu' ? 'selected' : '' }}>Hindu</option>
+                                    <option value="Buddha" {{ old('agama', $dataWarga->agama) == 'Buddha' ? 'selected' : '' }}>Buddha</option>
+                                    <option value="Konghucu" {{ old('agama', $dataWarga->agama) == 'Konghucu' ? 'selected' : '' }}>Konghucu</option>
+                                </select>
+                                @error('agama')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <!--end::Col-->
+
+                            <!--begin::Col-->
+                            <div class="col-md-6 fv-row">
+                                <label class="required fs-6 fw-semibold mb-2">Status Perkawinan</label>
+                                <select class="form-select @error('status_perkawinan') is-invalid @enderror" name="status_perkawinan">
+                                    <option value="">Pilih status perkawinan</option>
+                                    <option value="Belum Kawin" {{ old('status_perkawinan', $dataWarga->status_perkawinan) == 'Belum Kawin' ? 'selected' : '' }}>Belum Kawin</option>
+                                    <option value="Kawin" {{ old('status_perkawinan', $dataWarga->status_perkawinan) == 'Kawin' ? 'selected' : '' }}>Kawin</option>
+                                    <option value="Cerai Hidup" {{ old('status_perkawinan', $dataWarga->status_perkawinan) == 'Cerai Hidup' ? 'selected' : '' }}>Cerai Hidup</option>
+                                    <option value="Cerai Mati" {{ old('status_perkawinan', $dataWarga->status_perkawinan) == 'Cerai Mati' ? 'selected' : '' }}>Cerai Mati</option>
+                                </select>
+                                @error('status_perkawinan')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <!--end::Col-->
+                        </div>
+
+                        <div class="row g-9 mt-5">
+                            <!--begin::Col-->
+                            <div class="col-md-6 fv-row">
+                                <label class="required fs-6 fw-semibold mb-2">Pekerjaan</label>
+                                <input type="text" class="form-control @error('pekerjaan') is-invalid @enderror" 
+                                       name="pekerjaan" value="{{ old('pekerjaan', $dataWarga->pekerjaan) }}" placeholder="Masukkan pekerjaan" />
+                                @error('pekerjaan')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <!--end::Col-->
+
+                            <!--begin::Col-->
+                            <div class="col-md-6 fv-row">
+                                <label class="required fs-6 fw-semibold mb-2">Pendidikan</label>
+                                <input type="text" class="form-control @error('pendidikan') is-invalid @enderror" 
+                                       name="pendidikan" value="{{ old('pendidikan', $dataWarga->pendidikan) }}" placeholder="Masukkan pendidikan terakhir" />
+                                @error('pendidikan')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <!--end::Col-->
+                        </div>
+
+                        <div class="row g-9 mt-5">
+                            <!--begin::Col-->
+                            <div class="col-md-6 fv-row">
+                                <label class="required fs-6 fw-semibold mb-2">Kewarganegaraan</label>
+                                <input type="text" class="form-control @error('kewarganegaraan') is-invalid @enderror" 
+                                       name="kewarganegaraan" value="{{ old('kewarganegaraan', $dataWarga->kewarganegaraan) }}" placeholder="Masukkan kewarganegaraan" />
+                                @error('kewarganegaraan')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <!--end::Col-->
+
+                            <!--begin::Col-->
+                            <div class="col-md-6 fv-row">
+                                <label class="fs-6 fw-semibold mb-2">Foto</label>
+                                @if($dataWarga->foto)
+                                    <div class="mb-3">
+                                        <img src="{{ asset('storage/' . $dataWarga->foto) }}" alt="Current Photo" class="img-thumbnail" style="max-width: 100px;">
+                                        <div class="form-text">Foto saat ini</div>
+                                    </div>
+                                @endif
+                                <input type="file" class="form-control @error('foto') is-invalid @enderror" 
+                                       name="foto" accept="image/*" />
+                                <div class="form-text">Format: JPEG, PNG, JPG. Maksimal 2MB. Kosongkan jika tidak ingin mengubah foto.</div>
+                                @error('foto')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <!--end::Col-->
+                        </div>
+
+                        <div class="row g-9 mt-5">
+                            <!--begin::Col-->
+                            <div class="col-md-12 fv-row">
+                                <div class="form-check form-check-custom form-check-solid">
+                                    <input class="form-check-input" type="checkbox" name="is_kepala_keluarga" 
+                                           value="1" {{ old('is_kepala_keluarga', $dataWarga->is_kepala_keluarga) ? 'checked' : '' }} id="is_kepala_keluarga" />
+                                    <label class="form-check-label" for="is_kepala_keluarga">
+                                        Kepala Keluarga
+                                    </label>
+                                </div>
+                            </div>
+                            <!--end::Col-->
+                        </div>
+                    </div>
+                    <!--end::Card body-->
+                </div>
+                <!--end::Card-->
+
+                <!--begin::Card-->
+                <div class="card mb-8">
+                    <!--begin::Card header-->
+                    <div class="card-header">
+                        <div class="card-title">
+                            <h2>Akun Login (Opsional)</h2>
+                        </div>
+                    </div>
+                    <!--end::Card header-->
+
+                    <!--begin::Card body-->
+                    <div class="card-body">
+                        <div class="row g-9">
+                            <!--begin::Col-->
+                            <div class="col-md-12 fv-row">
+                                <label class="fs-6 fw-semibold mb-2">Email</label>
+                                <input type="email" class="form-control @error('email') is-invalid @enderror" 
+                                       name="email" value="{{ old('email', $dataWarga->email) }}" placeholder="Masukkan email (opsional)" />
+                                <div class="form-text">Email akan digunakan untuk login ke sistem</div>
+                                @error('email')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <!--end::Col-->
+                        </div>
+
+                        <div class="row g-9 mt-5">
+                            <!--begin::Col-->
+                            <div class="col-md-6 fv-row">
+                                <label class="fs-6 fw-semibold mb-2">Password Baru</label>
+                                <input type="password" class="form-control @error('password') is-invalid @enderror" 
+                                       name="password" placeholder="Masukkan password baru (opsional)" />
+                                <div class="form-text">Minimal 8 karakter. Kosongkan jika tidak ingin mengubah password.</div>
+                                @error('password')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <!--end::Col-->
+
+                            <!--begin::Col-->
+                            <div class="col-md-6 fv-row">
+                                <label class="fs-6 fw-semibold mb-2">Konfirmasi Password</label>
+                                <input type="password" class="form-control" 
+                                       name="password_confirmation" placeholder="Konfirmasi password baru" />
+                            </div>
+                            <!--end::Col-->
+                        </div>
+                    </div>
+                    <!--end::Card body-->
+                </div>
+                <!--end::Card-->
+
+                <!--begin::Actions-->
+                <div class="card">
+                    <div class="card-footer d-flex justify-content-end py-6 px-9">
+                        <a href="{{ route('data-warga.index') }}" class="btn btn-light btn-active-light-primary me-2">
+                            Batal
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <span class="indicator-label">Perbarui</span>
+                            <span class="indicator-progress">Memperbarui...
+                            <span class="spinner-border spinner-border-sm align-middle ms-2"></span></span>
+                        </button>
+                    </div>
+                </div>
+                <!--end::Actions-->
+            </form>
+        </div>
+    </div>
+    <!--end::Content-->
+</div>
+@endsection
+
+@push('scripts')
+<script>
+document.getElementById('kt_warga_form').addEventListener('submit', function(e) {
+    const submitBtn = document.querySelector('[type="submit"]');
+    submitBtn.setAttribute('data-kt-indicator', 'on');
+    submitBtn.disabled = true;
+});
+</script>
+@endpush

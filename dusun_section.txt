@@ -1,0 +1,399 @@
+<!-- Per Dusun Statistics Section -->
+<section id="dusun" class="stat-target py-20 pb-32 bg-gradient-to-br from-slate-50 via-gray-50 to-zinc-50 relative overflow-hidden">
+    <!-- Floating Decoration -->
+    <div class="absolute top-20 left-10 w-64 h-64 bg-gradient-to-br from-slate-200/20 to-gray-300/20 rounded-full blur-3xl" data-aos="fade-right" data-aos-duration="1200" data-aos-delay="400"></div>
+    <div class="absolute bottom-20 right-10 w-96 h-96 bg-gradient-to-br from-zinc-200/20 to-slate-300/20 rounded-full blur-3xl" data-aos="fade-left" data-aos-duration="1200" data-aos-delay="600"></div>
+
+    <div class="relative w-full lg:w-[80%] max-w-none mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16" data-aos="fade-up" data-aos-duration="800">
+            <div class="inline-flex items-center relative mb-6">
+                <div class="absolute inset-0 bg-gradient-to-r from-slate-600 to-gray-600 rounded-full blur-lg opacity-20"></div>
+                <div class="relative bg-gradient-to-r from-slate-600 to-gray-600 text-white px-6 py-3 rounded-full text-sm font-semibold shadow-lg">
+                    <i class="fas fa-map-marked-alt mr-2"></i>
+                    Statistik Per Dusun
+                </div>
+            </div>
+
+            <h2 class="text-4xl lg:text-5xl font-black mb-4">
+                <span class="bg-gradient-to-r from-slate-600 via-gray-600 to-zinc-600 bg-clip-text text-transparent">
+                    Analisis Data Per Wilayah Dusun
+                </span>
+            </h2>
+            <div class="w-16 h-1 bg-gradient-to-r from-slate-500 to-gray-500 rounded-full mx-auto mb-8"></div>
+            <div class="max-w-4xl mx-auto" data-aos="fade-up" data-aos-delay="500">
+                <p class="text-xl lg:text-2xl text-gray-700 leading-relaxed">
+                    <span class="font-semibold text-slate-700">Data detail penduduk per dusun</span> di
+                    <span class="relative inline-block">
+                        <span class="relative z-10 font-semibold text-slate-700">{{ $villageName }}</span>
+                        <span class="absolute bottom-0 left-0 w-full h-3 bg-gradient-to-r from-slate-200 to-slate-300 opacity-60 rounded"></span>
+                    </span>
+                </p>
+            </div>
+        </div>
+
+        <!-- Dusun Overview Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16" data-aos="fade-up" data-aos-duration="800" data-aos-delay="200">
+            @foreach($dusunStats as $dusun => $count)
+                @php
+                    $percentage = $totalWarga > 0 ? round(($count / $totalWarga) * 100, 1) : 0;
+                    // Generate gradient colors for each dusun
+                    $gradients = [
+                        'from-blue-500 to-indigo-600',
+                        'from-emerald-500 to-teal-600',
+                        'from-purple-500 to-violet-600',
+                        'from-orange-500 to-red-600',
+                        'from-cyan-500 to-blue-600',
+                        'from-pink-500 to-rose-600'
+                    ];
+                    $gradient = $gradients[array_search($dusun, array_keys($dusunStats)) % count($gradients)];
+                @endphp
+                <div class="stat-card bg-white rounded-2xl p-6 shadow-xl border border-gray-100 hover:shadow-2xl transition-all duration-300">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-gradient-to-br {{ $gradient }} rounded-xl flex items-center justify-center transform transition-transform hover:scale-110">
+                            <i class="fas fa-home text-white text-xl"></i>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-2xl font-black text-gray-900">{{ $count }}</div>
+                            <div class="text-sm text-gray-500">penduduk</div>
+                        </div>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-900 mb-2">{{ $dusun }}</h3>
+                    <div class="w-full bg-gray-200 rounded-full h-2 mb-2">
+                        <div class="bg-gradient-to-r {{ $gradient }} h-2 rounded-full transition-all duration-1000" style="width: {{ $percentage }}%"></div>
+                    </div>
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="text-gray-600">{{ $percentage }}% dari total</span>
+                        <button class="text-blue-600 hover:text-blue-800 font-medium" onclick="showDusunDetail('{{ $dusun }}')">
+                            Detail <i class="fas fa-arrow-right ml-1"></i>
+                        </button>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+
+        <!-- Detailed Statistics Cards -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+            <!-- Population Distribution Card -->
+            <div class="stat-card bg-white rounded-3xl p-8 shadow-2xl" data-aos="fade-up" data-aos-duration="800" data-aos-delay="300">
+                <div class="text-center mb-8">
+                    <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-users text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-2">Distribusi Populasi Per Dusun</h3>
+                    <p class="text-gray-600">Sebaran penduduk berdasarkan wilayah dusun</p>
+                </div>
+
+                <!-- Chart Section -->
+                <div class="mb-8">
+                    <div class="chart-container relative">
+                        <div class="chart-loading" id="dusunPopulationChartLoading">
+                            <i class="fas fa-spinner fa-spin mr-2"></i>
+                            Memuat data...
+                        </div>
+                        <canvas id="dusunPopulationChart" class="h-96"></canvas>
+                    </div>
+                </div>
+
+                <!-- Detailed Population Breakdown -->
+                <div class="space-y-6">
+                        @foreach($dusunStats as $dusun => $count)
+                            @php
+                                $percentage = $totalWarga > 0 ? round(($count / $totalWarga) * 100, 1) : 0;
+                            $estimatedKK = round($count / 4);
+
+                            // Get additional stats for this dusun
+                            $lakiLaki = \App\Models\User::where('dusun', $dusun)
+                                ->whereNotNull('nik')
+                                ->where(function($q) {
+                                    $q->where('jenis_kelamin', 'Laki-laki')->orWhere('jenis_kelamin', 'L');
+                                })->count();
+
+                            $perempuan = \App\Models\User::where('dusun', $dusun)
+                                ->whereNotNull('nik')
+                                ->where(function($q) {
+                                    $q->where('jenis_kelamin', 'Perempuan')->orWhere('jenis_kelamin', 'P');
+                                })->count();
+
+                            $kepalaKeluarga = \App\Models\User::where('dusun', $dusun)
+                                ->whereNotNull('nik')
+                                ->where('is_kepala_keluarga', true)->count();
+
+                            $colors = ['blue', 'emerald', 'purple', 'orange', 'pink', 'rose'];
+                                $color = $colors[array_search($dusun, array_keys($dusunStats)) % count($colors)];
+                            @endphp
+                        <div class="bg-gradient-to-br from-{{ $color }}-50 to-{{ $color }}-100 rounded-2xl p-6 border border-{{ $color }}-200 hover:shadow-lg transition-all duration-300">
+                            <!-- Header -->
+                            <div class="flex items-center justify-between mb-6">
+                                <div class="flex items-center">
+                                    <div class="w-12 h-12 bg-gradient-to-br from-{{ $color }}-500 to-{{ $color }}-600 rounded-xl flex items-center justify-center mr-4">
+                                        <i class="fas fa-home text-white text-lg"></i>
+                                </div>
+                                    <div>
+                                        <h4 class="text-xl font-bold text-{{ $color }}-900">{{ $dusun }}</h4>
+                                        <p class="text-sm text-{{ $color }}-700">{{ $count }} warga • {{ $estimatedKK }} KK diperkirakan</p>
+                                </div>
+                            </div>
+                                <div class="text-right">
+                                    <div class="text-3xl font-bold text-{{ $color }}-600">{{ $percentage }}%</div>
+                                    <div class="text-sm text-{{ $color }}-700">Dari total penduduk</div>
+                </div>
+            </div>
+
+                            <!-- Progress Bar -->
+                            <div class="mb-6">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-sm font-medium text-{{ $color }}-700">Persentase Populasi</span>
+                                    <span class="text-sm font-bold text-{{ $color }}-800">{{ $percentage }}%</span>
+                    </div>
+                                <div class="w-full bg-{{ $color }}-200 rounded-full h-3 overflow-hidden">
+                                    <div class="h-full bg-gradient-to-r from-{{ $color }}-500 to-{{ $color }}-600 rounded-full transition-all duration-2000 ease-out"
+                                         style="width: {{ $percentage }}%"></div>
+                </div>
+                </div>
+
+                            <!-- Detailed Stats -->
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <div class="bg-white rounded-lg p-4 border border-{{ $color }}-200 hover:shadow-md transition-all duration-300">
+                                    <div class="text-center">
+                                        <div class="text-2xl font-bold text-{{ $color }}-600">{{ $lakiLaki }}</div>
+                                        <div class="text-xs text-{{ $color }}-700">Laki-laki</div>
+                                </div>
+                            </div>
+                                <div class="bg-white rounded-lg p-4 border border-{{ $color }}-200 hover:shadow-md transition-all duration-300">
+                                    <div class="text-center">
+                                        <div class="text-2xl font-bold text-{{ $color }}-600">{{ $perempuan }}</div>
+                                        <div class="text-xs text-{{ $color }}-700">Perempuan</div>
+                                        </div>
+                                    </div>
+                                <div class="bg-white rounded-lg p-4 border border-{{ $color }}-200 hover:shadow-md transition-all duration-300">
+                                    <div class="text-center">
+                                        <div class="text-2xl font-bold text-{{ $color }}-600">{{ $kepalaKeluarga }}</div>
+                                        <div class="text-xs text-{{ $color }}-700">Kepala KK</div>
+                                </div>
+                                        </div>
+                                <div class="bg-white rounded-lg p-4 border border-{{ $color }}-200 hover:shadow-md transition-all duration-300">
+                                    <div class="text-center">
+                                        <div class="text-2xl font-bold text-{{ $color }}-600">{{ $estimatedKK }}</div>
+                                        <div class="text-xs text-{{ $color }}-700">KK (est.)</div>
+                                    </div>
+                                </div>
+                                        </div>
+
+                            <!-- Gender Ratio -->
+                            <div class="mt-4">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-sm font-medium text-{{ $color }}-700">Rasio Gender</span>
+                                    <span class="text-sm font-bold text-{{ $color }}-800">
+                                        {{ $perempuan > 0 ? round($lakiLaki / $perempuan, 2) : 'N/A' }} : 1
+                                    </span>
+                                    </div>
+                                <div class="flex rounded-full overflow-hidden h-2">
+                                    <div class="bg-gradient-to-r from-blue-500 to-blue-600 h-full transition-all duration-1500 ease-out"
+                                         style="width: {{ $count > 0 ? round(($lakiLaki / $count) * 100, 1) : 0 }}%"></div>
+                                    <div class="bg-gradient-to-r from-pink-500 to-pink-600 h-full transition-all duration-1500 ease-out"
+                                         style="width: {{ $count > 0 ? round(($perempuan / $count) * 100, 1) : 0 }}%"></div>
+                                </div>
+                                <div class="flex justify-between text-xs text-{{ $color }}-600 mt-1">
+                                    <span>Laki-laki {{ $count > 0 ? round(($lakiLaki / $count) * 100, 1) : 0 }}%</span>
+                                    <span>Perempuan {{ $count > 0 ? round(($perempuan / $count) * 100, 1) : 0 }}%</span>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+
+            <!-- Detailed Aid Distribution Card -->
+            <div class="stat-card bg-white rounded-3xl p-8 shadow-2xl" data-aos="fade-up" data-aos-duration="800" data-aos-delay="400">
+                <div class="text-center mb-8">
+                    <div class="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-hand-holding-heart text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-2">Detail Bantuan Per Dusun</h3>
+                    <p class="text-gray-600">Breakdown program bantuan per dusun</p>
+                </div>
+
+                <!-- Chart Section -->
+                <div class="mb-8">
+                    <div class="chart-container relative">
+                        <div class="chart-loading" id="dusunAidBreakdownChartLoading">
+                        <i class="fas fa-spinner fa-spin mr-2"></i>
+                        Memuat data...
+                    </div>
+                        <canvas id="dusunAidBreakdownChart" class="h-96"></canvas>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    @foreach($dusunStats as $dusun => $count)
+                        @php
+                            // Get detailed aid data per dusun
+                            $aidData = \App\Models\PenerimaBantuan::whereHas('user', function($query) use ($dusun) {
+                                $query->where('dusun', $dusun);
+                            })
+                            ->selectRaw('program, COUNT(DISTINCT user_id) as unique_recipients, COUNT(*) as total_recipients')
+                            ->groupBy('program')
+                            ->orderBy('unique_recipients', 'desc')
+                            ->get();
+
+                            $totalAidRecipients = $aidData->sum('unique_recipients');
+                            $aidPercentage = $count > 0 ? round(($totalAidRecipients / $count) * 100, 1) : 0;
+                            $colors = ['blue', 'emerald', 'purple', 'orange', 'pink', 'rose'];
+                            $color = $colors[array_search($dusun, array_keys($dusunStats)) % count($colors)];
+                        @endphp
+                        <div class="bg-gradient-to-br from-{{ $color }}-50 to-{{ $color }}-100 rounded-2xl p-6 border border-{{ $color }}-200 hover:shadow-lg transition-all duration-300">
+                            <!-- Header -->
+                            <div class="flex items-center justify-between mb-6">
+                                    <div class="flex items-center">
+                                    <div class="w-12 h-12 bg-gradient-to-br from-{{ $color }}-500 to-{{ $color }}-600 rounded-xl flex items-center justify-center mr-4">
+                                        <i class="fas fa-home text-white text-lg"></i>
+                                        </div>
+                                    <div>
+                                        <h4 class="text-xl font-bold text-{{ $color }}-900">{{ $dusun }}</h4>
+                                        <p class="text-sm text-{{ $color }}-700">{{ $count }} warga • {{ $totalAidRecipients }} KK menerima bantuan</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-3xl font-bold text-{{ $color }}-600">{{ $aidPercentage }}%</div>
+                                    <div class="text-sm text-{{ $color }}-700">Cakupan bantuan</div>
+                </div>
+            </div>
+
+                            <!-- Progress Bar -->
+                            <div class="mb-6">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-sm font-medium text-{{ $color }}-700">Progress Cakupan</span>
+                                    <span class="text-sm font-bold text-{{ $color }}-800">{{ $aidPercentage }}%</span>
+                    </div>
+                                <div class="w-full bg-{{ $color }}-200 rounded-full h-3 overflow-hidden">
+                                    <div class="h-full bg-gradient-to-r from-{{ $color }}-500 to-{{ $color }}-600 rounded-full transition-all duration-2000 ease-out"
+                                         style="width: {{ $aidPercentage }}%"></div>
+                </div>
+                </div>
+
+                            <!-- Program Details -->
+                            @if($aidData->count() > 0)
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    @foreach($aidData as $program)
+                                        @php
+                                            $programColors = [
+                                                'PKH' => 'red',
+                                                'PBI/BPJS' => 'blue',
+                                                'BPJS DAERAH' => 'indigo',
+                                                'BPJS MANDIRI' => 'cyan',
+                                                'SEMBAKO' => 'green',
+                                                'BLTDD' => 'yellow',
+                                                'BPMT_PPKM' => 'orange',
+                                                'BST' => 'pink',
+                                                'BLT_COVID' => 'purple',
+                                                'BLT_BBM' => 'amber',
+                                                'BPNT' => 'emerald',
+                                                'BLT' => 'rose',
+                                                'BSU' => 'violet',
+                                                'BPUM' => 'teal'
+                                            ];
+                                            $progColor = $programColors[$program->program] ?? 'gray';
+                                            $progPercentage = $count > 0 ? round(($program->unique_recipients / $count) * 100, 1) : 0;
+                                @endphp
+                                        <div class="bg-white rounded-lg p-4 border border-{{ $progColor }}-200 hover:shadow-md transition-all duration-300">
+                                            <div class="flex items-center justify-between mb-3">
+                                    <div class="flex items-center">
+                                                    <div class="w-8 h-8 bg-gradient-to-br from-{{ $progColor }}-500 to-{{ $progColor }}-600 rounded-lg flex items-center justify-center mr-3">
+                                                        <i class="fas fa-gift text-white text-xs"></i>
+                                        </div>
+                                                    <div>
+                                                        <h5 class="font-bold text-{{ $progColor }}-900 text-sm">{{ $program->program }}</h5>
+                                                        <p class="text-xs text-{{ $progColor }}-700">{{ $program->total_recipients }} total penerima</p>
+                                    </div>
+                                </div>
+                                                <div class="text-right">
+                                                    <div class="text-lg font-bold text-{{ $progColor }}-600">{{ $program->unique_recipients }}</div>
+                                                    <div class="text-xs text-{{ $progColor }}-700">KK</div>
+                                        </div>
+                                    </div>
+                                            <div class="space-y-2">
+                                <div class="flex justify-between items-center">
+                                                    <span class="text-xs text-{{ $progColor }}-700">Cakupan:</span>
+                                                    <span class="text-xs font-bold text-{{ $progColor }}-800">{{ $progPercentage }}%</span>
+                                        </div>
+                                                <div class="w-full bg-{{ $progColor }}-200 rounded-full h-2">
+                                                    <div class="bg-gradient-to-r from-{{ $progColor }}-500 to-{{ $progColor }}-600 h-2 rounded-full transition-all duration-1500 ease-out"
+                                                         style="width: {{ $progPercentage }}%"></div>
+                                    </div>
+                                </div>
+                                        </div>
+                                    @endforeach
+                                    </div>
+                            @else
+                                <div class="text-center py-8">
+                                    <div class="w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <i class="fas fa-exclamation-triangle text-gray-400 text-2xl"></i>
+                                </div>
+                                    <h4 class="text-lg font-semibold text-gray-600 mb-2">Belum Ada Data Bantuan</h4>
+                                    <p class="text-gray-500 text-sm">Data program bantuan untuk {{ $dusun }} akan muncul di sini</p>
+                            </div>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+
+        <!-- Comparison Matrix -->
+        <div class="mt-16 bg-white rounded-3xl shadow-2xl overflow-hidden" data-aos="fade-up" data-aos-duration="800" data-aos-delay="400">
+            <div class="p-8">
+                <h3 class="text-2xl font-bold text-gray-900 mb-6 text-center">Matriks Perbandingan Antar Dusun</h3>
+                <div class="overflow-x-auto custom-scrollbar">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="bg-gradient-to-r from-slate-50 to-gray-50">
+                                <th class="text-left p-4 font-bold text-gray-900">Dusun</th>
+                                <th class="text-center p-4 font-bold text-gray-900">Populasi</th>
+                                <th class="text-center p-4 font-bold text-gray-900">KK</th>
+                                <th class="text-center p-4 font-bold text-gray-900">Penerima Bantuan</th>
+                                <th class="text-center p-4 font-bold text-gray-900">Persentase</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($dusunStats as $dusun => $count)
+                                @php
+                                    $percentage = $totalWarga > 0 ? round(($count / $totalWarga) * 100, 1) : 0;
+                                    $estimatedKK = round($count / 4);
+
+                                    // Get aid recipients per dusun from database
+                                    $aidRecipients = \App\Models\PenerimaBantuan::whereHas('user', function($query) use ($dusun) {
+                                        $query->where('dusun', $dusun);
+                                    })->distinct('user_id')->count();
+
+                                    $aidPercentage = $count > 0 ? round(($aidRecipients / $count) * 100, 1) : 0;
+                                @endphp
+                                <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                                    <td class="p-4 font-medium text-gray-900">{{ $dusun }}</td>
+                                    <td class="p-4 text-center">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                            {{ $count }}
+                                        </span>
+                                    </td>
+                                    <td class="p-4 text-center">
+                                        <span class="text-gray-900 font-medium">{{ $estimatedKK }}</span>
+                                    </td>
+                                    <td class="p-4 text-center">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                                            {{ $aidRecipients }} KK
+                                        </span>
+                                    </td>
+                                    <td class="p-4 text-center">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                            {{ $aidPercentage }}%
+                                        </span>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

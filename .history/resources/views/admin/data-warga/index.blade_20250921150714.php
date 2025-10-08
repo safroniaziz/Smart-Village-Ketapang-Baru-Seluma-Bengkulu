@@ -1,0 +1,1025 @@
+@extends('layouts.dashboard.dashboard')
+
+@section('title', 'Data Warga')
+
+@section('menu')
+    Data Warga
+@endsection
+
+@section('link')
+    <li class="breadcrumb-item text-muted">
+        <a href="{{ route('dashboard') }}" class="text-muted text-hover-primary">Dashboard</a>
+    </li>
+    <li class="breadcrumb-item">
+        <span class="bullet bg-gray-500 w-5px h-2px"></span>
+    </li>
+    <li class="breadcrumb-item text-muted">Data Warga</li>
+@endsection
+
+@push('styles')
+<style>
+/* Advanced Table Styling */
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 0.75rem;
+}
+
+.table {
+    margin-bottom: 0;
+}
+
+.table thead th {
+    border-bottom: 2px solid var(--kt-gray-200);
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    /* Removed sticky position to avoid conflict with dashboard header */
+    /* position: sticky;
+    top: 0; */
+    z-index: 10;
+}
+
+.table tbody tr {
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.table tbody tr:hover {
+    background: linear-gradient(135deg, rgba(33, 150, 243, 0.04) 0%, rgba(33, 150, 243, 0.08) 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* Statistics Cards Animation */
+.card.hoverable {
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0,0,0,0.08);
+}
+
+.card.hoverable:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+    border-color: var(--kt-primary);
+}
+
+.card.hoverable .symbol-label {
+    position: relative;
+    overflow: hidden;
+}
+
+.card.hoverable .symbol-label::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.6s;
+}
+
+.card.hoverable:hover .symbol-label::before {
+    left: 100%;
+}
+
+/* Enhanced Symbols */
+.symbol-40px {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.symbol-40px:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+
+/* Compact button styling */
+.btn-sm {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+}
+
+.btn-sm:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+/* Menu improvements */
+.menu {
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    border: 1px solid rgba(0,0,0,0.08);
+}
+
+.menu-link {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    margin: 0.25rem;
+    transition: all 0.2s ease;
+}
+
+.menu-link:hover {
+    background: var(--kt-primary-light);
+    color: var(--kt-primary);
+    transform: translateX(4px);
+}
+
+/* Badge enhancements */
+.badge {
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Sort icons */
+.sort-icon {
+    opacity: 0.5;
+    transition: all 0.2s ease;
+}
+
+th.cursor-pointer:hover .sort-icon {
+    opacity: 1;
+    color: var(--kt-primary);
+}
+
+/* Custom Pagination Styling */
+.pagination-wrapper .btn {
+    border: 1px solid var(--kt-gray-300);
+    margin: 0 2px;
+    min-width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    border-radius: 0.5rem;
+    font-weight: 600;
+}
+
+.pagination-wrapper .btn:hover:not(.disabled) {
+    background: linear-gradient(135deg, var(--kt-primary-light) 0%, var(--kt-primary) 100%);
+    border-color: var(--kt-primary);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(33, 150, 243, 0.3);
+}
+
+.pagination-wrapper .btn.btn-primary {
+    background: linear-gradient(135deg, var(--kt-primary) 0%, #1976d2 100%);
+    border-color: var(--kt-primary);
+    color: white;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
+}
+
+.pagination-wrapper .btn.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Advanced Filters */
+.form-select, .form-control {
+    border-radius: 0.5rem;
+    border: 1px solid var(--kt-gray-300);
+    transition: all 0.2s ease;
+}
+
+.form-select:focus, .form-control:focus {
+    border-color: var(--kt-primary);
+    box-shadow: 0 0 0 0.2rem rgba(33, 150, 243, 0.25);
+    transform: translateY(-1px);
+}
+
+/* Loading animation */
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+.loading {
+    animation: pulse 1.5s infinite;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+    .table td, .table th {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.875rem;
+    }
+
+    .symbol-40px {
+        width: 35px;
+        height: 35px;
+    }
+
+    .pagination-wrapper {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .pagination-wrapper .btn {
+        min-width: 35px;
+        height: 35px;
+        font-size: 0.8rem;
+    }
+
+    .card.hoverable:hover {
+        transform: none;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .table tbody tr:hover {
+        background: linear-gradient(135deg, rgba(33, 150, 243, 0.08) 0%, rgba(33, 150, 243, 0.12) 100%);
+    }
+}
+</style>
+@endpush
+
+@section('content')
+<div class="d-flex flex-column flex-column-fluid">
+    <!--begin::Toolbar-->
+    <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+        <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+            <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+                <h1 class="page-heading d-flex text-dark fw-bold fs-3 flex-column justify-content-center my-0">
+                    Data Warga
+                </h1>
+                <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
+                    <li class="breadcrumb-item text-muted">
+                        <a href="{{ route('dashboard') }}" class="text-muted text-hover-primary">Dashboard</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <span class="bullet bg-gray-400 w-5px h-2px"></span>
+                    </li>
+                    <li class="breadcrumb-item text-muted">Data Warga</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!--end::Toolbar-->
+
+    <!--begin::Content-->
+    <div id="kt_app_content" class="app-content flex-column-fluid">
+        <div id="kt_app_content_container" class="app-container container-xxl">
+
+            @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show mb-5" role="alert">
+                    <div class="d-flex align-items-center">
+                        <i class="ki-duotone ki-check-circle fs-2 text-success me-3">
+                            <span class="path1"></span>
+                            <span class="path2"></span>
+                        </i>
+                        <div class="flex-grow-1">
+                            <h5 class="mb-1">Berhasil!</h5>
+                            <div>{{ session('success') }}</div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            @endif
+
+            <!--begin::Statistics Cards-->
+            <div class="row g-5 g-xl-8 mb-8">
+                <div class="col-xl-3">
+                    <div class="card bg-body hoverable card-xl-stretch mb-xl-8">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="symbol symbol-50px me-5">
+                                    <div class="symbol-label bg-light-primary">
+                                        <i class="ki-duotone ki-people fs-2x text-primary">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                            <span class="path3"></span>
+                                            <span class="path4"></span>
+                                            <span class="path5"></span>
+                                        </i>
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="text-dark fw-bold fs-6 mb-2">Total Warga</div>
+                                    <div class="fw-semibold text-muted fs-7">{{ \App\Models\User::count() }} orang</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3">
+                    <div class="card bg-body hoverable card-xl-stretch mb-xl-8">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="symbol symbol-50px me-5">
+                                    <div class="symbol-label bg-light-success">
+                                        <i class="ki-duotone ki-check-circle fs-2x text-success">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                        </i>
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="text-dark fw-bold fs-6 mb-2">Warga Aktif</div>
+                                    <div class="fw-semibold text-muted fs-7">{{ \App\Models\User::where('status_aktif', true)->count() }} orang</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3">
+                    <div class="card bg-body hoverable card-xl-stretch mb-xl-8">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="symbol symbol-50px me-5">
+                                    <div class="symbol-label bg-light-info">
+                                        <i class="ki-duotone ki-profile-user fs-2x text-info">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                            <span class="path3"></span>
+                                            <span class="path4"></span>
+                                        </i>
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="text-dark fw-bold fs-6 mb-2">Laki-laki</div>
+                                    <div class="fw-semibold text-muted fs-7">{{ \App\Models\User::where('jenis_kelamin', 'Laki-laki')->count() }} orang</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3">
+                    <div class="card bg-body hoverable card-xl-stretch mb-xl-8">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="symbol symbol-50px me-5">
+                                    <div class="symbol-label bg-light-warning">
+                                        <i class="ki-duotone ki-profile-user fs-2x text-warning">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                            <span class="path3"></span>
+                                            <span class="path4"></span>
+                                        </i>
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="text-dark fw-bold fs-6 mb-2">Perempuan</div>
+                                    <div class="fw-semibold text-muted fs-7">{{ \App\Models\User::where('jenis_kelamin', 'Perempuan')->count() }} orang</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--end::Statistics Cards-->
+
+            <!--begin::Card-->
+                        <!--begin::Card-->
+            <div class="card shadow-sm">
+                <!--begin::Card header-->
+                <div class="card-header border-0 pt-6">
+                    <div class="card-title">
+                        <!--begin::Search-->
+                        <div class="d-flex align-items-center position-relative my-1">
+                            <i class="ki-duotone ki-magnifier fs-3 position-absolute ms-5">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                            </i>
+                            <input type="text" id="kt_table_search"
+                                   class="form-control form-control-solid w-300px ps-12"
+                                   placeholder="Cari warga..."
+                                   autocomplete="off" />
+                        </div>
+                        <!--end::Search-->
+                    </div>
+                    <div class="card-toolbar">
+                        <div class="d-flex justify-content-end align-items-center flex-wrap" data-kt-user-table-toolbar="base">
+                            <!--begin::Quick Filter-->
+                            <div class="me-4">
+                                <select class="form-select form-select-solid form-select-sm w-150px" data-control="select2" data-placeholder="Status" data-hide-search="true" id="status_filter">
+                                    <option value="">Semua Status</option>
+                                    <option value="1">Aktif</option>
+                                    <option value="0">Tidak Aktif</option>
+                                </select>
+                            </div>
+                            <!--end::Quick Filter-->
+
+                            <!--begin::Advanced Filter-->
+                            <button type="button" class="btn btn-light-primary me-3 btn-sm" data-bs-toggle="modal" data-bs-target="#kt_modal_filter">
+                                <i class="ki-duotone ki-filter fs-5 me-1">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                </i>
+                                Filter Lanjutan
+                            </button>
+                            <!--end::Advanced Filter-->
+
+                            <!--begin::Export-->
+                            <div class="dropdown me-3">
+                                <button type="button" class="btn btn-light-success btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+                                    <i class="ki-duotone ki-exit-up fs-5 me-1">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                    </i>
+                                    Export
+                                </button>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" href="#">
+                                        <i class="ki-duotone ki-file-down fs-5 me-2 text-success"></i>
+                                        Export Excel
+                                    </a>
+                                    <a class="dropdown-item" href="#">
+                                        <i class="ki-duotone ki-file-down fs-5 me-2 text-danger"></i>
+                                        Export PDF
+                                    </a>
+                                    <a class="dropdown-item" href="#">
+                                        <i class="ki-duotone ki-file-down fs-5 me-2 text-primary"></i>
+                                        Export CSV
+                                    </a>
+                                </div>
+                            </div>
+                            <!--end::Export-->
+
+                            <!--begin::Add user-->
+                            <a href="{{ route('data-warga.create') }}" class="btn btn-primary btn-sm">
+                                <i class="ki-duotone ki-plus fs-5 me-1"></i>
+                                Tambah Warga Baru
+                            </a>
+                            <!--end::Add user-->
+                        </div>
+                    </div>
+                </div>
+                <!--end::Card header-->
+
+                <!--begin::Card body-->
+                <div class="card-body py-4">
+                    <!--begin::Table container-->
+                    <div class="table-responsive">
+                        <table class="table table-hover table-rounded table-striped border gy-7 gs-7" id="kt_table_warga">
+                            <thead>
+                                <tr class="fw-bold fs-6 text-gray-800 border-bottom-2 border-gray-200">
+                                    <th class="w-10px pe-2">
+                                        <div class="form-check form-check-sm form-check-custom form-check-solid me-3">
+                                            <input class="form-check-input" type="checkbox" data-kt-check="true" data-kt-check-target="#kt_table_warga .form-check-input" value="1" />
+                                        </div>
+                                    </th>
+                                    <th class="min-w-125px cursor-pointer" data-column="nama">
+                                        <div class="d-flex align-items-center">
+                                            Warga
+                                            <i class="ki-duotone ki-up-down fs-5 ms-1 sort-icon">
+                                                <span class="path1"></span>
+                                                <span class="path2"></span>
+                                            </i>
+                                        </div>
+                                    </th>
+                                    <th class="min-w-100px d-none d-md-table-cell cursor-pointer" data-column="nik">
+                                        <div class="d-flex align-items-center">
+                                            NIK
+                                            <i class="ki-duotone ki-up-down fs-5 ms-1 sort-icon">
+                                                <span class="path1"></span>
+                                                <span class="path2"></span>
+                                            </i>
+                                        </div>
+                                    </th>
+                                    <th class="min-w-100px d-none d-lg-table-cell">Jenis Kelamin</th>
+                                    <th class="min-w-80px d-none d-md-table-cell cursor-pointer" data-column="umur">
+                                        <div class="d-flex align-items-center">
+                                            Umur
+                                            <i class="ki-duotone ki-up-down fs-5 ms-1 sort-icon">
+                                                <span class="path1"></span>
+                                                <span class="path2"></span>
+                                            </i>
+                                        </div>
+                                    </th>
+                                    <th class="min-w-100px d-none d-lg-table-cell">Dusun</th>
+                                    <th class="min-w-100px d-none d-xl-table-cell">Pekerjaan</th>
+                                    <th class="min-w-100px">Status</th>
+                                    <th class="text-end min-w-100px">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-gray-600 fw-semibold">
+                                @forelse($wargas as $warga)
+                                <tr class="border-bottom border-gray-300" data-warga-id="{{ $warga->id }}">
+                                    <td>
+                                        <div class="form-check form-check-sm form-check-custom form-check-solid">
+                                            <input class="form-check-input" type="checkbox" value="{{ $warga->id }}" />
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="symbol symbol-40px me-3">
+                                                <div class="symbol-label overflow-hidden">
+                                                    @if($warga->foto)
+                                                        <img src="{{ asset('storage/' . $warga->foto) }}" alt="{{ $warga->nama_lengkap }}" class="w-100 h-100 object-fit-cover" />
+                                                    @else
+                                                        <div class="symbol-label fs-6 fw-bold {{ $warga->jenis_kelamin == 'Laki-laki' ? 'bg-light-primary text-primary' : 'bg-light-danger text-danger' }}">
+                                                            {{ substr($warga->nama_lengkap, 0, 1) }}
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                            <div class="d-flex flex-column">
+                                                <a href="{{ route('data-warga.show', $warga) }}" class="text-gray-800 text-hover-primary fw-bold mb-1">
+                                                    {{ Str::limit($warga->nama_lengkap, 25) }}
+                                                </a>
+                                                <div class="d-flex align-items-center">
+                                                    <i class="ki-duotone ki-geolocation fs-7 text-muted me-1">
+                                                        <span class="path1"></span>
+                                                        <span class="path2"></span>
+                                                    </i>
+                                                    <span class="text-muted fs-7">{{ Str::limit($warga->tempat_lahir ?? 'Tidak diketahui', 15) }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="d-none d-md-table-cell">
+                                        <div class="d-flex flex-column">
+                                            <span class="text-gray-800 fw-bold fs-6">{{ $warga->nik ?? '-' }}</span>
+                                            @if($warga->email)
+                                                <span class="text-muted fs-7">{{ Str::limit($warga->email, 20) }}</span>
+                                            @endif
+                                        </div>
+                                    </td>
+                                    <td class="d-none d-lg-table-cell">
+                                        @if($warga->jenis_kelamin == 'Laki-laki')
+                                            <div class="badge badge-light-primary fs-7 fw-bold">
+                                                <i class="ki-duotone ki-profile-user fs-5 me-1"></i>
+                                                Laki-laki
+                                            </div>
+                                        @elseif($warga->jenis_kelamin == 'Perempuan')
+                                            <div class="badge badge-light-danger fs-7 fw-bold">
+                                                <i class="ki-duotone ki-profile-user fs-5 me-1"></i>
+                                                Perempuan
+                                            </div>
+                                        @else
+                                            <span class="text-muted">-</span>
+                                        @endif
+                                    </td>
+                                    <td class="d-none d-md-table-cell">
+                                        @if($warga->tanggal_lahir)
+                                            <div class="d-flex flex-column">
+                                                <span class="text-gray-800 fw-bold">{{ \Carbon\Carbon::parse($warga->tanggal_lahir)->age }} tahun</span>
+                                                <span class="text-muted fs-7">{{ \Carbon\Carbon::parse($warga->tanggal_lahir)->format('d M Y') }}</span>
+                                            </div>
+                                        @else
+                                            <span class="text-muted">-</span>
+                                        @endif
+                                    </td>
+                                    <td class="d-none d-lg-table-cell">
+                                        @if($warga->dusun)
+                                            <div class="badge badge-light-info fs-7">{{ $warga->dusun }}</div>
+                                        @else
+                                            <span class="text-muted">-</span>
+                                        @endif
+                                    </td>
+                                    <td class="d-none d-xl-table-cell">
+                                        @if($warga->pekerjaan)
+                                            <span class="text-gray-700">{{ Str::limit($warga->pekerjaan, 15) }}</span>
+                                        @else
+                                            <span class="text-muted">-</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($warga->status_aktif)
+                                            <div class="badge badge-light-success">Aktif</div>
+                                        @else
+                                            <div class="badge badge-light-danger">Tidak Aktif</div>
+                                        @endif
+                                    </td>
+                                    <td class="text-end">
+                                        <a href="#" class="btn btn-light btn-active-light-primary btn-sm" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
+                                            Aksi
+                                            <i class="ki-duotone ki-down fs-5 ms-1"></i>
+                                        </a>
+                                        <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-125px py-4" data-kt-menu="true">
+                                            <div class="menu-item px-3">
+                                                <a href="{{ route('data-warga.show', $warga) }}" class="menu-link px-3">
+                                                    <i class="ki-duotone ki-eye fs-5 me-2"></i>
+                                                    Lihat
+                                                </a>
+                                            </div>
+                                            <div class="menu-item px-3">
+                                                <a href="{{ route('data-warga.edit', $warga) }}" class="menu-link px-3">
+                                                    <i class="ki-duotone ki-pencil fs-5 me-2"></i>
+                                                    Edit
+                                                </a>
+                                            </div>
+                                            <div class="menu-item px-3">
+                                                <a href="#" class="menu-link px-3 text-danger" onclick="deleteWarga({{ $warga->id }})">
+                                                    <i class="ki-duotone ki-trash fs-5 me-2"></i>
+                                                    Hapus
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="9" class="text-center py-10">
+                                        <div class="d-flex flex-column align-items-center">
+                                            <i class="ki-duotone ki-file-down fs-2x text-muted mb-4">
+                                                <span class="path1"></span>
+                                                <span class="path2"></span>
+                                            </i>
+                                            <span class="text-muted">Tidak ada data warga</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                    <!--end::Table-->
+
+                    <!--begin::Pagination-->
+                    @if($wargas->hasPages())
+                    <div class="d-flex flex-stack flex-wrap pt-10 pagination-wrapper">
+                        <div class="fs-6 fw-semibold text-gray-700">
+                            Menampilkan {{ $wargas->firstItem() }} sampai {{ $wargas->lastItem() }} dari {{ $wargas->total() }} data
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <!--begin::Previous-->
+                            @if ($wargas->onFirstPage())
+                                <span class="btn btn-sm btn-light disabled me-2">
+                                    <i class="ki-duotone ki-left fs-5 me-1">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                    </i>
+                                    Previous
+                                </span>
+                            @else
+                                <a href="{{ $wargas->previousPageUrl() }}" class="btn btn-sm btn-light me-2">
+                                    <i class="ki-duotone ki-left fs-5 me-1">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                    </i>
+                                    Previous
+                                </a>
+                            @endif
+                            <!--end::Previous-->
+
+                            <!--begin::Pages-->
+                            <div class="d-flex align-items-center me-2">
+                                @if($wargas->lastPage() > 1)
+                                    @php
+                                        $start = max(1, $wargas->currentPage() - 2);
+                                        $end = min($wargas->lastPage(), $wargas->currentPage() + 2);
+                                    @endphp
+
+                                    @if($start > 1)
+                                        <a href="{{ $wargas->url(1) }}" class="btn btn-sm btn-light me-1">1</a>
+                                        @if($start > 2)
+                                            <span class="btn btn-sm btn-light disabled me-1">...</span>
+                                        @endif
+                                    @endif
+
+                                    @for($page = $start; $page <= $end; $page++)
+                                        @if($page == $wargas->currentPage())
+                                            <span class="btn btn-sm btn-primary me-1">{{ $page }}</span>
+                                        @else
+                                            <a href="{{ $wargas->url($page) }}" class="btn btn-sm btn-light me-1">{{ $page }}</a>
+                                        @endif
+                                    @endfor
+
+                                    @if($end < $wargas->lastPage())
+                                        @if($end < $wargas->lastPage() - 1)
+                                            <span class="btn btn-sm btn-light disabled me-1">...</span>
+                                        @endif
+                                        <a href="{{ $wargas->url($wargas->lastPage()) }}" class="btn btn-sm btn-light me-1">{{ $wargas->lastPage() }}</a>
+                                    @endif
+                                @endif
+                            </div>
+                            <!--end::Pages-->
+
+                            <!--begin::Next-->
+                            @if ($wargas->hasMorePages())
+                                <a href="{{ $wargas->nextPageUrl() }}" class="btn btn-sm btn-light">
+                                    Next
+                                    <i class="ki-duotone ki-right fs-5 ms-1">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                    </i>
+                                </a>
+                            @else
+                                <span class="btn btn-sm btn-light disabled">
+                                    Next
+                                    <i class="ki-duotone ki-right fs-5 ms-1">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                    </i>
+                                </span>
+                            @endif
+                            <!--end::Next-->
+                        </div>
+                    </div>
+                    @endif
+                    <!--end::Pagination-->
+                </div>
+                <!--end::Card body-->
+            </div>
+            <!--end::Card-->
+        </div>
+    </div>
+    <!--end::Content-->
+</div>
+
+<!--begin::Modal - Filter-->
+<div class="modal fade" id="kt_modal_filter" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered mw-650px">
+        <div class="modal-content">
+            <form action="{{ route('data-warga.index') }}" method="GET" id="filterForm">
+                <div class="modal-header">
+                    <h2 class="fw-bold">Filter Data Warga</h2>
+                    <div class="btn btn-icon btn-sm btn-active-icon-primary" data-bs-dismiss="modal">
+                        <i class="ki-duotone ki-cross fs-5">
+                            <span class="path1"></span>
+                            <span class="path2"></span>
+                        </i>
+                    </div>
+                </div>
+                <div class="modal-body scroll-y mx-5 mx-xl-15 my-7">
+                    <div class="row g-9 mb-8">
+                        <div class="col-md-6">
+                            <label class="fs-6 fw-semibold mb-2">Jenis Kelamin</label>
+                            <select class="form-select" name="gender">
+                                <option value="">Semua</option>
+                                <option value="Laki-laki" {{ request('gender') == 'Laki-laki' ? 'selected' : '' }}>Laki-laki</option>
+                                <option value="Perempuan" {{ request('gender') == 'Perempuan' ? 'selected' : '' }}>Perempuan</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="fs-6 fw-semibold mb-2">Dusun</label>
+                            <select class="form-select" name="dusun">
+                                <option value="">Semua Dusun</option>
+                                @foreach($dusunOptions as $dusun)
+                                    <option value="{{ $dusun }}" {{ request('dusun') == $dusun ? 'selected' : '' }}>
+                                        {{ $dusun }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row g-9 mb-8">
+                        <div class="col-md-6">
+                            <label class="fs-6 fw-semibold mb-2">Agama</label>
+                            <select class="form-select" name="religion">
+                                <option value="">Semua Agama</option>
+                                @foreach($agamaOptions as $agama)
+                                    <option value="{{ $agama }}" {{ request('religion') == $agama ? 'selected' : '' }}>
+                                        {{ $agama }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="fs-6 fw-semibold mb-2">Status Perkawinan</label>
+                            <select class="form-select" name="status">
+                                <option value="">Semua Status</option>
+                                @foreach($statusOptions as $status)
+                                    <option value="{{ $status }}" {{ request('status') == $status ? 'selected' : '' }}>
+                                        {{ $status }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row g-9 mb-8">
+                        <div class="col-md-6">
+                            <label class="fs-6 fw-semibold mb-2">Pendidikan</label>
+                            <select class="form-select" name="education">
+                                <option value="">Semua Pendidikan</option>
+                                @foreach($educationOptions as $education)
+                                    <option value="{{ $education }}" {{ request('education') == $education ? 'selected' : '' }}>
+                                        {{ $education }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="fs-6 fw-semibold mb-2">Rentang Umur</label>
+                            <select class="form-select" name="age_range">
+                                <option value="">Semua Umur</option>
+                                <option value="0-17" {{ request('age_range') == '0-17' ? 'selected' : '' }}>0-17 tahun</option>
+                                <option value="18-30" {{ request('age_range') == '18-30' ? 'selected' : '' }}>18-30 tahun</option>
+                                <option value="31-50" {{ request('age_range') == '31-50' ? 'selected' : '' }}>31-50 tahun</option>
+                                <option value="51+" {{ request('age_range') == '51+' ? 'selected' : '' }}>51+ tahun</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row g-9">
+                        <div class="col-md-12">
+                            <label class="fs-6 fw-semibold mb-2">Pekerjaan</label>
+                            <select class="form-select" name="profession">
+                                <option value="">Semua Pekerjaan</option>
+                                @foreach($professionOptions as $profession)
+                                    <option value="{{ $profession }}" {{ request('profession') == $profession ? 'selected' : '' }}>
+                                        {{ $profession }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-light-primary" onclick="resetFilter()">Reset</button>
+                    <button type="submit" class="btn btn-primary">Terapkan Filter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!--end::Modal - Filter-->
+
+@endsection
+
+@push('scripts')
+<script>
+$(document).ready(function() {
+    // Enhanced search functionality
+    let searchTimeout;
+    $('#kt_table_search').on('input', function() {
+        clearTimeout(searchTimeout);
+        const searchTerm = $(this).val().toLowerCase();
+
+        searchTimeout = setTimeout(function() {
+            $('#kt_table_warga tbody tr').each(function() {
+                const rowText = $(this).text().toLowerCase();
+                if (rowText.includes(searchTerm)) {
+                    $(this).show().removeClass('d-none');
+                } else {
+                    $(this).hide().addClass('d-none');
+                }
+            });
+
+            updateTableStats();
+        }, 300);
+    });
+
+    // Status filter functionality
+    $('#status_filter').on('change', function() {
+        const statusValue = $(this).val();
+
+        $('#kt_table_warga tbody tr').each(function() {
+            if (statusValue === '') {
+                $(this).show().removeClass('d-none');
+            } else {
+                const statusBadge = $(this).find('td:nth-last-child(2) .badge');
+                const isActive = statusBadge.hasClass('badge-light-success');
+
+                if ((statusValue === '1' && isActive) || (statusValue === '0' && !isActive)) {
+                    $(this).show().removeClass('d-none');
+                } else {
+                    $(this).hide().addClass('d-none');
+                }
+            }
+        });
+
+        updateTableStats();
+    });
+
+    // Table sorting functionality
+    $('th[data-column]').on('click', function() {
+        const column = $(this).data('column');
+        const $table = $('#kt_table_warga');
+        const $tbody = $table.find('tbody');
+        const $rows = $tbody.find('tr:not(.d-none)').get();
+
+        // Toggle sort direction
+        const currentSort = $(this).data('sort') || 'asc';
+        const newSort = currentSort === 'asc' ? 'desc' : 'asc';
+        $(this).data('sort', newSort);
+
+        // Update sort icon
+        $('th .sort-icon').removeClass('text-primary');
+        $(this).find('.sort-icon').addClass('text-primary');
+
+        // Sort rows
+        $rows.sort(function(a, b) {
+            let aValue, bValue;
+
+            switch(column) {
+                case 'nama':
+                    aValue = $(a).find('td:nth-child(2) a').text();
+                    bValue = $(b).find('td:nth-child(2) a').text();
+                    break;
+                case 'nik':
+                    aValue = $(a).find('td:nth-child(3)').text();
+                    bValue = $(b).find('td:nth-child(3)').text();
+                    break;
+                case 'umur':
+                    aValue = parseInt($(a).find('td:nth-child(5)').text()) || 0;
+                    bValue = parseInt($(b).find('td:nth-child(5)').text()) || 0;
+                    break;
+            }
+
+            if (newSort === 'asc') {
+                return aValue > bValue ? 1 : -1;
+            } else {
+                return aValue < bValue ? 1 : -1;
+            }
+        });
+
+        // Reorder table
+        $.each($rows, function(index, row) {
+            $tbody.append(row);
+        });
+
+        // Add animation
+        $tbody.find('tr').hide().fadeIn(300);
+    });
+
+    // Row click to view details
+    $('#kt_table_warga tbody').on('click', 'tr', function(e) {
+        if ($(e.target).closest('a, button, .form-check').length === 0) {
+            const wargaId = $(this).data('warga-id');
+            if (wargaId) {
+                window.location.href = `{{ url('data-warga') }}/${wargaId}`;
+            }
+        }
+    });
+
+    function updateTableStats() {
+        const visibleRows = $('#kt_table_warga tbody tr:not(.d-none)').length;
+        const totalRows = $('#kt_table_warga tbody tr').length;
+        console.log(`Showing ${visibleRows} of ${totalRows} entries`);
+    }
+
+    // Initialize tooltips
+    $('[data-bs-toggle="tooltip"]').tooltip();
+
+    // Initialize Select2
+    $('[data-control="select2"]').select2({
+        minimumResultsForSearch: Infinity
+    });
+});
+
+// Enhanced delete function
+function deleteWarga(id) {
+    Swal.fire({
+        title: 'Hapus Data Warga?',
+        text: "Data yang dihapus tidak dapat dikembalikan!",
+        icon: "warning",
+        showCancelButton: true,
+        buttonsStyling: false,
+        confirmButtonText: "Ya, Hapus!",
+        cancelButtonText: "Batal",
+        customClass: {
+            confirmButton: "btn btn-danger fw-bold",
+            cancelButton: "btn btn-active-light-primary fw-bold"
+        },
+        showLoaderOnConfirm: true,
+        preConfirm: () => {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve();
+                }, 1000);
+            });
+        }
+    }).then(function(result) {
+        if (result.value) {
+            // Add loading state to row
+            $(`tr[data-warga-id="${id}"]`).addClass('loading');
+
+            // Create and submit delete form
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `{{ url('data-warga') }}/${id}`;
+
+            const methodField = document.createElement('input');
+            methodField.type = 'hidden';
+            methodField.name = '_method';
+            methodField.value = 'DELETE';
+
+            const tokenField = document.createElement('input');
+            tokenField.type = 'hidden';
+            tokenField.name = '_token';
+            tokenField.value = '{{ csrf_token() }}';
+
+            form.appendChild(methodField);
+            form.appendChild(tokenField);
+            document.body.appendChild(form);
+            form.submit();
+        }
+    });
+}
+
+// Reset filter function
+function resetFilter() {
+    document.getElementById('filterForm').reset();
+    window.location.href = `{{ route('data-warga.index') }}`;
+}
+</script>
+@endpush

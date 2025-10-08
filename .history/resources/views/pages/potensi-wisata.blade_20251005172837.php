@@ -1,0 +1,3387 @@
+@extends('layouts.app-public')
+
+@section('title', ($wisata ? $wisata->nama : 'Pantai Ancol Seluma') . ' - Smart Village Ketapang Baru')
+
+@php
+use Illuminate\Support\Facades\Storage;
+@endphp
+
+@push('meta')
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+@endpush
+
+@push('styles')
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" />
+<style>
+    /* Modern Tourism Page Design System */
+
+    /* Smooth gradient animation like statistik page */
+    .hero-gradient {
+        background: linear-gradient(135deg, #0f766e 0%, #0891b2 25%, #0284c7 50%, #2563eb 75%, #4f46e5 100%);
+        background-size: 200% 200%;
+        animation: gradientShift 8s ease infinite;
+    }
+
+    @keyframes gradientShift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    /* Enhanced card hover effects */
+    .stat-card {
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        transform-origin: center;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Consistent section spacing */
+    .section-spacing {
+        padding: 6rem 0;
+    }
+
+    .section-spacing-lg {
+        padding: 8rem 0;
+    }
+
+    /* Enhanced info cards */
+    .info-card {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        border: 1px solid rgba(0, 0, 0, 0.04);
+    }
+
+    .info-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+    }
+
+    .info-card-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .info-card h3 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 1rem;
+    }
+
+    .info-card p {
+        color: #64748b;
+        line-height: 1.7;
+        font-size: 1rem;
+    }
+
+    /* Enhanced card hover effects - Consistent with Statistik Page */
+    .stat-card {
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        transform-origin: center;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Data visualization enhancements */
+    .data-point {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .data-point::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s ease;
+    }
+
+    .data-point:hover::before {
+        left: 100%;
+    }
+
+    /* Custom Animations for Hero Visual */
+    @keyframes tilt {
+        0%, 50%, 100% {
+            transform: rotate(0deg);
+        }
+        25% {
+            transform: rotate(1deg);
+        }
+        75% {
+            transform: rotate(-1deg);
+        }
+    }
+
+    .animate-tilt {
+        animation: tilt 10s infinite;
+    }
+
+    /* Floating elements animation */
+    @keyframes float {
+        0%, 100% {
+            transform: translateY(0px);
+        }
+        50% {
+            transform: translateY(-10px);
+        }
+    }
+
+    .animate-float {
+        animation: float 3s ease-in-out infinite;
+    }
+
+    /* Glow pulse animation */
+    @keyframes glow-pulse {
+        0%, 100% {
+            opacity: 0.5;
+        }
+        50% {
+            opacity: 0.8;
+        }
+    }
+
+    .animate-glow-pulse {
+        animation: glow-pulse 2s ease-in-out infinite;
+    }
+
+
+    .section-header {
+        text-align: center;
+        margin-bottom: 4rem;
+    }
+
+    .section-badge {
+        display: inline-block;
+        background: linear-gradient(135deg, #0f766e, #0891b2);
+        color: white;
+        padding: 0.5rem 1.5rem;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 0.875rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 20px rgba(15, 118, 110, 0.3);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .section-title {
+        font-size: clamp(2rem, 4vw, 3rem);
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 1rem;
+        letter-spacing: -0.025em;
+    }
+
+
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60px;
+        height: 4px;
+        background: linear-gradient(90deg, #3b82f6, #06b6d4);
+        border-radius: 2px;
+    }
+
+        /* Gallery Section */
+    .gallery-section {
+        background: #ffffff;
+        position: relative;
+    }
+
+    .gallery-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, #e5e7eb, transparent);
+    }
+
+    .video-container {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+
+    .video-wrapper {
+        position: relative;
+        background: white;
+        border-radius: 28px;
+        padding: 3rem;
+        box-shadow:
+            0 20px 40px rgba(0, 0, 0, 0.1),
+            0 4px 20px rgba(0, 0, 0, 0.05);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .video-wrapper::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background:
+            radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.05) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.05) 0%, transparent 50%);
+        pointer-events: none;
+    }
+
+    /* Main video container for aspect ratio */
+    .video-container-responsive {
+        position: relative;
+        padding-bottom: 56.25%;
+        height: 0;
+        overflow: hidden;
+        border-radius: 20px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+        margin-top: 2rem;
+        z-index: 2;
+    }
+
+    .video-container-responsive iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 20px;
+    }
+
+    /* Gallery Section - Instagram Style */
+    .gallery-section {
+        padding: 8rem 0;
+        background: #ffffff;
+        position: relative;
+    }
+
+    .gallery-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, #e5e7eb, transparent);
+    }
+
+    .gallery-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 2rem;
+        position: relative;
+    }
+
+    .gallery-header {
+        text-align: center;
+        margin-bottom: 4rem;
+        position: relative;
+    }
+
+    .gallery-header .section-badge {
+        background: #f3f4f6;
+        color: #374151;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        font-weight: 500;
+    }
+
+    .gallery-header .section-title {
+        color: #111827;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+
+
+    /* Gallery Category Tabs */
+    .gallery-tabs-container {
+        margin: 3rem 0 2rem 0;
+        display: flex;
+        justify-content: center;
+    }
+
+    .gallery-tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        padding: 1rem;
+        border-radius: 20px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e2e8f0;
+    }
+
+    .gallery-tab {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 1.5rem;
+        background: white;
+        border: 2px solid transparent;
+        border-radius: 16px;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        text-decoration: none;
+        color: #64748b;
+        font-weight: 500;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    .gallery-tab::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+        transition: left 0.5s ease;
+    }
+
+    .gallery-tab:hover::before {
+        left: 100%;
+    }
+
+    .gallery-tab:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(59, 130, 246, 0.15);
+        border-color: rgba(59, 130, 246, 0.2);
+        color: #3b82f6;
+    }
+
+    .gallery-tab.active {
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+        border-color: #3b82f6;
+    }
+
+    .gallery-tab.active:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 30px rgba(59, 130, 246, 0.5);
+    }
+
+    .tab-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 2rem;
+        height: 2rem;
+        border-radius: 10px;
+        background: rgba(59, 130, 246, 0.1);
+        color: #3b82f6;
+        transition: all 0.3s ease;
+        font-size: 0.875rem;
+    }
+
+    .gallery-tab.active .tab-icon {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+    }
+
+    .tab-content {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .tab-title {
+        font-weight: 600;
+        font-size: 0.875rem;
+        line-height: 1.2;
+    }
+
+    .tab-count {
+        font-size: 0.75rem;
+        opacity: 0.8;
+        font-weight: 500;
+    }
+
+    /* Gallery Category Content */
+    .gallery-category-content {
+        display: none;
+        animation: fadeIn 0.5s ease;
+    }
+
+    .gallery-category-content.active {
+        display: block;
+    }
+
+    .category-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .category-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+    }
+
+    .category-stats {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+    }
+
+    .stats-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #64748b;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .gallery-tabs {
+            padding: 0.75rem;
+            gap: 0.5rem;
+        }
+
+        .gallery-tab {
+            padding: 0.5rem 1rem;
+            gap: 0.5rem;
+        }
+
+        .tab-icon {
+            width: 1.5rem;
+            height: 1.5rem;
+            font-size: 0.75rem;
+        }
+
+        .tab-title {
+            font-size: 0.75rem;
+        }
+
+        .tab-count {
+            font-size: 0.625rem;
+        }
+    }
+
+    /* Instagram-Style Grid */
+    .gallery-instagram {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 4px;
+        margin-top: 3rem;
+    }
+
+    @media (max-width: 768px) {
+        .gallery-instagram {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .gallery-instagram {
+            grid-template-columns: 1fr;
+            gap: 4px;
+        }
+    }
+
+    .photo-card {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        cursor: pointer;
+        position: relative;
+        aspect-ratio: 3/2; /* Slightly wider landscape ratio */
+    }
+
+    .photo-card:hover {
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        transform: translateY(-2px);
+    }
+
+    .photo-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.3s ease;
+    }
+
+    .photo-card:hover .photo-image {
+        transform: scale(1.05);
+    }
+
+    .photo-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.6);
+        opacity: 0;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2;
+    }
+
+    .photo-card:hover .photo-overlay {
+        opacity: 1;
+    }
+
+    .overlay-content {
+        text-align: center;
+        color: white;
+        padding: 1rem;
+        transform: translateY(10px);
+        transition: transform 0.3s ease;
+    }
+
+    .photo-card:hover .overlay-content {
+        transform: translateY(0);
+    }
+
+    .overlay-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: white;
+    }
+
+    .overlay-description {
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.9);
+        line-height: 1.4;
+    }
+
+    .photo-likes {
+        position: absolute;
+        top: 0.75rem;
+        right: 0.75rem;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 0.25rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        opacity: 0;
+        transform: scale(0.8);
+        transition: all 0.3s ease;
+        z-index: 3;
+    }
+
+    .photo-card:hover .photo-likes {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    /* Photo Stats */
+    .photo-stats {
+        position: absolute;
+        bottom: 0.75rem;
+        left: 0.75rem;
+        display: flex;
+        gap: 1rem;
+        opacity: 0;
+        transform: translateY(10px);
+        transition: all 0.3s ease;
+        z-index: 3;
+    }
+
+    .photo-card:hover .photo-stats {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .stat-item-mini {
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 0.25rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    /* Description Section - Enhanced */
+    .description-section {
+        padding: 8rem 0;
+        background:
+            linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%),
+            radial-gradient(circle at 70% 30%, rgba(59, 130, 246, 0.05) 0%, transparent 50%);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .description-section::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, #10b981, #3b82f6, #8b5cf6, #ec4899);
+    }
+
+    .description-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+
+    .description-grid {
+        display: grid;
+        grid-template-columns: 1.2fr 1fr;
+        gap: 5rem;
+        align-items: start;
+    }
+
+    .description-content h2 {
+        font-size: clamp(2.25rem, 3.5vw, 3rem);
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 2.5rem;
+        letter-spacing: -0.025em;
+        position: relative;
+    }
+
+    .description-content h2::before {
+        content: '';
+        position: absolute;
+        left: -2rem;
+        top: 0;
+        bottom: 0;
+        width: 5px;
+        background: linear-gradient(to bottom, #3b82f6, #06b6d4);
+        border-radius: 3px;
+    }
+
+    .description-text {
+        font-size: 1.125rem;
+        line-height: 1.8;
+        color: #475569;
+        font-weight: 400;
+    }
+
+    .info-cards {
+        display: grid;
+        gap: 2rem;
+    }
+
+    .info-card {
+        background: white;
+        border-radius: 20px;
+        padding: 2.5rem;
+        box-shadow:
+            0 10px 30px rgba(0, 0, 0, 0.1),
+            0 4px 15px rgba(0, 0, 0, 0.05);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .info-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #3b82f6, #06b6d4, #10b981);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.4s ease;
+    }
+
+    .info-card:hover::before {
+        transform: scaleX(1);
+    }
+
+    .info-card:hover {
+        transform: translateY(-8px);
+        box-shadow:
+            0 20px 40px rgba(0, 0, 0, 0.15),
+            0 8px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    .info-icon {
+        width: 64px;
+        height: 64px;
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.75rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+        position: relative;
+    }
+
+    .info-icon::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 50%);
+        border-radius: 16px;
+    }
+
+    .info-card h3 {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 0.75rem;
+    }
+
+    .info-card p {
+        color: #64748b;
+        line-height: 1.7;
+        font-size: 1rem;
+    }
+
+    /* Instagram-Style Modal */
+    .modal {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.85);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .modal.show {
+        opacity: 1;
+    }
+
+    .modal-content {
+        position: relative;
+        max-width: 80vw;
+        max-height: 85vh;
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        transform: scale(0.95);
+        transition: transform 0.3s ease;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .modal.show .modal-content {
+        transform: scale(1);
+    }
+
+    .modal-close {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        width: 32px;
+        height: 32px;
+        background: rgba(0, 0, 0, 0.6);
+        border: none;
+        border-radius: 50%;
+        color: white;
+        font-size: 0.9rem;
+        cursor: pointer;
+        z-index: 10;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-close:hover {
+        background: rgba(0, 0, 0, 0.8);
+        transform: scale(1.1);
+    }
+
+    .modal-image-container {
+        flex: 1;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #000;
+        min-height: 400px;
+        aspect-ratio: 3/2; /* Slightly wider landscape ratio */
+        overflow: hidden;
+    }
+
+    .modal-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* Crop to fill landscape container */
+        display: block;
+    }
+
+    .modal-nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 40px;
+        height: 40px;
+        background: rgba(0, 0, 0, 0.6);
+        border: none;
+        border-radius: 50%;
+        color: white;
+        font-size: 1rem;
+        cursor: pointer;
+        z-index: 10;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-prev {
+        left: 1rem;
+    }
+
+    .modal-next {
+        right: 1rem;
+    }
+
+    .modal-nav:hover {
+        background: rgba(0, 0, 0, 0.8);
+        transform: translateY(-50%) scale(1.1);
+    }
+
+    .modal-info {
+        padding: 1.5rem;
+        background: white;
+        border-top: 1px solid #f3f4f6;
+    }
+
+    .modal-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #111827;
+        line-height: 1.4;
+    }
+
+    .modal-description {
+        color: #6b7280;
+        line-height: 1.5;
+        font-size: 0.95rem;
+        margin-bottom: 1rem;
+    }
+
+    .modal-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 1rem;
+        border-top: 1px solid #f3f4f6;
+    }
+
+    .modal-stats {
+        display: flex;
+        gap: 1.5rem;
+    }
+
+    .modal-stat {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #6b7280;
+        font-size: 0.9rem;
+    }
+
+    .modal-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .modal-action-btn {
+        width: 32px;
+        height: 32px;
+        border: 1px solid #e5e7eb;
+        background: white;
+        border-radius: 6px;
+        color: #6b7280;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-action-btn:hover {
+        background: #f9fafb;
+        color: #374151;
+    }
+
+    .modal-action-btn.liked {
+        color: #ef4444;
+        background: #fef2f2;
+        border-color: #fecaca;
+    }
+
+    .modal-placeholder {
+        color: #9ca3af;
+        font-style: italic;
+        text-align: center;
+        padding: 1rem 0;
+    }
+
+    /* Modal Responsive */
+    @media (max-width: 768px) {
+        .modal {
+            padding: 0.5rem;
+        }
+
+        .modal-content {
+            max-width: 100vw;
+            max-height: 95vh;
+        }
+
+        .modal-image-container {
+            aspect-ratio: 3/2; /* Maintain slightly wider landscape on mobile */
+            min-height: 300px;
+        }
+
+        .modal-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .modal-info {
+            padding: 1rem;
+        }
+
+        .modal-meta {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .modal-stats {
+            width: 100%;
+        }
+    }
+
+    /* Gallery Grid Layout */
+    .gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-top: 2rem;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        .gallery-grid {
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .description-grid {
+            grid-template-columns: 1fr;
+            gap: 4rem;
+        }
+
+        .description-content h2::before {
+            display: none;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .hero-section {
+            min-height: 75vh;
+        }
+
+        .stats-container {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.25rem;
+        }
+
+        .gallery-container {
+            padding: 0 1rem;
+        }
+
+        .gallery-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .photo-card {
+            aspect-ratio: 3/2; /* Maintain slightly wider landscape on mobile */
+        }
+
+        .video-wrapper {
+            padding: 2rem;
+        }
+
+        .modal-content {
+            max-width: 95vw;
+        }
+
+        .photo-card:hover {
+            transform: translateY(-10px);
+        }
+    }
+
+    /* Smooth scrolling */
+    html {
+        scroll-behavior: smooth;
+    }
+
+    /* Loading animation */
+    .loading {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: #fff;
+        animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    /* Enhanced Description Section Styles */
+    .animation-delay-1000 {
+        animation-delay: 1s;
+    }
+
+    .animation-delay-2000 {
+        animation-delay: 2s;
+    }
+
+    /* Pulse animation for decorative elements */
+    @keyframes pulse {
+        0%, 100% {
+            transform: scale(1);
+            opacity: 0.3;
+        }
+        50% {
+            transform: scale(1.05);
+            opacity: 0.5;
+        }
+    }
+
+    /* Hover effects for feature cards */
+    .bg-white\/80:hover {
+        background-color: rgba(255, 255, 255, 0.95);
+        transform: translateY(-4px);
+    }
+
+    /* Backdrop blur support */
+    .backdrop-blur-sm {
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+    }
+
+    /* Glass morphism effect */
+    .glass-effect {
+        background: rgba(255, 255, 255, 0.25);
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+
+    /* Gradient text animation */
+    .gradient-text-animate {
+        background: linear-gradient(-45deg, #14b8a6, #06b6d4, #3b82f6, #14b8a6);
+        background-size: 400% 400%;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: gradientShift 3s ease infinite;
+    }
+
+    @keyframes gradientShift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    /* Smooth hover transitions */
+    .smooth-hover {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .smooth-hover:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Progress bar animation */
+    .progress-bar {
+        animation: progressAnimation 2s ease-in-out forwards;
+    }
+
+    @keyframes progressAnimation {
+        from { width: 0%; }
+        to { width: 85%; }
+    }
+
+    /* Video fallback styles */
+    .video-fallback {
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    }
+
+    /* Aspect ratio fix for video container */
+    .aspect-w-16 {
+        position: relative;
+        width: 100%;
+        padding-bottom: 56.25%; /* 16:9 aspect ratio */
+        background: #000;
+    }
+
+    .aspect-w-16 > * {
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+    }
+
+    /* Video iframe specific styles */
+    .video-iframe {
+        border: none;
+        outline: none;
+    }
+
+    /* Ensure video fallback is hidden by default */
+    .video-fallback {
+        display: none;
+    }
+
+    /* Modal Styles */
+    .modal-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+    }
+
+    .modal-container {
+        background: white;
+        border-radius: 1rem;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        width: 90%;
+        max-width: 1200px;
+        height: 95vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        animation: modalSlideIn 0.3s ease-out;
+    }
+
+    /* PDF Modal specific styling */
+    #pdfModal .modal-container {
+        width: 85%;
+        max-width: 1000px;
+        height: 90vh;
+        min-height: 600px;
+    }
+
+    @keyframes modalSlideIn {
+        from {
+            opacity: 0;
+            transform: scale(0.95) translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+    }
+
+    .modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1.5rem;
+        border-bottom: 1px solid #e5e7eb;
+        background: #f9fafb;
+    }
+
+    .modal-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #111827;
+        display: flex;
+        align-items: center;
+    }
+
+    .modal-close {
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 0.5rem;
+        background: #ef4444;
+        color: white;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+    }
+
+    .modal-close:hover {
+        background: #dc2626;
+        transform: scale(1.05);
+    }
+
+    .modal-body {
+        flex: 1;
+        overflow: hidden;
+    }
+
+    .modal-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 1.25rem 1.5rem;
+        border-top: 1px solid #e5e7eb;
+        background: linear-gradient(to bottom, #ffffff, #f8fafc);
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Enhanced Modal Button Styles */
+    .modal-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.75rem 1.5rem;
+        font-size: 0.9375rem;
+        font-weight: 600;
+        border-radius: 0.75rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        text-decoration: none;
+        cursor: pointer;
+        border: none;
+        outline: none;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .modal-btn::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.3);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s, height 0.6s;
+    }
+
+    .modal-btn:hover::before {
+        width: 300px;
+        height: 300px;
+    }
+
+    .modal-btn span {
+        position: relative;
+        z-index: 1;
+    }
+
+    .modal-btn i {
+        position: relative;
+        z-index: 1;
+        margin-right: 0.5rem;
+        font-size: 1rem;
+    }
+
+    /* Close Button - Subtle Gray */
+    .modal-btn-close {
+        background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+        color: #475569;
+        border: 2px solid #cbd5e1;
+        box-shadow: 0 2px 8px rgba(71, 85, 105, 0.15);
+    }
+
+    .modal-btn-close:hover {
+        background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+        border-color: #94a3b8;
+        color: #1e293b;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(71, 85, 105, 0.25);
+    }
+
+    .modal-btn-close:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 4px rgba(71, 85, 105, 0.2);
+    }
+
+    /* YouTube Button - Red Gradient */
+    .modal-btn-youtube {
+        background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+        color: white;
+        border: 2px solid transparent;
+        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
+    }
+
+    .modal-btn-youtube:hover {
+        background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(220, 38, 38, 0.5);
+    }
+
+    .modal-btn-youtube:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 8px rgba(220, 38, 38, 0.4);
+    }
+
+    .pdf-viewer-container {
+        height: 70vh;
+        min-height: 500px;
+    }
+
+    .video-modal-container {
+        height: 70vh;
+        min-height: 500px;
+        position: relative;
+        background: #000;
+    }
+
+    .video-modal-container iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+    /* Enhanced PDF Viewer Styles */
+    .pdf-simple-viewer {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        border-radius: 0 0 0.75rem 0.75rem;
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        border: 1px solid #e2e8f0;
+    }
+
+    .pdf-direct-frame {
+        border: none !important;
+        outline: none;
+        width: 100%;
+        height: 100%;
+        display: block;
+        background: #fff;
+        opacity: 0;
+        transition: all 0.4s ease;
+        border-radius: 0 0 0.75rem 0.75rem;
+    }
+
+    .pdf-direct-frame:loaded,
+    .pdf-direct-frame[src] {
+        opacity: 1;
+    }
+
+    .pdf-fallback {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 1;
+        background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+        border-radius: 0 0 0.75rem 0.75rem;
+    }
+
+    /* PDF Toolbar Styles */
+    .pdf-toolbar {
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        border-bottom: 1px solid #e2e8f0;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .pdf-action-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        color: #64748b;
+        transition: all 0.2s ease;
+        text-decoration: none;
+    }
+
+    .pdf-action-btn:hover {
+        background: rgba(59, 130, 246, 0.1);
+        color: #3b82f6;
+        transform: translateY(-1px);
+    }
+
+    .pdf-action-btn:active {
+        transform: translateY(0);
+    }
+
+    /* PDF Close Button in Toolbar */
+    .pdf-close-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 32px;
+        border-radius: 8px;
+        color: #dc2626;
+        background: rgba(220, 38, 38, 0.1);
+        border: 1px solid rgba(220, 38, 38, 0.2);
+        transition: all 0.2s ease;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 16px;
+    }
+
+    .pdf-close-btn:hover {
+        background: #dc2626;
+        color: white;
+        transform: translateY(-1px) scale(1.05);
+        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+    }
+
+    .pdf-close-btn:active {
+        transform: translateY(0) scale(0.95);
+    }
+
+    /* Video Modal Styles */
+    .video-viewer-container {
+        background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        min-height: 600px;
+    }
+
+    .video-toolbar {
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        border-bottom: 1px solid #e2e8f0;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .video-action-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        color: #64748b;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+    }
+
+    .video-action-btn:hover {
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+        transform: translateY(-1px);
+    }
+
+    .video-action-btn:active {
+        transform: translateY(0);
+    }
+
+    /* Video Close Button in Toolbar */
+    .video-close-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 32px;
+        border-radius: 8px;
+        color: #dc2626;
+        background: rgba(220, 38, 38, 0.1);
+        border: 1px solid rgba(220, 38, 38, 0.2);
+        transition: all 0.2s ease;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 16px;
+    }
+
+    .video-close-btn:hover {
+        background: #dc2626;
+        color: white;
+        transform: translateY(-1px) scale(1.05);
+        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+    }
+
+    .video-close-btn:active {
+        transform: translateY(0) scale(0.95);
+    }
+
+    /* Video Player Wrapper */
+    .video-player-wrapper {
+        border-radius: 0 0 0.75rem 0.75rem;
+        overflow: hidden;
+        position: relative;
+        width: 100%;
+        height: 100%;
+        min-height: 500px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #000;
+    }
+
+    /* Modal video iframe styles */
+    .video-frame {
+        position: absolute !important;
+        top: 0;
+        left: 0;
+        border: none !important;
+        outline: none;
+        background: #000;
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: contain;
+        display: block;
+    }
+
+    #videoModalPlayer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100% !important;
+        height: 100% !important;
+        background: #000;
+        z-index: 10;
+        border: none;
+        outline: none;
+    }
+
+    #videoModalPlayer[src=""], #videoModalPlayer[src="about:blank"] {
+        background: #1a1a1a;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .video-loading {
+        background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+        z-index: 20;
+        pointer-events: auto;
+    }
+
+    .video-loading[style*="display: none"] {
+        pointer-events: none;
+    }
+
+    /* Video Modal specific sizing */
+    #videoModal .modal-container {
+        width: 90%;
+        max-width: 1200px;
+        height: 85vh;
+        min-height: 600px;
+    }
+
+    /* Fullscreen Video Mode */
+    .modal-container.fullscreen-video {
+        width: 98vw !important;
+        height: 98vh !important;
+        max-width: none !important;
+        max-height: none !important;
+        margin: 1vh 1vw !important;
+        animation: fullscreenExpand 0.3s ease-out !important;
+    }
+
+    /* Enhanced Modal Close Button */
+    .modal-close-enhanced {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        color: #ffffff;
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+        font-size: 18px;
+        font-weight: 700;
+        box-shadow:
+            0 4px 12px rgba(239, 68, 68, 0.25),
+            0 2px 4px rgba(0, 0, 0, 0.1),
+            inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .modal-close-enhanced::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, transparent 50%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .modal-close-enhanced:hover {
+        background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+        transform: rotate(90deg) scale(1.15);
+        box-shadow:
+            0 8px 25px rgba(239, 68, 68, 0.35),
+            0 4px 12px rgba(0, 0, 0, 0.15),
+            inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        border-color: rgba(255, 255, 255, 0.5);
+    }
+
+    .modal-close-enhanced:hover::before {
+        opacity: 1;
+    }
+
+    .modal-close-enhanced:active {
+        transform: rotate(90deg) scale(0.95);
+        box-shadow:
+            0 2px 8px rgba(239, 68, 68, 0.3),
+            inset 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Responsive video modal */
+    @media (max-width: 768px) {
+        #videoModal .modal-container {
+            width: 95vw;
+            max-width: 95vw;
+            height: 80vh;
+        }
+
+        .video-toolbar {
+            padding: 0.75rem 1rem;
+        }
+
+        .video-action-btn,
+        .video-close-btn {
+            width: 28px;
+            height: 28px;
+        }
+
+        .modal-close-enhanced {
+            width: 40px;
+            height: 40px;
+            font-size: 18px;
+        }
+    }    /* PDF Close Button in Toolbar */
+    .pdf-close-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        color: #dc2626;
+        background: rgba(220, 38, 38, 0.1);
+        border: 1px solid rgba(220, 38, 38, 0.2);
+        transition: all 0.2s ease;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    .pdf-close-btn:hover {
+        background: #dc2626;
+        color: white;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+    }
+
+    .pdf-close-btn:active {
+        transform: translateY(0);
+    }
+
+    /* Enhanced modal header */
+    .modal-header {
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        border-bottom: 1px solid #e2e8f0;
+        padding: 1.25rem 1.5rem;
+    }
+
+    .modal-title {
+        font-weight: 600;
+        font-size: 1.125rem;
+        color: #1f2937;
+        display: flex;
+        align-items: center;
+    }
+
+    .modal-close {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        color: #6b7280;
+        transition: all 0.2s ease;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(229, 231, 235, 0.3);
+        cursor: pointer;
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+    .modal-close:hover {
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+        transform: rotate(90deg) scale(1.1);
+        border-color: #ef4444;
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+    }
+
+    .modal-close:active {
+        transform: rotate(90deg) scale(0.95);
+    }
+
+    /* Fullscreen PDF Mode */
+    .modal-container.fullscreen-pdf {
+        width: 98vw !important;
+        height: 98vh !important;
+        max-width: none !important;
+        max-height: none !important;
+        margin: 1vh 1vw !important;
+        animation: fullscreenExpand 0.3s ease-out !important;
+    }
+
+    @keyframes fullscreenExpand {
+        from {
+            width: 85%;
+            height: 90vh;
+        }
+        to {
+            width: 98vw;
+            height: 98vh;
+        }
+    }
+
+    /* Loading states */
+    .pdf-simple-viewer.loading::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 40px;
+        height: 40px;
+        border: 3px solid #e2e8f0;
+        border-top: 3px solid #3b82f6;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        z-index: 10;
+    }
+
+    @keyframes spin {
+        0% { transform: translate(-50%, -50%) rotate(0deg); }
+        100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    /* Responsive modal */
+    @media (max-width: 768px) {
+        .modal-container {
+            width: 95vw;
+            max-width: 95vw;
+            height: 85vh;
+            margin: 0.5rem;
+        }
+
+        #pdfModal .modal-container {
+            width: 95vw;
+            max-width: 95vw;
+            height: 85vh;
+        }
+
+        .pdf-toolbar {
+            padding: 0.75rem 1rem;
+        }
+
+        .pdf-toolbar .flex:first-child .space-x-3 {
+            gap: 0.5rem;
+        }
+
+        .pdf-action-btn {
+            width: 28px;
+            height: 28px;
+        }
+
+        .pdf-viewer-container,
+        .video-modal-container {
+            height: 60vh;
+            min-height: 400px;
+        }
+
+        .modal-footer {
+            flex-direction: column-reverse;
+            gap: 0.75rem;
+            padding: 1rem;
+        }
+
+        .modal-btn {
+            width: 100%;
+            justify-content: center;
+            padding: 0.875rem 1.25rem;
+        }
+    }
+</style>
+@endpush
+
+@section('content')
+<!-- Hero Section - Consistent with Design System -->
+<section class="relative text-white overflow-hidden min-h-[calc(100vh-8rem)] md:min-h-[calc(100vh-10rem)] flex items-center hero-gradient pt-8 py-8 lg:py-12 pb-16 lg:pb-20">
+    <!-- Background Pattern -->
+    <div class="absolute inset-0 bg-white/5"></div>
+
+    <!-- Particle.js Container -->
+    <div id="particles-tourism" class="absolute inset-0"></div>
+
+    <div class="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-0">
+        <div class="flex flex-col lg:flex-row items-center justify-between gap-10 min-h-[80vh]">
+            <!-- Hero Content (Left Side) -->
+            <div class="flex-1 space-y-10 relative z-10">
+                <div class="space-y-8">
+                    <!-- Badge -->
+                    <div class="flex items-center space-x-3 mb-6" data-aos="fade-up" data-aos-delay="200">
+                        <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-map-marker-alt text-white text-xl"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-semibold text-teal-100">DESTINASI WISATA</h2>
+                            <p class="text-sm text-teal-100">{{ $wisata->lokasi ?? 'Ketapang Baru, Seluma' }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Main Title -->
+                    <h1 class="text-4xl lg:text-6xl font-black leading-tight mb-6" data-aos="fade-up" data-aos-delay="400">
+                        @if($wisata)
+                        <span class="text-white">{{ explode(' ', $wisata->nama)[0] ?? 'Pantai' }}</span><br>
+                        <span class="text-yellow-400 font-extrabold">{{ implode(' ', array_slice(explode(' ', $wisata->nama), 1)) ?: 'Ancol Seluma' }}</span>
+                        @else
+                        <span class="text-white">Pantai</span><br>
+                        <span class="text-yellow-400 font-extrabold">Ancol Seluma</span>
+                        @endif
+                    </h1>
+
+                    <!-- Badge Status -->
+                    <div class="mb-6" data-aos="fade-up" data-aos-delay="500">
+                        <div class="inline-flex items-center bg-gradient-to-r from-teal-600 to-cyan-600 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg">
+                            <i class="fas fa-star mr-2 text-yellow-300 text-xs"></i>
+                            Destinasi Unggulan Bengkulu
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <p class="text-lg lg:text-xl text-teal-100 leading-relaxed max-w-2xl font-light" data-aos="fade-up" data-aos-delay="600">
+                        @if($wisata)
+                        {{ Str::limit(strip_tags($wisata->deskripsi), 120) }}
+                        @else
+                        Nikmati keindahan pantai eksotis dengan pasir putih dan air laut jernih.
+                        @endif
+                        Destinasi perfect untuk <span class="font-semibold text-yellow-300">liburan keluarga</span> yang tak terlupakan.
+                    </p>
+                </div>
+
+                <!-- Enhanced Quick Stats -->
+                @if($wisata)
+                 <!-- Enhanced Quick Stats - Single Row Layout -->
+                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8" data-aos="fade-up" data-aos-delay="700">
+                     <div class="stat-card bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20 hover:bg-white/15 transition-all duration-300 data-point text-center">
+                         <div class="text-2xl font-black text-yellow-400 animate-pulse mb-1">{{ $galleryCount }}</div>
+                         <div class="text-sm text-blue-100 font-medium">Foto Gallery</div>
+                         <div class="text-xs text-blue-200 mt-1 flex items-center justify-center">
+                             <i class="fas fa-images text-green-300 mr-1"></i>
+                             <span>7 Kategori</span>
+                         </div>
+                     </div>
+
+                     <div class="stat-card bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20 hover:bg-white/15 transition-all duration-300 data-point text-center">
+                         <div class="text-2xl font-black text-yellow-400 animate-pulse mb-1">{{ number_format($wisata->views ?? 0) }}</div>
+                         <div class="text-sm text-blue-100 font-medium">Pengunjung</div>
+                         <div class="text-xs text-blue-200 mt-1 flex items-center justify-center">
+                             <i class="fas fa-chart-line text-green-300 mr-1"></i>
+                             <span>+15% bulan ini</span>
+                         </div>
+                     </div>
+
+                     <div class="stat-card bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20 hover:bg-white/15 transition-all duration-300 data-point text-center">
+                         <div class="text-2xl font-black text-yellow-400 animate-pulse mb-1">4.8⭐</div>
+                         <div class="text-sm text-blue-100 font-medium">Rating Wisata</div>
+                         <div class="text-xs text-blue-200 mt-1 flex items-center justify-center">
+                             <i class="fas fa-star text-yellow-300 mr-1"></i>
+                             <span>Sangat Recommended</span>
+                         </div>
+                     </div>
+
+                     <div class="stat-card bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20 hover:bg-white/15 transition-all duration-300 data-point text-center">
+                         <div class="text-2xl font-black text-yellow-400 animate-pulse mb-1">24/7</div>
+                         <div class="text-sm text-blue-100 font-medium">Akses Terbuka</div>
+                         <div class="text-xs text-blue-200 mt-1 flex items-center justify-center">
+                             <i class="fas fa-clock text-blue-300 mr-1"></i>
+                             <span>Sepanjang Hari</span>
+                         </div>
+                     </div>
+                 </div>
+                @endif
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row gap-4 mt-8" data-aos="fade-up" data-aos-delay="800">
+                    @if($wisata->file_potensi_desa)
+                    <button onclick="openPdfModal()" class="inline-flex items-center justify-center px-8 py-3 bg-white text-teal-600 font-semibold rounded-full hover:bg-gray-100 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105">
+                        <i class="fas fa-file-pdf mr-2"></i>
+                        File Potensi Wisata
+                    </button>
+                    @endif
+
+                    @if($youtubeId)
+                    <button onclick="openVideoModal()" class="inline-flex items-center justify-center px-8 py-3 bg-transparent border-2 border-white text-white font-semibold rounded-full hover:bg-white hover:text-teal-600 transition-all duration-300">
+                        <i class="fas fa-play mr-2"></i>
+                        Tonton Video
+                    </button>
+                    @endif
+                </div>
+            </div>
+
+            <!-- Hero Visual (Right Side) - Enhanced with Life -->
+            <div class="flex-1 relative" data-aos="fade-left" data-aos-delay="900">
+                @if($heroPhoto)
+                <div class="relative max-w-lg mx-auto">
+                    <!-- Animated Background Elements -->
+                    <div class="absolute -inset-4 bg-gradient-to-r from-teal-400/20 to-cyan-400/20 rounded-3xl blur-xl animate-pulse"></div>
+                    <div class="absolute -inset-2 bg-gradient-to-br from-yellow-400/10 to-orange-400/10 rounded-3xl blur-lg animate-pulse" style="animation-delay: 1s;"></div>
+
+                    <!-- Main Image with Enhanced Effects -->
+                    <div class="relative group">
+                        <!-- Glow Effect -->
+                        <div class="absolute -inset-1 bg-gradient-to-r from-teal-400 via-cyan-400 to-blue-400 rounded-3xl blur opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-tilt"></div>
+
+                        <!-- Main Image Container -->
+                        <div class="relative bg-white/10 backdrop-blur-sm rounded-3xl p-1">
+                            <img src="{{ $heroPhoto->url_foto }}"
+                                 alt="{{ $heroPhoto->judul ?? ($wisata ? $wisata->nama : 'Pantai Ancol Seluma') }}"
+                                 class="w-full rounded-3xl shadow-2xl transform group-hover:scale-105 transition-all duration-700 group-hover:rotate-1 cursor-pointer"
+                                 onclick="openCategoryModal(0, '{{ $heroPhoto->kategori }}')">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent rounded-3xl"></div>
+
+                            <!-- Floating Info Badge -->
+                            <div class="absolute top-4 right-4 bg-white/20 backdrop-blur-md rounded-full px-3 py-1 text-white text-sm font-medium border border-white/30">
+                                <i class="fas fa-camera mr-1"></i>
+                                {{ $galleryCount }} Foto
+                            </div>
+
+                            <!-- Play Button Overlay -->
+                            @if($youtubeId)
+                            <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500">
+                                <button onclick="openVideoModal()" class="w-20 h-20 bg-red-600/90 hover:bg-red-600 rounded-full flex items-center justify-center shadow-2xl transform hover:scale-110 transition-all duration-300">
+                                    <i class="fas fa-play text-white text-2xl ml-1"></i>
+                                </button>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+
+                    <!-- Enhanced Floating Cards with Animations -->
+                    @if($randomPantaiPhotos && $randomPantaiPhotos->count() > 0)
+                    <div class="absolute -bottom-6 -left-6 w-28 h-28 rounded-2xl overflow-hidden shadow-2xl border-4 border-white/80 transform rotate-12 hover:rotate-0 transition-all duration-500 hover:scale-110 group cursor-pointer"
+                         data-aos="zoom-in" data-aos-delay="1200"
+                         onclick="openCategoryModal(0, 'pantai')">
+                        <img src="{{ $randomPantaiPhotos[0]->url_foto }}" alt="{{ $randomPantaiPhotos[0]->judul ?? 'Preview' }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                        <div class="absolute inset-0 bg-gradient-to-br from-teal-500/20 to-cyan-500/20 group-hover:from-teal-500/30 group-hover:to-cyan-500/30 transition-all duration-300"></div>
+                        <div class="absolute bottom-1 left-1 right-1 bg-black/50 backdrop-blur-sm rounded-lg p-1">
+                            <div class="text-white text-xs font-medium text-center">Gallery</div>
+                        </div>
+                    </div>
+                    @endif
+
+                    @if($randomPantaiPhotos && $randomPantaiPhotos->count() > 1)
+                    <div class="absolute -top-6 -right-6 w-28 h-28 rounded-2xl overflow-hidden shadow-2xl border-4 border-white/80 transform -rotate-12 hover:rotate-0 transition-all duration-500 hover:scale-110 group cursor-pointer"
+                         data-aos="zoom-in" data-aos-delay="1400"
+                         onclick="openCategoryModal(1, 'pantai')">
+                        <img src="{{ $randomPantaiPhotos[1]->url_foto }}" alt="{{ $randomPantaiPhotos[1]->judul ?? 'Preview' }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                        <div class="absolute inset-0 bg-gradient-to-br from-yellow-500/20 to-orange-500/20 group-hover:from-yellow-500/30 group-hover:to-orange-500/30 transition-all duration-300"></div>
+                        <div class="absolute bottom-1 left-1 right-1 bg-black/50 backdrop-blur-sm rounded-lg p-1">
+                            <div class="text-white text-xs font-medium text-center">Wisata</div>
+                        </div>
+                    </div>
+                    @endif
+                </div>
+                @else
+                <!-- Fallback jika tidak ada hero photo -->
+                <div class="relative max-w-lg mx-auto">
+                    <div class="bg-gray-200 rounded-3xl p-8 text-center">
+                        <i class="fas fa-image text-gray-400 text-6xl mb-4"></i>
+                        <h3 class="text-gray-600 mb-2">Belum ada Hero Photo</h3>
+                        <p class="text-gray-500 text-sm">Admin belum mengatur foto hero untuk ditampilkan di halaman ini</p>
+                    </div>
+                </div>
+                @endif
+
+                @if($randomPantaiPhotos && $randomPantaiPhotos->count() > 0)
+                <!-- Floating Action Buttons -->
+                    <div class="absolute top-1/2 -left-16 transform -translate-y-1/2 space-y-3" data-aos="fade-right" data-aos-delay="1600">
+                        <button class="w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 hover:scale-110 shadow-lg animate-float">
+                            <i class="fas fa-share-alt"></i>
+                        </button>
+                        <button class="w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 hover:scale-110 shadow-lg animate-float" style="animation-delay: 0.5s;">
+                            <i class="fas fa-heart"></i>
+                        </button>
+                        <button class="w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 hover:scale-110 shadow-lg animate-float" style="animation-delay: 1s;">
+                            <i class="fas fa-bookmark"></i>
+                        </button>
+                    </div>
+
+                    <!-- Floating Stats Cards -->
+                    <div class="absolute -right-16 top-1/4 space-y-3" data-aos="fade-left" data-aos-delay="1800">
+                        <div class="bg-white/10 backdrop-blur-md rounded-2xl p-3 border border-white/20 shadow-lg animate-float">
+                            <div class="text-yellow-400 text-lg font-bold">4.8⭐</div>
+                            <div class="text-white text-xs">Rating</div>
+                        </div>
+                        <div class="bg-white/10 backdrop-blur-md rounded-2xl p-3 border border-white/20 shadow-lg animate-float" style="animation-delay: 0.7s;">
+                            <div class="text-green-400 text-lg font-bold">24/7</div>
+                            <div class="text-white text-xs">Akses</div>
+                        </div>
+                    </div>
+
+                    <!-- Animated Dots Pattern -->
+                    <div class="absolute inset-0 pointer-events-none">
+                        <div class="absolute top-1/4 left-1/4 w-2 h-2 bg-white/30 rounded-full animate-ping" style="animation-delay: 0s;"></div>
+                        <div class="absolute top-3/4 right-1/4 w-1 h-1 bg-cyan-400/50 rounded-full animate-ping" style="animation-delay: 1s;"></div>
+                        <div class="absolute top-1/2 left-1/6 w-1.5 h-1.5 bg-yellow-400/40 rounded-full animate-ping" style="animation-delay: 2s;"></div>
+                    </div>
+                </div>
+                @endif
+            </div>
+        </div>
+    </div>
+</section>
+
+@if($wisata)
+
+<!-- Gallery Section -->
+<section id="gallery" class="gallery-section section-spacing">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="section-header" data-aos="fade-up">
+            <div class="section-badge">
+                <i class="fas fa-images mr-2"></i>
+                Gallery Foto
+            </div>
+            <h2 class="section-title">
+                Galeri Foto {{ $wisata->nama }}
+            </h2>
+            <p class="text-xl lg:text-2xl text-gray-700 leading-relaxed">
+                <span class="font-semibold text-slate-700">Koleksi foto-foto menawan</span> yang memperlihatkan keindahan dan pesona
+                <span class="relative inline-block">
+                    <span class="relative z-10 font-semibold text-teal-700">{{ $wisata->nama }}</span>
+                    <span class="absolute bottom-0 left-0 w-full h-3 bg-gradient-to-r from-slate-200 to-teal-200 opacity-60 rounded"></span>
+                </span>
+            </p>
+        </div>
+
+        @if($galleryCategories && $galleryCategories->count() > 0)
+        <!-- Gallery Category Tabs -->
+        <div class="gallery-tabs-container" data-aos="fade-up" data-aos-delay="100">
+            <div class="gallery-tabs">
+                @php
+                    $tabIndex = 0;
+                    $categoryLabels = App\Models\GalleryFoto::getKategoriList();
+                @endphp
+                @php
+                    // Array icon random untuk setiap kategori
+                    $categoryIcons = [
+                        'pantai' => ['fa-umbrella-beach', 'fa-water', 'fa-sun', 'fa-anchor', 'fa-ship'],
+                        'makanan_khas' => ['fa-utensils', 'fa-hamburger', 'fa-pizza-slice', 'fa-birthday-cake', 'fa-coffee'],
+                        'seni_budaya' => ['fa-masks-theater', 'fa-music', 'fa-paint-brush', 'fa-theater-masks', 'fa-guitar'],
+                        'kerajinan' => ['fa-palette', 'fa-hammer', 'fa-tools', 'fa-paint-brush', 'fa-scissors'],
+                        'aktivitas' => ['fa-running', 'fa-swimmer', 'fa-bicycle', 'fa-hiking', 'fa-gamepad'],
+                        'pemandangan' => ['fa-mountain', 'fa-tree', 'fa-cloud-sun', 'fa-leaf', 'fa-seedling'],
+                        'festival' => ['fa-calendar-star', 'fa-star', 'fa-gift', 'fa-crown', 'fa-trophy']
+                    ];
+
+                    // Function untuk get random icon berdasarkan kategori
+                    function getRandomIcon($kategori, $categoryIcons) {
+                        if (isset($categoryIcons[$kategori])) {
+                            $icons = $categoryIcons[$kategori];
+                            return $icons[array_rand($icons)];
+                        }
+                        return 'fa-images'; // default icon
+                    }
+                @endphp
+
+                @foreach($galleryCategories as $kategori => $photos)
+                <button class="gallery-tab {{ $tabIndex === 0 ? 'active' : '' }}"
+                        onclick="switchGalleryTab('{{ $kategori }}', this)"
+                        data-category="{{ $kategori }}">
+                    <div class="tab-icon">
+                        <i class="fas {{ getRandomIcon($kategori, $categoryIcons) }}"></i>
+                    </div>
+                    <div class="tab-content">
+                        <div class="tab-title">{{ $categoryLabels[$kategori] ?? ucwords(str_replace('_', ' ', $kategori)) }}</div>
+                        <div class="tab-count">{{ $photos->count() }} foto</div>
+                    </div>
+                </button>
+                @php $tabIndex++; @endphp
+                @endforeach
+            </div>
+        </div>
+
+        <!-- Gallery Content per Category -->
+        @php $categoryIndex = 0; @endphp
+        @foreach($galleryCategories as $kategori => $photos)
+        <div class="gallery-category-content {{ $categoryIndex === 0 ? 'active' : '' }}"
+             id="gallery-{{ $kategori }}"
+             data-aos="fade-up"
+             data-aos-delay="200">
+
+            <div class="category-header">
+                <h3 class="category-title">{{ $categoryLabels[$kategori] ?? ucwords(str_replace('_', ' ', $kategori)) }}</h3>
+                <div class="category-stats">
+                    <span class="stats-item">
+                        <i class="fas fa-images"></i> {{ $photos->count() }} Foto
+                    </span>
+                </div>
+            </div>
+
+            <div class="gallery-instagram">
+                @foreach($photos as $index => $photo)
+                <div class="photo-card"
+                     data-aos="fade-in"
+                     data-aos-delay="{{ 50 + ($index * 30) }}"
+                     onclick="openCategoryModal('{{ $kategori }}', {{ $index }})"
+                     data-category="{{ $kategori }}"
+                     data-index="{{ $index }}">
+
+                    <img src="{{ str_starts_with($photo->url_foto, 'http') ? $photo->url_foto : Storage::url('potensi_wisata/' . $photo->url_foto) }}"
+                         alt="{{ $photo->judul ?? 'Foto ' . ($index + 1) }}"
+                         class="photo-image"
+                         loading="lazy">
+
+                    <div class="photo-overlay">
+                        <div class="overlay-content">
+                            <div class="overlay-title">{{ $photo->judul ?? 'Foto ' . ($index + 1) }}</div>
+                            @if($photo->deskripsi)
+                            <div class="overlay-description">{{ Str::limit($photo->deskripsi, 80) }}</div>
+                            @endif
+                        </div>
+                    </div>
+
+                    <div class="photo-likes">
+                        <i class="fas fa-heart"></i> {{ rand(10, 99) }}
+                    </div>
+
+                    <div class="photo-stats">
+                        <div class="stat-item-mini">
+                            <i class="fas fa-eye"></i> {{ rand(100, 999) }}
+                        </div>
+                        <div class="stat-item-mini">
+                            <i class="fas fa-share"></i> {{ rand(5, 50) }}
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+        @php $categoryIndex++; @endphp
+        @endforeach
+        @else
+        <div class="text-center py-16" data-aos="fade-up">
+            <i class="fas fa-images text-6xl text-gray-400 mb-4"></i>
+            <h3 class="text-2xl font-semibold text-gray-600 mb-2">Belum ada foto</h3>
+            <p class="text-gray-500">Galeri foto akan segera ditambahkan</p>
+        </div>
+        @endif
+    </div>
+</section>
+
+<!-- Enhanced Description Section -->
+<section class="section-spacing relative overflow-hidden">
+    <!-- Background with gradient -->
+    <div class="absolute inset-0 bg-gradient-to-br from-teal-50 via-cyan-50 to-blue-50"></div>
+
+    <!-- Decorative elements -->
+    <div class="absolute top-0 left-0 w-32 h-32 bg-teal-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse"></div>
+    <div class="absolute bottom-0 right-0 w-40 h-40 bg-cyan-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse animation-delay-1000"></div>
+
+    <div class="relative max-w-full mx-auto px-4 sm:px-6 lg:px-12 xl:px-16 2xl:px-24">
+        <!-- Section Header -->
+        <div class="text-center mb-16" data-aos="fade-up">
+            <div class="inline-flex items-center bg-gradient-to-r from-teal-600 to-cyan-600 text-white px-6 py-3 rounded-full text-sm font-semibold shadow-lg mb-6">
+                <i class="fas fa-map-marker-alt mr-2 text-yellow-300"></i>
+                Destinasi Wisata Unggulan
+            </div>
+
+            <h2 class="text-4xl lg:text-5xl font-bold mb-4">
+                <span class="text-teal-600">Pesona</span> {{ $wisata->nama }}
+            </h2>
+            <div class="w-16 h-1 bg-gradient-to-r from-teal-500 to-cyan-500 rounded-full mx-auto mb-6"></div>
+            <p class="text-xl lg:text-2xl text-gray-700 leading-relaxed max-w-4xl mx-auto">
+                <span class="font-semibold text-slate-700">Jelajahi keindahan alam yang memukau</span> <span class="font-semibold text-teal-600">dan nikmati pengalaman wisata yang tak terlupakan</span>
+                di <span class="font-semibold text-teal-700">{{ $wisata->nama }}</span> dengan fasilitas lengkap
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-8 xl:gap-12 items-start">
+            <!-- Content Area -->
+            <div class="xl:col-span-9 space-y-8" data-aos="fade-right">
+                <!-- Main Description -->
+                <div class="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-white/20">
+                    <div class="prose prose-lg text-gray-700 leading-relaxed max-w-none">
+                        {!! $wisata->deskripsi !!}
+                    </div>
+                </div>
+
+                <!-- Key Features -->
+                @if($wisata->fitur_unggulan && count($wisata->fitur_unggulan) > 0)
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
+                    @foreach($wisata->fitur_unggulan as $index => $fitur)
+                    <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20 hover:shadow-xl transition-all duration-300">
+                        <div class="flex items-center mb-4">
+                            @php
+                                $gradients = [
+                                    'from-green-400 to-emerald-500',
+                                    'from-indigo-400 to-purple-500',
+                                    'from-orange-400 to-red-500',
+                                    'from-purple-400 to-pink-500',
+                                    'from-blue-400 to-cyan-500',
+                                    'from-red-400 to-rose-500'
+                                ];
+                                $gradient = $gradients[$index % count($gradients)];
+                            @endphp
+                            <div class="w-12 h-12 bg-gradient-to-r {{ $gradient }} rounded-xl flex items-center justify-center">
+                                <i class="{{ $fitur['icon'] }} text-white text-xl"></i>
+                            </div>
+                            <h3 class="ml-4 text-xl font-bold text-gray-900">{{ $fitur['judul'] }}</h3>
+                        </div>
+                        <p class="text-gray-600">{{ $fitur['deskripsi'] }}</p>
+                    </div>
+                    @endforeach
+                </div>
+                @endif
+            </div>
+
+            <!-- Info Cards -->
+            <div class="xl:col-span-3 space-y-6" data-aos="fade-left" data-aos-delay="200">
+                <!-- Location Card -->
+                <div class="bg-white/90 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-white/20">
+                    <div class="flex items-start space-x-4">
+                        <div class="w-16 h-16 bg-gradient-to-r from-teal-500 to-cyan-500 rounded-2xl flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-map-marker-alt text-white text-2xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-900 mb-2">Lokasi</h3>
+                            <p class="text-gray-600 leading-relaxed">{{ $wisata->lokasi }}</p>
+                            <a href="#" class="inline-flex items-center mt-3 text-teal-600 hover:text-teal-700 font-semibold">
+                                <i class="fas fa-external-link-alt mr-2"></i>
+                                Lihat di Maps
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Activity Card -->
+                <div class="bg-white/90 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-white/20">
+                    <div class="flex items-start space-x-4">
+                        <div class="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-compass text-white text-2xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-900 mb-2">Aktivitas Wisata</h3>
+                            <p class="text-gray-600 leading-relaxed">
+                                {{ $wisata->aktivitas_wisata ?? 'Berbagai aktivitas wisata menarik tersedia untuk semua usia.' }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Card -->
+                <div class="bg-white/90 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-white/20">
+                    <div class="flex items-start space-x-4">
+                        <div class="w-16 h-16 bg-gradient-to-r from-rose-400 to-pink-500 rounded-2xl flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-phone text-white text-2xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-900 mb-2">Kontak & Informasi</h3>
+                            <div class="space-y-3">
+                                @if($wisata->nomor_telepon)
+                                <div class="flex items-center text-gray-600">
+                                    <i class="fas fa-phone mr-3 text-green-500"></i>
+                                    <span>{{ $wisata->nomor_telepon }}</span>
+                                </div>
+                                @endif
+                                @if($wisata->whatsapp)
+                                <div class="flex items-center text-gray-600">
+                                    <i class="fab fa-whatsapp mr-3 text-green-500"></i>
+                                    <a href="https://wa.me/{{ str_replace(['+', '-', ' '], '', $wisata->whatsapp) }}" target="_blank" class="hover:text-green-600">Hubungi via WhatsApp</a>
+                                </div>
+                                @endif
+                                @if($wisata->info_guide)
+                                <div class="flex items-start text-gray-600">
+                                    <i class="fas fa-info-circle mr-3 text-blue-500 mt-1"></i>
+                                    <span>{{ $wisata->info_guide }}</span>
+                                </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Info -->
+                <div class="bg-gradient-to-r from-teal-500 to-cyan-500 rounded-3xl p-8 shadow-xl text-white">
+                    <h3 class="text-xl font-bold mb-6 flex items-center">
+                        <i class="fas fa-info-circle mr-3"></i>
+                        Info Praktis
+                    </h3>
+                    <div class="space-y-4">
+                        @if($wisata->jam_buka)
+                        <div class="flex items-center">
+                            <i class="fas fa-clock mr-3 text-yellow-300"></i>
+                            <span><strong>Jam Buka:</strong> {{ $wisata->jam_buka }}</span>
+                        </div>
+                        @endif
+                        @if($wisata->harga_tiket)
+                        <div class="flex items-center">
+                            <i class="fas fa-ticket-alt mr-3 text-yellow-300"></i>
+                            <span><strong>Harga Tiket:</strong> {{ $wisata->harga_tiket }}</span>
+                        </div>
+                        @endif
+                        @if($wisata->fasilitas_parkir)
+                        <div class="flex items-center">
+                            <i class="fas fa-car mr-3 text-yellow-300"></i>
+                            <span><strong>Parkir:</strong> {{ $wisata->fasilitas_parkir }}</span>
+                        </div>
+                        @endif
+                        @if($wisata->warung_makan)
+                        <div class="flex items-center">
+                            <i class="fas fa-utensils mr-3 text-yellow-300"></i>
+                            <span><strong>Warung Makan:</strong> {{ $wisata->warung_makan }}</span>
+                        </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+@endif
+
+<!-- Instagram-Style Photo Modal -->
+<div id="photoModal" class="modal">
+    <div class="modal-content">
+        <button class="modal-close" onclick="closeModal()">
+            <i class="fas fa-times"></i>
+        </button>
+
+        <div class="modal-image-container">
+            <img id="modalImage" src="" alt="" class="modal-image">
+
+            @if($galleryPhotos && count($galleryPhotos) > 1)
+            <button class="modal-nav modal-prev" onclick="prevPhoto()">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="modal-nav modal-next" onclick="nextPhoto()">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            @endif
+        </div>
+
+        <div class="modal-info">
+            <h3 id="modalTitle" class="modal-title"></h3>
+            <p id="modalDescription" class="modal-description"></p>
+
+            <div class="modal-meta">
+                <div class="modal-stats">
+                    <div class="modal-stat">
+                        <i class="fas fa-eye"></i>
+                        <span id="modalViews">0</span>
+                    </div>
+                    <div class="modal-stat">
+                        <i class="fas fa-calendar"></i>
+                        <span>{{ $wisata ? $wisata->nama : 'Pantai Ancol Seluma' }}</span>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button class="modal-action-btn" id="likeBtn" onclick="toggleLike()">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                    <button class="modal-action-btn" onclick="sharePhoto()">
+                        <i class="fas fa-share"></i>
+                    </button>
+                    <button class="modal-action-btn" onclick="downloadPhoto()">
+                        <i class="fas fa-download"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- PDF Modal -->
+<div id="pdfModal" class="modal-backdrop" style="display: none;">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h3 class="modal-title">
+                <i class="fas fa-file-pdf text-red-600 mr-2"></i>
+                Berkas Potensi Desa Wisata
+            </h3>
+            <button type="button" class="modal-close" onclick="closePdfModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body p-0 flex-1 flex flex-col">
+            @if($wisata->file_potensi_desa)
+            <!-- PDF Viewer Container -->
+            <div class="pdf-viewer-container flex-1 flex flex-col">
+                <!-- PDF Toolbar -->
+                <div class="pdf-toolbar bg-gradient-to-r from-slate-50 to-gray-50 px-4 py-3 border-b border-gray-200 flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-gradient-to-br from-red-500 to-red-600 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-file-pdf text-white text-sm"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-medium text-gray-800 text-sm">Berkas Lomba Desa Wisata</h4>
+                            <p class="text-xs text-gray-500">{{ $wisata->nama }}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-1">
+                        <a href="{{ asset($wisata->file_potensi_desa) }}"
+                           download
+                           class="pdf-action-btn"
+                           title="Unduh PDF">
+                            <i class="fas fa-download"></i>
+                        </a>
+                        <a href="{{ asset($wisata->file_potensi_desa) }}"
+                           target="_blank"
+                           class="pdf-action-btn"
+                           title="Buka di Tab Baru">
+                            <i class="fas fa-external-link-alt"></i>
+                        </a>
+                        <button onclick="toggleFullscreenPdf()"
+                                class="pdf-action-btn"
+                                title="Fullscreen">
+                            <i class="fas fa-expand"></i>
+                        </button>
+                        <div class="w-px h-6 bg-gray-300 mx-2"></div>
+                        <button onclick="closePdfModal()"
+                                class="pdf-close-btn"
+                                title="Tutup Modal">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- PDF Viewer -->
+                <div class="pdf-simple-viewer flex-1">
+                        <!-- Direct PDF Embed with Google Docs Viewer as backup -->
+                        <iframe
+                            src="{{ asset($wisata->file_potensi_desa) }}"
+                            width="100%"
+                            height="100%"
+                            class="pdf-direct-frame border-0"
+                            title="PDF Viewer - {{ $wisata->nama }}"
+                            style="border: none;"
+                            onload="this.style.opacity='1'"
+                            onerror="this.src='https://docs.google.com/gview?url={{ urlencode(asset($wisata->file_potensi_desa)) }}&embedded=true'">
+                        </iframe>
+
+                        <!-- Fallback content shown if iframe fails -->
+                        <div class="pdf-fallback flex items-center justify-center h-full bg-gray-50" style="display: none;">
+                            <div class="text-center p-8 max-w-lg">
+                                <div class="w-20 h-20 bg-red-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                                    <i class="fas fa-file-pdf text-3xl text-red-600"></i>
+                                </div>
+
+                                <h5 class="text-xl font-bold text-gray-800 mb-3">Berkas Lomba Desa Wisata</h5>
+                                <p class="text-gray-600 mb-8 leading-relaxed">
+                                    Dokumen resmi berkas lomba desa wisata {{ $wisata ? $wisata->nama : 'Pantai Ancol Seluma' }}.
+                                    Silakan pilih salah satu opsi untuk melihat dokumen:
+                                </p>
+
+                                <div class="space-y-4">
+                                    <a href="{{ asset($wisata->file_potensi_desa) }}"
+                                       target="_blank"
+                                       class="inline-flex items-center w-full justify-center px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl font-medium">
+                                        <i class="fas fa-external-link-alt mr-3"></i>
+                                        Buka PDF di Tab Baru
+                                    </a>
+
+                                    <a href="{{ asset($wisata->file_potensi_desa) }}"
+                                       download
+                                       class="inline-flex items-center w-full justify-center px-6 py-3 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-all duration-200 shadow-lg hover:shadow-xl font-medium">
+                                        <i class="fas fa-download mr-3"></i>
+                                        Download PDF
+                                        @if(file_exists(public_path($wisata->file_potensi_desa)))
+                                        <span class="ml-2 text-sm opacity-80">
+                                            ({{ number_format(filesize(public_path($wisata->file_potensi_desa)) / 1024, 0) }} KB)
+                                        </span>
+                                        @endif
+                                    </a>
+
+                                    <a href="https://docs.google.com/gview?url={{ urlencode(asset($wisata->file_potensi_desa)) }}"
+                                       target="_blank"
+                                       class="inline-flex items-center w-full justify-center px-6 py-3 bg-orange-600 text-white rounded-xl hover:bg-orange-700 transition-all duration-200 shadow-lg hover:shadow-xl font-medium">
+                                        <i class="fab fa-google mr-3"></i>
+                                        Lihat via Google Docs
+                                    </a>
+                                </div>
+
+                                <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-xl">
+                                    <div class="flex items-start text-sm text-blue-800">
+                                        <i class="fas fa-lightbulb mt-0.5 mr-3 text-blue-600"></i>
+                                        <div class="text-left">
+                                            <p class="font-medium mb-1">Tips Viewing PDF:</p>
+                                            <ul class="text-xs space-y-1 opacity-90">
+                                                <li>• Tab baru memberikan kontrol penuh atas dokumen</li>
+                                                <li>• Google Docs viewer cocok untuk preview cepat</li>
+                                                <li>• Download untuk akses offline</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @else
+            <div class="flex items-center justify-center h-full bg-gray-50">
+                <div class="text-center p-8">
+                    <i class="fas fa-file-pdf text-6xl text-gray-400 mb-4"></i>
+                    <p class="text-gray-600">File PDF tidak tersedia</p>
+                    <p class="text-sm text-gray-500 mt-2">Silakan hubungi administrator untuk informasi lebih lanjut</p>
+                </div>
+            </div>
+            @endif
+        </div>
+    </div>
+</div>
+
+<!-- Video Modal -->
+<div id="videoModal" class="modal-backdrop" style="display: none;">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h3 class="modal-title">
+                <i class="fas fa-play text-red-600 mr-2"></i>
+                Video Tour {{ $wisata->nama }}
+                @if($wisata->sumber_video)
+                <span class="text-sm text-gray-500 ml-2">- {{ $wisata->sumber_video }}</span>
+                @endif
+            </h3>
+            <button type="button" class="modal-close-enhanced" onclick="closeVideoModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body p-0 flex-1 flex flex-col">
+            @if($youtubeId)
+            <!-- Video Viewer Container -->
+            <div class="video-viewer-container flex-1 flex flex-col">
+                <!-- Video Toolbar -->
+                <div class="video-toolbar bg-gradient-to-r from-slate-50 to-gray-50 px-4 py-3 border-b border-gray-200 flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-gradient-to-br from-red-500 to-red-600 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-play text-white text-sm"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-medium text-gray-800 text-sm">Video Tour {{ $wisata ? $wisata->nama : 'Pantai' }}</h4>
+                            <p class="text-xs text-gray-500">{{ $wisata->nama }}@if($wisata->sumber_video) - {{ $wisata->sumber_video }}@endif</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-1">
+                        <a href="https://www.youtube.com/watch?v={{ $youtubeId }}"
+                           target="_blank"
+                           class="video-action-btn"
+                           title="Buka di YouTube">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                        <button onclick="toggleVideoQuality()"
+                                class="video-action-btn"
+                                title="Kualitas Video">
+                            <i class="fas fa-cog"></i>
+                        </button>
+                        <button onclick="toggleVideoFullscreen()"
+                                class="video-action-btn"
+                                title="Fullscreen">
+                            <i class="fas fa-expand"></i>
+                        </button>
+                        <div class="w-px h-6 bg-gray-300 mx-2"></div>
+                        <button onclick="closeVideoModal()"
+                                class="video-close-btn"
+                                title="Tutup Modal">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Enhanced Video Player -->
+                <div class="video-player-wrapper flex-1 bg-black relative">
+                    @if($youtubeId)
+                    <iframe id="videoModalPlayer"
+                            src=""
+                            class="video-frame w-full h-full"
+                            frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            allowfullscreen
+                            loading="eager"
+                            title="YouTube video player"
+                            referrerpolicy="strict-origin-when-cross-origin"
+                            style="display: block; position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
+                    </iframe>
+
+                    <!-- Debug info (remove in production) -->
+                    <div class="absolute top-2 left-2 bg-black bg-opacity-50 text-white text-xs p-2 rounded" id="videoDebugInfo" style="display: none;">
+                        YouTube ID: {{ $youtubeId }}
+                    </div>
+                    @else
+                    <div class="flex items-center justify-center h-full">
+                        <div class="text-white text-center">
+                            <i class="fas fa-exclamation-triangle text-4xl mb-4"></i>
+                            <p>Video ID tidak ditemukan</p>
+                        </div>
+                    </div>
+                    @endif
+
+                    <!-- Loading overlay -->
+                    <div class="video-loading absolute inset-0 bg-black flex items-center justify-center" style="display: none;">
+                        <div class="text-center text-white">
+                            <div class="w-12 h-12 border-3 border-white border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                            <p class="text-lg font-medium">Loading Video...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @else
+            <div class="flex items-center justify-center h-full bg-gradient-to-br from-gray-900 to-black">
+                <div class="text-center text-white p-8">
+                    <div class="w-20 h-20 bg-red-100 bg-opacity-20 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-video text-3xl text-red-400"></i>
+                    </div>
+                    <h5 class="text-xl font-bold text-white mb-3">Video Tidak Tersedia</h5>
+                    <p class="text-gray-300 mb-6">Maaf, video tour untuk destinasi ini belum tersedia.</p>
+                    <button onclick="closeVideoModal()" class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                        Tutup
+                    </button>
+                </div>
+            </div>
+            @endif
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="modal-btn modal-btn-close" onclick="closeVideoModal()">
+                <i class="fas fa-times"></i>
+                <span>Tutup</span>
+            </button>
+            @if($wisata->video_youtube)
+            <a href="{{ $wisata->video_youtube }}"
+               target="_blank"
+               class="modal-btn modal-btn-youtube">
+                <i class="fab fa-youtube"></i>
+                <span>Buka di YouTube</span>
+            </a>
+            @endif
+        </div>
+    </div>
+</div>
+@endsection
+
+@push('scripts')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script>
+    // Initialize AOS
+    AOS.init({
+        duration: 800,
+        easing: 'ease-out-cubic',
+        once: true,
+        offset: 100
+    });
+
+    // Gallery data
+    const galleryData = @json($galleryPhotos ?? []);
+    const galleryCategories = @json($galleryCategories ?? []);
+    let currentPhotoIndex = 0;
+    let currentCategory = 'pantai'; // Default category
+
+    // Debug: Log gallery data
+    console.log('Gallery Data:', galleryData);
+    console.log('Gallery Categories:', galleryCategories);
+    console.log('YouTube ID available:', '{{ $youtubeId ?? "None" }}');
+
+    // Gallery Tab Switching
+    function switchGalleryTab(kategori, tabElement) {
+        // Update current category
+        currentCategory = kategori;
+
+        // Remove active class from all tabs
+        document.querySelectorAll('.gallery-tab').forEach(tab => {
+            tab.classList.remove('active');
+        });
+
+        // Add active class to clicked tab
+        tabElement.classList.add('active');
+
+        // Hide all gallery contents
+        document.querySelectorAll('.gallery-category-content').forEach(content => {
+            content.classList.remove('active');
+        });
+
+        // Show selected category content
+        const targetContent = document.getElementById('gallery-' + kategori);
+        if (targetContent) {
+            targetContent.classList.add('active');
+
+            // Trigger AOS animation for photos in active tab
+            setTimeout(() => {
+                AOS.refresh();
+            }, 100);
+        }
+    }    // Initialize default tab on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Activate first tab by default (pantai)
+        const firstTab = document.querySelector('.gallery-tab');
+        const firstContent = document.querySelector('.gallery-category-content');
+
+        if (firstTab && firstContent) {
+            firstTab.classList.add('active');
+            firstContent.classList.add('active');
+        }
+    });
+
+    // Open modal for category-specific photos
+    function openCategoryModal(kategori, index) {
+        currentCategory = kategori;
+
+        if (!galleryCategories[kategori] || galleryCategories[kategori].length === 0) return;
+
+        currentPhotoIndex = index;
+        updateCategoryModalContent();
+
+        const modal = document.getElementById('photoModal');
+        modal.style.display = 'flex';
+        setTimeout(() => {
+            modal.classList.add('show');
+        }, 10);
+
+        document.body.style.overflow = 'hidden';
+    }
+
+    // Open modal (fallback for general gallery)
+    function openModal(index) {
+        if (!galleryData || galleryData.length === 0) return;
+
+        currentPhotoIndex = index;
+        updateModalContent();
+
+        const modal = document.getElementById('photoModal');
+        modal.style.display = 'flex';
+        setTimeout(() => {
+            modal.classList.add('show');
+        }, 10);
+
+        document.body.style.overflow = 'hidden';
+    }
+
+    // Close modal
+    function closeModal() {
+        const modal = document.getElementById('photoModal');
+        modal.classList.remove('show');
+        setTimeout(() => {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }, 400);
+    }
+
+    // Previous photo
+    function prevPhoto() {
+        if (currentCategory && galleryCategories[currentCategory]) {
+            const categoryPhotos = galleryCategories[currentCategory];
+            if (categoryPhotos.length <= 1) return;
+
+            currentPhotoIndex = (currentPhotoIndex - 1 + categoryPhotos.length) % categoryPhotos.length;
+            updateCategoryModalContent();
+        } else {
+            if (!galleryData || galleryData.length <= 1) return;
+
+            currentPhotoIndex = (currentPhotoIndex - 1 + galleryData.length) % galleryData.length;
+            updateModalContent();
+        }
+    }
+
+    // Next photo
+    function nextPhoto() {
+        if (currentCategory && galleryCategories[currentCategory]) {
+            const categoryPhotos = galleryCategories[currentCategory];
+            if (categoryPhotos.length <= 1) return;
+
+            currentPhotoIndex = (currentPhotoIndex + 1) % categoryPhotos.length;
+            updateCategoryModalContent();
+        } else {
+            if (!galleryData || galleryData.length <= 1) return;
+
+            currentPhotoIndex = (currentPhotoIndex + 1) % galleryData.length;
+            updateModalContent();
+        }
+    }
+
+    // Update modal content for category-specific photos
+    function updateCategoryModalContent() {
+        const categoryPhotos = galleryCategories[currentCategory];
+        const photo = categoryPhotos[currentPhotoIndex];
+        const photoNumber = currentPhotoIndex + 1;
+
+        // Prepare image URL
+        const imageUrl = (photo.url_foto && photo.url_foto.startsWith('http'))
+            ? photo.url_foto
+            : `/storage/potensi_wisata/${photo.url_foto}`;
+
+        // Update image
+        document.getElementById('modalImage').src = imageUrl;
+        document.getElementById('modalImage').alt = photo.judul || `Foto ${photoNumber}`;
+
+        // Update title
+        const titleElement = document.getElementById('modalTitle');
+        if (photo.judul && photo.judul.trim() !== '') {
+            titleElement.textContent = photo.judul;
+            titleElement.classList.remove('modal-placeholder');
+        } else {
+            titleElement.textContent = `Foto ${photoNumber} - {{ $wisata ? $wisata->nama : 'Pantai Ancol Seluma' }}`;
+            titleElement.classList.add('modal-placeholder');
+        }
+
+        // Update description
+        const descElement = document.getElementById('modalDescription');
+        if (photo.deskripsi && photo.deskripsi.trim() !== '') {
+            descElement.textContent = photo.deskripsi;
+            descElement.classList.remove('modal-placeholder');
+            descElement.style.display = 'block';
+        } else {
+            descElement.textContent = 'Nikmati keindahan {{ $wisata ? $wisata->nama : 'Pantai Ancol Seluma' }} yang memukau dengan pemandangan yang spektakuler.';
+            descElement.classList.add('modal-placeholder');
+            descElement.style.display = 'block';
+        }
+
+        // Update views (random untuk demo)
+        const viewsElement = document.getElementById('modalViews');
+        if (viewsElement) {
+            viewsElement.textContent = Math.floor(Math.random() * 900) + 100;
+        }
+    }
+
+    // Update modal content (fallback for general gallery)
+    function updateModalContent() {
+        const photo = galleryData[currentPhotoIndex];
+        const photoNumber = currentPhotoIndex + 1;
+
+        // Update image
+        document.getElementById('modalImage').src = photo.url;
+        document.getElementById('modalImage').alt = photo.judul || `Foto ${photoNumber}`;
+
+        // Update title dengan fallback yang elegant
+        const titleElement = document.getElementById('modalTitle');
+        if (photo.judul && photo.judul.trim() !== '') {
+            titleElement.textContent = photo.judul;
+            titleElement.classList.remove('modal-placeholder');
+        } else {
+            titleElement.textContent = `Foto ${photoNumber} - {{ $wisata ? $wisata->nama : 'Pantai Ancol Seluma' }}`;
+            titleElement.classList.add('modal-placeholder');
+        }
+
+        // Update description dengan fallback yang elegant
+        const descElement = document.getElementById('modalDescription');
+        if (photo.keterangan && photo.keterangan.trim() !== '') {
+            descElement.textContent = photo.keterangan;
+            descElement.classList.remove('modal-placeholder');
+            descElement.style.display = 'block';
+        } else {
+            descElement.textContent = 'Nikmati keindahan {{ $wisata ? $wisata->nama : 'Pantai Ancol Seluma' }} yang memukau dengan pemandangan yang spektakuler.';
+            descElement.classList.add('modal-placeholder');
+            descElement.style.display = 'block';
+        }
+
+        // Update views (random untuk demo)
+        const viewsElement = document.getElementById('modalViews');
+        if (viewsElement) {
+            viewsElement.textContent = Math.floor(Math.random() * 900) + 100;
+        }
+    }
+
+    // Keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        const modal = document.getElementById('photoModal');
+        if (modal.classList.contains('show')) {
+            if (e.key === 'Escape') {
+                closeModal();
+            } else if (e.key === 'ArrowLeft') {
+                prevPhoto();
+            } else if (e.key === 'ArrowRight') {
+                nextPhoto();
+            }
+        }
+    });
+
+    // Instagram-like interactions
+    let isLiked = false;
+
+    function toggleLike() {
+        const likeBtn = document.getElementById('likeBtn');
+        isLiked = !isLiked;
+
+        if (isLiked) {
+            likeBtn.classList.add('liked');
+            // Add heart animation
+            likeBtn.style.transform = 'scale(1.2)';
+            setTimeout(() => {
+                likeBtn.style.transform = 'scale(1)';
+            }, 200);
+        } else {
+            likeBtn.classList.remove('liked');
+        }
+    }
+
+    function sharePhoto() {
+        const photo = galleryData[currentPhotoIndex];
+        const shareText = `Lihat foto indah dari {{ $wisata ? $wisata->nama : 'Pantai Ancol Seluma' }}: ${photo.judul || '{{ $wisata ? $wisata->nama : 'Pantai Ancol Seluma' }}'}`;
+
+        if (navigator.share) {
+            navigator.share({
+                title: photo.judul || '{{ $wisata ? $wisata->nama : 'Pantai Ancol Seluma' }}',
+                text: shareText,
+                url: window.location.href
+            });
+        } else {
+            // Fallback: copy to clipboard
+            navigator.clipboard.writeText(window.location.href + '#photo-' + (currentPhotoIndex + 1));
+            alert('Link telah disalin ke clipboard!');
+        }
+    }
+
+    function downloadPhoto() {
+        const photo = galleryData[currentPhotoIndex];
+        const link = document.createElement('a');
+        link.href = photo.url;
+        link.download = `pantai-ancol-seluma-${currentPhotoIndex + 1}.jpg`;
+        link.target = '_blank';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    // Click outside modal to close
+    document.getElementById('photoModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeModal();
+        }
+    });
+
+    // Update views counter
+    @if($wisata)
+    fetch('{{ route("potensi-wisata.increment-views", $wisata->id) }}', {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'Content-Type': 'application/json'
+        }
+    }).catch(console.error);
+    @endif
+
+    // Video loading handler
+    document.addEventListener('DOMContentLoaded', function() {
+        const videoIframe = document.querySelector('.video-iframe');
+        const videoFallback = document.querySelector('.video-fallback');
+
+        if (videoIframe) {
+            let loadTimeout;
+
+            // Set a timeout to check if video loads
+            loadTimeout = setTimeout(function() {
+                console.log('Video loading timeout - showing fallback');
+                if (videoFallback) {
+                    videoIframe.style.display = 'none';
+                    videoFallback.style.display = 'flex';
+                }
+            }, 5000); // 5 second timeout
+
+            // If iframe loads successfully, clear timeout
+            videoIframe.addEventListener('load', function() {
+                console.log('Video loaded successfully');
+                clearTimeout(loadTimeout);
+                if (videoFallback) {
+                    videoFallback.style.display = 'none';
+                }
+            });
+
+            // If iframe fails to load
+            videoIframe.addEventListener('error', function() {
+                console.log('Video failed to load - showing fallback');
+                clearTimeout(loadTimeout);
+                if (videoFallback) {
+                    videoIframe.style.display = 'none';
+                    videoFallback.style.display = 'flex';
+                }
+            });
+        }
+
+        // Force autoplay after user interaction
+        let videoAutoplayTriggered = false;
+
+        function triggerVideoAutoplay() {
+            if (!videoAutoplayTriggered) {
+                const iframe = document.querySelector('.video-iframe');
+                if (iframe) {
+                    // Get current src and add autoplay parameter if not already there
+                    let currentSrc = iframe.src;
+                    if (currentSrc.indexOf('autoplay=1') === -1) {
+                        // Add autoplay parameter
+                        const separator = currentSrc.indexOf('?') !== -1 ? '&' : '?';
+                        iframe.src = currentSrc + separator + 'autoplay=1&mute=0';
+                    }
+
+                    // Try to play the video using postMessage API
+                    try {
+                        iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+                    } catch (e) {
+                        console.log('Could not trigger autoplay via postMessage');
+                    }
+
+                    videoAutoplayTriggered = true;
+                    console.log('Video autoplay triggered after user interaction');
+                }
+            }
+        }
+
+        // Trigger autoplay on first scroll
+        let scrollTriggered = false;
+        window.addEventListener('scroll', function() {
+            if (!scrollTriggered) {
+                scrollTriggered = true;
+                setTimeout(triggerVideoAutoplay, 1000);
+            }
+        });
+
+        // Trigger autoplay on first click anywhere
+        let clickTriggered = false;
+        document.addEventListener('click', function() {
+            if (!clickTriggered) {
+                clickTriggered = true;
+                setTimeout(triggerVideoAutoplay, 500);
+            }
+        });
+
+        // Also try to trigger when video section becomes visible
+        if ('IntersectionObserver' in window) {
+            const videoSection = document.getElementById('video');
+            if (videoSection) {
+                const observer = new IntersectionObserver(function(entries) {
+                    entries.forEach(function(entry) {
+                        if (entry.isIntersecting && !videoAutoplayTriggered) {
+                            setTimeout(triggerVideoAutoplay, 1000);
+                            observer.disconnect();
+                        }
+                    });
+                }, {
+                    threshold: 0.5
+                });
+
+                observer.observe(videoSection);
+            }
+        }
+
+        // Modal Functions
+        window.openPdfModal = function() {
+            const modal = document.getElementById('pdfModal');
+            if (modal) {
+                modal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+                console.log('PDF modal opened');
+            }
+        };
+
+        window.closePdfModal = function() {
+            const modal = document.getElementById('pdfModal');
+            if (modal) {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        };
+
+        window.toggleFullscreenPdf = function() {
+            const modal = document.getElementById('pdfModal');
+            const container = modal?.querySelector('.modal-container');
+
+            if (container) {
+                if (container.classList.contains('fullscreen-pdf')) {
+                    // Exit fullscreen
+                    container.classList.remove('fullscreen-pdf');
+                } else {
+                    // Enter fullscreen
+                    container.classList.add('fullscreen-pdf');
+                }
+            }
+        };
+
+        window.toggleVideoFullscreen = function() {
+            const modal = document.getElementById('videoModal');
+            const container = modal?.querySelector('.modal-container');
+
+            if (container) {
+                if (container.classList.contains('fullscreen-video')) {
+                    // Exit fullscreen
+                    container.classList.remove('fullscreen-video');
+                } else {
+                    // Enter fullscreen
+                    container.classList.add('fullscreen-video');
+                }
+            }
+        };
+
+        window.toggleVideoQuality = function() {
+            // This would normally open quality selector
+            // For now, we'll just open in YouTube
+            const iframe = document.getElementById('videoModalPlayer');
+            if (iframe) {
+                const src = iframe.src;
+                const videoId = src.match(/embed\/([^?]+)/)?.[1];
+                if (videoId) {
+                    window.open(`https://www.youtube.com/watch?v=${videoId}`, '_blank');
+                }
+            }
+        };
+
+        window.openVideoModal = function() {
+            const modal = document.getElementById('videoModal');
+            const iframe = document.getElementById('videoModalPlayer');
+            const mainVideo = document.getElementById('mainVideoPlayer');
+            const loading = modal?.querySelector('.video-loading');
+
+            if (modal) {
+                modal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+
+                // Hide main video section completely to avoid conflicts
+                const videoSection = document.getElementById('video');
+                if (videoSection) {
+                    videoSection.style.display = 'none';
+                    console.log('Main video section hidden');
+                }
+
+                // Force stop main video by clearing src
+                if (mainVideo) {
+                    mainVideo.src = 'about:blank';
+                    console.log('Main video force stopped');
+                }
+
+                // Show loading state
+                if (loading) {
+                    loading.style.display = 'flex';
+                }
+
+                // Load modal video immediately - ensure iframe is visible first
+                if (iframe) {
+                    // Force iframe to be visible and positioned correctly
+                    iframe.style.display = 'block';
+                    iframe.style.visibility = 'visible';
+                    iframe.style.opacity = '1';
+                    iframe.style.zIndex = '10';
+
+                    // Create completely new src with autoplay for modal
+                    const youtubeId = '{{ $youtubeId }}';
+                    const newSrc = `https://www.youtube.com/embed/${youtubeId}?rel=0&controls=1&autoplay=1&mute=0&enablejsapi=1`;
+
+                    // Clear old src first to force reload
+                    iframe.src = 'about:blank';
+
+                    // Set new src after a tiny delay to ensure clean load
+                    setTimeout(() => {
+                        iframe.src = newSrc;
+                        console.log('Modal video loaded:', newSrc);
+                        console.log('Iframe element:', iframe);
+                    }, 100);
+                }
+
+                // Log video source for debugging
+                console.log('Opening modal, main video stopped');
+
+                // Hide loading after iframe loads
+                if (iframe) {
+                    iframe.onload = function() {
+                        console.log('Video iframe loaded successfully');
+                        console.log('Iframe dimensions:', iframe.offsetWidth, 'x', iframe.offsetHeight);
+                        setTimeout(() => {
+                            if (loading) loading.style.display = 'none';
+                        }, 1000);
+                    };
+
+                    iframe.onerror = function() {
+                        console.error('Video iframe failed to load');
+                        if (loading) loading.style.display = 'none';
+                    };
+
+                    // Check if iframe is visible
+                    setTimeout(() => {
+                        const rect = iframe.getBoundingClientRect();
+                        console.log('Iframe position:', rect);
+                        if (rect.width === 0 || rect.height === 0) {
+                            console.warn('Iframe has zero dimensions - video may not be visible');
+                        }
+                    }, 2000);
+                }
+
+                console.log('Enhanced video modal opened');
+                console.log('YouTube Video should be playing');
+
+                // Show debug info temporarily
+                const debugInfo = document.getElementById('videoDebugInfo');
+                if (debugInfo) {
+                    debugInfo.style.display = 'block';
+                    setTimeout(() => {
+                        debugInfo.style.display = 'none';
+                    }, 5000);
+                }
+            }
+        };
+
+        window.closeVideoModal = function() {
+            const modal = document.getElementById('videoModal');
+            const iframe = document.getElementById('videoModalPlayer');
+            const mainVideo = document.getElementById('mainVideoPlayer');
+            const loading = modal?.querySelector('.video-loading');
+
+            if (modal) {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+
+                // Stop modal video immediately and hide it
+                if (iframe) {
+                    iframe.src = 'about:blank';
+                    iframe.style.opacity = '0';
+                    console.log('Modal video force stopped');
+                }
+
+                // Hide loading state
+                if (loading) {
+                    loading.style.display = 'none';
+                }
+
+                // Restore main video section after a delay
+                setTimeout(() => {
+                    const videoSection = document.getElementById('video');
+                    if (videoSection) {
+                        videoSection.style.display = 'block';
+                        console.log('Main video section restored');
+                    }
+
+                    // Restore main video iframe
+                    if (mainVideo) {
+                        const youtubeId = '{{ $youtubeId }}';
+                        mainVideo.src = `https://www.youtube.com/embed/${youtubeId}?rel=0&controls=1&autoplay=0&mute=0`;
+                        console.log('Main video iframe restored');
+                    }
+                }, 300);
+
+                console.log('Video modal closed');
+            }
+        };
+
+        // Simple PDF Modal
+        window.openPdfModal = function() {
+            const modal = document.getElementById('pdfModal');
+            if (modal) {
+                modal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+                console.log('PDF modal opened');
+            }
+        };
+
+        // Close modal when clicking backdrop
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('modal-backdrop')) {
+                closePdfModal();
+                closeVideoModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closePdfModal();
+                closeVideoModal();
+            }
+        });
+
+        // Clean up any stray elements that might be left from other pages
+        const cleanUpStrays = () => {
+            // Remove any chart-related elements
+            const chartElements = document.querySelectorAll('[data-chart], .chart-container, .chart-tabs');
+            chartElements.forEach(el => el.remove());
+
+            // Remove any navigation tabs that don't belong to this page
+            const strayTabs = document.querySelectorAll('.nav-tabs:not(.gallery-tabs), .tab-pane:not(.gallery-tab-pane)');
+            strayTabs.forEach(el => el.remove());
+        };
+
+        // Clean up on page load
+        cleanUpStrays();
+
+        // Clean up on window focus (when coming back from other pages)
+        window.addEventListener('focus', cleanUpStrays);
+    });
+</script>
+@endpush

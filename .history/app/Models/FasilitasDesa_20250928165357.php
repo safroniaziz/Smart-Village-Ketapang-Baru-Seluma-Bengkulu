@@ -1,0 +1,52 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class FasilitasDesa extends Model
+{
+    use SoftDeletes;
+    protected $table = 'fasilitas_desa';
+
+    protected $fillable = [
+        'nama_fasilitas',
+        'kategori',
+        'deskripsi',
+        'alamat',
+        'kondisi',
+        'tahun_dibangun',
+        'luas_bangunan',
+        'luas_tanah',
+        'status_kepemilikan',
+        'fasilitas_yang_tersedia',
+        'kapasitas',
+        'pengelola',
+        'foto',
+        'koordinat',
+        'urutan'
+    ];
+
+    protected $casts = [
+        'tahun_dibangun' => 'integer',
+        'luas_bangunan' => 'decimal:2',
+        'luas_tanah' => 'decimal:2',
+        'kapasitas' => 'integer',
+        'urutan' => 'integer'
+    ];
+
+    // Scope untuk fasilitas aktif
+
+    // Scope untuk kategori tertentu
+    public function scopeKategori($query, $kategori)
+    {
+        return $query->where('kategori', $kategori);
+    }
+
+    // Scope untuk sorting berdasarkan created_at ascending
+    public function scopeOrdered($query)
+    {
+        return $query->orderBy('created_at', 'asc');
+    }
+}

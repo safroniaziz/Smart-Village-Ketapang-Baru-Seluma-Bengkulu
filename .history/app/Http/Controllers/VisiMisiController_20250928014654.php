@@ -1,0 +1,227 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\VisiDesa;
+use App\Models\MisiDesa;
+use App\Models\PendekatanDesa;
+use App\Models\TahapanDesa;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+
+class VisiMisiController extends Controller
+{
+    // VISI DESA
+    public function indexVisi()
+    {
+        $visi = VisiDesa::ordered()->get();
+        return view('admin.visi-misi.visi', compact('visi'));
+    }
+
+    public function storeVisi(Request $request)
+    {
+        $request->validate([
+            'visi' => 'required|string',
+            'deskripsi' => 'nullable|string',
+        ]);
+
+        VisiDesa::create($request->all());
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Visi berhasil ditambahkan'
+        ]);
+    }
+
+    public function updateVisi(Request $request, $id)
+    {
+        $request->validate([
+            'visi' => 'required|string',
+            'deskripsi' => 'nullable|string',
+        ]);
+
+        $visi = VisiDesa::findOrFail($id);
+        $visi->update($request->all());
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Visi berhasil diperbarui'
+        ]);
+    }
+
+    public function editVisi($id)
+    {
+        $visi = VisiDesa::findOrFail($id);
+        return response()->json($visi);
+    }
+
+    public function destroyVisi($id)
+    {
+        $visi = VisiDesa::findOrFail($id);
+        $visi->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Visi berhasil dihapus'
+        ]);
+    }
+
+    // MISI DESA
+    public function indexMisi()
+    {
+        $misi = MisiDesa::ordered()->get();
+        return view('admin.visi-misi.misi', compact('misi'));
+    }
+
+    public function storeMisi(Request $request)
+    {
+        $request->validate([
+            'judul' => 'required|string|max:255',
+            'deskripsi' => 'required|string',
+            'indikator' => 'nullable|string',
+        ]);
+
+        MisiDesa::create($request->all());
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Misi berhasil ditambahkan'
+        ]);
+    }
+
+    public function updateMisi(Request $request, $id)
+    {
+        $request->validate([
+            'judul' => 'required|string|max:255',
+            'deskripsi' => 'required|string',
+            'indikator' => 'nullable|string',
+        ]);
+
+        $misi = MisiDesa::findOrFail($id);
+        $misi->update($request->all());
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Misi berhasil diperbarui'
+        ]);
+    }
+
+    public function destroyMisi($id)
+    {
+        $misi = MisiDesa::findOrFail($id);
+        $misi->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Misi berhasil dihapus'
+        ]);
+    }
+
+    // PENDEKATAN DESA
+    public function indexPendekatan()
+    {
+        $pendekatan = PendekatanDesa::ordered()->get();
+        return view('admin.visi-misi.pendekatan', compact('pendekatan'));
+    }
+
+    public function storePendekatan(Request $request)
+    {
+        $request->validate([
+            'nama_pendekatan' => 'required|string|max:255',
+            'deskripsi' => 'required|string',
+            'strategi' => 'nullable|string',
+            'icon' => 'nullable|string|max:255',
+        ]);
+
+        PendekatanDesa::create($request->all());
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Pendekatan berhasil ditambahkan'
+        ]);
+    }
+
+    public function updatePendekatan(Request $request, $id)
+    {
+        $request->validate([
+            'nama_pendekatan' => 'required|string|max:255',
+            'deskripsi' => 'required|string',
+            'strategi' => 'nullable|string',
+            'icon' => 'nullable|string|max:255',
+        ]);
+
+        $pendekatan = PendekatanDesa::findOrFail($id);
+        $pendekatan->update($request->all());
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Pendekatan berhasil diperbarui'
+        ]);
+    }
+
+    public function destroyPendekatan($id)
+    {
+        $pendekatan = PendekatanDesa::findOrFail($id);
+        $pendekatan->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Pendekatan berhasil dihapus'
+        ]);
+    }
+
+    // TAHAPAN DESA
+    public function indexTahapan()
+    {
+        $tahapan = TahapanDesa::ordered()->get();
+        return view('admin.visi-misi.tahapan', compact('tahapan'));
+    }
+
+    public function storeTahapan(Request $request)
+    {
+        $request->validate([
+            'nama_tahapan' => 'required|string|max:255',
+            'deskripsi' => 'required|string',
+            'kegiatan' => 'nullable|string',
+            'waktu' => 'nullable|string|max:255',
+            'icon' => 'nullable|string|max:255',
+        ]);
+
+        TahapanDesa::create($request->all());
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Tahapan berhasil ditambahkan'
+        ]);
+    }
+
+    public function updateTahapan(Request $request, $id)
+    {
+        $request->validate([
+            'nama_tahapan' => 'required|string|max:255',
+            'deskripsi' => 'required|string',
+            'kegiatan' => 'nullable|string',
+            'waktu' => 'nullable|string|max:255',
+            'icon' => 'nullable|string|max:255',
+        ]);
+
+        $tahapan = TahapanDesa::findOrFail($id);
+        $tahapan->update($request->all());
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Tahapan berhasil diperbarui'
+        ]);
+    }
+
+    public function destroyTahapan($id)
+    {
+        $tahapan = TahapanDesa::findOrFail($id);
+        $tahapan->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Tahapan berhasil dihapus'
+        ]);
+    }
+}
