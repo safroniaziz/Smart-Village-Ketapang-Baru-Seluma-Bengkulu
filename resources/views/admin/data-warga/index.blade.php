@@ -1473,7 +1473,7 @@ $(document).ready(function() {
         if ($(e.target).closest('a, button, .form-check').length === 0) {
             const wargaId = $(this).data('warga-id');
             if (wargaId) {
-                window.location.href = `{{ url('data-warga') }}/${wargaId}`;
+                window.location.href = `{{ url('manajemen-data-warga') }}/${wargaId}`;
             }
         }
     });

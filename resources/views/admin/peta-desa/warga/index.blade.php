@@ -103,11 +103,11 @@
                                     <td class="text-gray-700">{{ $item->nik }}</td>
                                     <td>
                                         <div class="d-flex align-items-center">
-                                            <div class="symbol symbol-40px me-4">
+                                            <div class="me-4 warga-avatar-wrapper">
                                                 @if($item->foto)
-                                                    <img src="{{ asset('storage/' . $item->foto) }}" alt="Foto Warga" class="w-100 h-100 object-fit-cover rounded">
+                                                    <img src="{{ asset('storage/' . $item->foto) }}" alt="Foto Warga" class="warga-avatar">
                                                 @else
-                                                    <div class="symbol-label bg-light-info">
+                                                    <div class="warga-avatar-placeholder">
                                                         <i class="fas fa-user text-info"></i>
                                                     </div>
                                                 @endif
@@ -131,7 +131,7 @@
                                     </td>
                                     <td>
                                         @if($item->foto)
-                                            <img src="{{ asset('storage/' . $item->foto) }}" alt="Foto Warga" class="img-thumbnail" style="width: 50px; height: 50px; object-fit: cover;">
+                                            <img src="{{ asset('storage/' . $item->foto) }}" alt="Foto Warga" class="img-thumbnail warga-foto-table" style="width: 50px; height: 50px; object-fit: cover;">
                                         @else
                                             <span class="text-muted fs-7">Tidak ada foto</span>
                                         @endif
@@ -314,6 +314,41 @@
         </div>
     </div>
 @endsection
+
+@push('styles')
+<style>
+.warga-avatar-wrapper {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    border-radius: 0.475rem;
+    overflow: hidden;
+}
+
+.warga-avatar {
+    width: 40px !important;
+    height: 40px !important;
+    object-fit: cover;
+    display: block;
+}
+
+.warga-avatar-placeholder {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.475rem;
+    background: #eef6ff;
+}
+
+.warga-foto-table {
+    width: 50px !important;
+    height: 50px !important;
+    object-fit: cover;
+}
+</style>
+@endpush
 
 @push('scripts')
 <script>
