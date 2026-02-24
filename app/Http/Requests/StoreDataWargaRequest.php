@@ -73,6 +73,7 @@ class StoreDataWargaRequest extends FormRequest
             'no_hp.regex' => 'Nomor HP hanya boleh berisi angka, +, -, dan spasi.',
             'no_hp.max' => 'Nomor HP maksimal 20 karakter.',
             'rt_rw.regex' => 'Format RT/RW harus seperti: 001/002.',
+            'rt_rw.max' => 'RT/RW maksimal 10 karakter.',
             'dusun.required' => 'Dusun wajib diisi.',
             'desa.required' => 'Desa wajib diisi.',
             'kecamatan.required' => 'Kecamatan wajib diisi.',
@@ -99,6 +100,16 @@ class StoreDataWargaRequest extends FormRequest
             'status_sosial.in' => 'Status sosial ekonomi tidak valid.',
             'kelayakan_rumah.required' => 'Kelayakan rumah wajib diisi.',
             'kelayakan_rumah.in' => 'Kelayakan rumah tidak valid.',
+        ];
+    }
+
+    /**
+     * Get custom attribute names.
+     */
+    public function attributes(): array
+    {
+        return [
+            'rt_rw' => 'RT/RW',
         ];
     }
 

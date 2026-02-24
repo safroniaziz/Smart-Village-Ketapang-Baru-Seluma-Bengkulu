@@ -85,6 +85,7 @@ class UpdateDataWargaRequest extends FormRequest
             'no_hp.max' => 'Nomor HP maksimal 20 karakter.',
             'tanggal_lahir.before' => 'Tanggal lahir harus sebelum hari ini.',
             'rt_rw.regex' => 'Format RT/RW harus seperti: 001/002.',
+            'rt_rw.max' => 'RT/RW maksimal 10 karakter.',
             'foto.image' => 'File harus berupa gambar.',
             'foto.mimes' => 'Format foto harus JPEG, PNG, atau JPG.',
             'foto.max' => 'Ukuran foto maksimal 2MB.',
@@ -93,6 +94,16 @@ class UpdateDataWargaRequest extends FormRequest
             'email.unique' => 'Email sudah terdaftar.',
             'password.min' => 'Password minimal 8 karakter.',
             'password.confirmed' => 'Konfirmasi password tidak cocok.',
+        ];
+    }
+
+    /**
+     * Get custom attribute names.
+     */
+    public function attributes(): array
+    {
+        return [
+            'rt_rw' => 'RT/RW',
         ];
     }
 

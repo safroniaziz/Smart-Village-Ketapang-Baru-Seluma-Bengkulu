@@ -231,6 +231,7 @@ return [
         'no_kk' => 'nomor KK',
         'rt' => 'RT',
         'rw' => 'RW',
+        'rt_rw' => 'RT/RW',
         'dusun' => 'dusun',
         'kelurahan' => 'kelurahan',
         'kecamatan' => 'kecamatan',
