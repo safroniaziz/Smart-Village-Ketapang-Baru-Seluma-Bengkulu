@@ -10,12 +10,12 @@
                 box-shadow: 0 4px 8px rgba(0,0,0,0.1);
                 transition: transform 0.3s ease;
             " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-                <img alt="Logo" src="{{ asset('assets/src/images/pppep.png') }}" class="h-50px app-sidebar-logo-default" />
+                <img alt="Logo" src="{{ asset('assets/images/seluma.png') }}" class="h-50px app-sidebar-logo-default" />
             </div>
-            <img alt="Logo" src="{{ asset('assets/src/images/pppep.png') }}" class="h-35px app-sidebar-logo-minimize d-none" />
+            <img alt="Logo" src="{{ asset('assets/images/seluma.png') }}" class="h-35px app-sidebar-logo-minimize d-none" />
             <div class="d-flex flex-column ms-3 app-sidebar-logo-default">
-                <span class="fs-3 fw-bolder text-uppercase" style="letter-spacing: 1px; font-family: 'Segoe UI', sans-serif; color: #ffffff; text-shadow: 0 0 10px rgba(255,255,255,0.3);">LPMPP UNIB</span>
-                <span class="fs-8 fw-light" style="margin-top: -4px; letter-spacing: 0.5px; color: rgba(255,255,255,0.9); text-shadow: 0 0 5px rgba(255,255,255,0.2);">Sistem Integrasi Mutu UNIB</span>
+                <span class="fs-3 fw-bolder text-uppercase" style="letter-spacing: 1px; font-family: 'Segoe UI', sans-serif; color: #ffffff; text-shadow: 0 0 10px rgba(255,255,255,0.3);">Smart Village</span>
+                <span class="fs-8 fw-light" style="margin-top: -4px; letter-spacing: 0.5px; color: rgba(255,255,255,0.9); text-shadow: 0 0 5px rgba(255,255,255,0.2);">Ketapang Baru</span>
             </div>
         </a>
 

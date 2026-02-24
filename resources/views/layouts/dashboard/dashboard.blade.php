@@ -3,7 +3,7 @@
 	<!--begin::Head-->
 	<head>
 <base href="../" />
-		<title>SINTAMU - LPMPP Universitas Bengkulu</title>
+		<title>Smart Village Ketapang Baru - Dashboard</title>
 		<meta charset="utf-8" />
         <meta name="csrf-token" content="{{ csrf_token() }}">
 		<meta name="description" content="The most advanced Bootstrap 5 Admin Theme with 40 unique prebuilt layouts on Themeforest trusted by 100,000 beginners and professionals. Multi-demo, Dark Mode, RTL support and complete React, Angular, Vue, Asp.Net Core, Rails, Spring, Blazor, Django, Express.js, Node.js, Flask, Symfony & Laravel versions. Grab your copy now and get life-time updates for free." />
@@ -45,7 +45,7 @@
 						<!--begin::Mobile logo-->
 						<div class="d-flex align-items-center flex-grow-1 flex-lg-grow-0">
 							<a href="{{ route('dashboard') }}" class="d-lg-none">
-								<img alt="Logo" src="{{ asset('assets/src/images/pppep.png') }}" class="h-30px" />
+								<img alt="Logo" src="{{ asset('assets/images/seluma.png') }}" class="h-30px" />
 							</a>
 						</div>
 						<!--end::Mobile logo-->

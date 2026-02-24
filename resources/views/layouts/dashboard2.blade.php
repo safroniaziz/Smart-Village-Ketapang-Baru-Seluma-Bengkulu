@@ -3,7 +3,7 @@
 	<!--begin::Head-->
 	<head>
 <base href="../" />
-		<title>SINTAMU - LPMPP Universitas Bengkulu</title>
+		<title>Smart Village Ketapang Baru - Dashboard</title>
 		<meta charset="utf-8" />
 		<meta name="description" content="The most advanced Bootstrap 5 Admin Theme with 40 unique prebuilt layouts on Themeforest trusted by 100,000 beginners and professionals. Multi-demo, Dark Mode, RTL support and complete React, Angular, Vue, Asp.Net Core, Rails, Spring, Blazor, Django, Express.js, Node.js, Flask, Symfony & Laravel versions. Grab your copy now and get life-time updates for free." />
 		<meta name="keywords" content="metronic, bootstrap, bootstrap 5, angular, VueJs, React, Asp.Net Core, Rails, Spring, Blazor, Django, Express.js, Node.js, Flask, Symfony & Laravel starter kits, admin themes, web design, figma, web development, free templates, free admin themes, bootstrap theme, bootstrap template, bootstrap dashboard, bootstrap dak mode, bootstrap button, bootstrap datepicker, bootstrap timepicker, fullcalendar, datatables, flaticon" />
@@ -15,7 +15,7 @@
 		<meta property="og:url" content="https://keenthemes.com/metronic" />
 		<meta property="og:site_name" content="Metronic by Keenthemes" />
 		<link rel="canonical" href="https://preview.keenthemes.com/metronic8" />
-		<link rel="shortcut icon" href="{{ asset('assets/src/images/pppep.png') }}" />
+		<link rel="shortcut icon" href="{{ asset('assets/images/seluma.png') }}" />
 		<!--begin::Fonts(mandatory for all pages)-->
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700" />
 		<!--end::Fonts-->
@@ -90,7 +90,7 @@
 									<!--end::Header secondary toggle-->
 									<!--begin::Logo-->
 									<a href="{{ route('auditee.dashboard') }}" class="d-flex align-items-center logo-background">
-										<img alt="Logo" src="{{ asset('assets/src/images/pppep.png') }}" class="h-30px h-lg-55px" />
+										<img alt="Logo" src="{{ asset('assets/images/seluma.png') }}" class="h-30px h-lg-55px" />
 									</a>
 									<!--end::Logo-->
 								</div>
@@ -458,7 +458,7 @@
                                                                 <div class="border border-gray-300 border-dashed rounded min-w-125px py-3 px-4 me-6 mb-3">
                                                                     <div class="d-flex align-items-center">
                                                                         <div class="{{ Auth::user()->email ? 'fs-6 fw-normal' : 'fs-6 fw-normal text-danger' }}">
-                                                                            {{ Auth::user()->email ? Auth::user()->email : 'koperasiamanahsejati.unib.ac.id' }}
+                                                                            {{ Auth::user()->email ? Auth::user()->email : 'Belum diisi' }}
                                                                         </div>
                                                                     </div>
                                                                     <!--end::Number-->

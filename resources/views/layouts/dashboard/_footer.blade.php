@@ -4,13 +4,13 @@
         <!--begin::Copyright-->
         <div class="text-gray-900 order-2 order-md-1">
             <span class="text-muted fw-semibold me-1">2025&copy;</span>
-            <a href="https://keenthemes.com" target="_blank" class="text-gray-800 text-hover-primary">LPMPP Universitas Bengkulu</a>
+            <a href="{{ url('/') }}" class="text-gray-800 text-hover-primary">Pemerintah Desa Ketapang Baru</a>
         </div>
         <!--end::Copyright-->
         <!--begin::Menu-->
         <ul class="menu menu-gray-600 menu-hover-primary fw-semibold order-1">
             <li class="menu-item">
-                <a href="https://lpmpp.unib.ac.id/" target="_blank" class="menu-link px-2">LPMPP Universitas Bengkulu</a>
+                <a href="{{ url('/') }}" class="menu-link px-2">Smart Village</a>
             </li>
         </ul>
         <!--end::Menu-->
