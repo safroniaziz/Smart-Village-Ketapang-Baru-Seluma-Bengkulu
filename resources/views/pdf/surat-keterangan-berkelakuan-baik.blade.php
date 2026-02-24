@@ -4,57 +4,60 @@
     <meta charset="utf-8">
     <title>Surat Keterangan Berkelakuan Baik</title>
     <style>
+        @page {
+            size: A4 portrait;
+            margin: 10mm 15mm;
+        }
+
         body {
             font-family: 'DejaVu Sans', Arial, sans-serif;
-            font-size: 12pt;
-            line-height: 1.6;
+            font-size: 10pt;
+            line-height: 1.3;
             color: #000;
             margin: 0;
             padding: 0;
         }
 
         .page {
-            max-width: 210mm;
-            min-height: 297mm;
-            margin: auto;
-            padding: 30px 40px;
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
             background: #fff;
         }
 
         /* Header */
         .header {
             border-bottom: 2px double #000;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
+            padding-bottom: 5px;
+            margin-bottom: 8px;
         }
         .header-table { width: 100%; border-collapse: collapse; }
         .header-table td { vertical-align: middle; }
-        .logo-cell { width: 120px; text-align: center; }
-        .logo img { width: 90px; }
+        .logo-cell { width: 100px; text-align: center; }
+        .logo img { width: 80px; }
         .text-cell { text-align: center; }
         .government-name {
-            font-size: 11pt; font-weight: 600; text-transform: uppercase;
+            font-size: 18px; font-weight: 700; text-transform: uppercase;
         }
         .village-name {
-            font-size: 13pt; font-weight: 700; text-transform: uppercase;
+            font-size: 16px; font-weight: 700; text-transform: uppercase;
         }
-        .district-info { font-size: 9.5pt; }
-        .contact-info { font-size: 9pt; font-style: italic; }
+        .contact-info { font-size: 12px; }
 
         /* Content */
         .intro-text { text-align: justify; margin: 15px 0; }
 
         /* Title */
-        .document-title { text-align: center; margin: 20px 0; }
+        .document-title { text-align: center; margin: 5px 0; }
         .title-main {
-            font-size: 14pt; font-weight: 700; text-transform: uppercase;
-            text-decoration: underline; margin-bottom: 5px;
+            font-size: 14pt; font-weight: bold; text-transform: uppercase;
+            text-decoration: underline; margin-bottom: 0px;
         }
         .document-number { font-size: 10pt; }
 
         /* Footer & Signature */
         .footer {
-            margin-top: 40px;
+            margin-top: 15px;
             display: table;
             width: 100%;
         }
@@ -65,13 +68,13 @@
         }
         .signature-section {
             text-align: center;
-            margin: 20px 0;
+            margin: 10px 0;
         }
         .signature-date {
             margin-bottom: 60px;
         }
         .signature-name {
-            font-weight: 700;
+            font-weight: bold;
             text-decoration: underline;
         }
 
@@ -82,7 +85,7 @@
         }
         .qr-code {
             width: 80px;
-            height: 80px;
+            height: 50px;
         }
         .tracking-info {
             font-size: 8pt;
@@ -92,12 +95,12 @@
 
         /* Tembusan */
         .tembusan-section {
-            margin-top: 30px;
+            margin-top: 15px;
             page-break-inside: avoid;
         }
         .tembusan-title {
-            font-weight: 700;
-            margin-bottom: 10px;
+            font-weight: bold;
+            margin-bottom: 0px;
         }
         .tembusan-list {
             margin-left: 0;
@@ -126,11 +129,10 @@
                         </div>
                     </td>
                     <td class="text-cell">
-                        <div class="government-name">Pemerintah Kabupaten Seluma</div>
-                        <div class="village-name">Desa Ketapang Baru</div>
-                        <div class="district-info">Kecamatan Semidang Alas Maras</div>
-                        <div class="district-info">Kabupaten Seluma, Provinsi Bengkulu</div>
-                        <div class="contact-info">Kode Pos: 38874 | Email: ketapangbaru@seluma.go.id</div>
+                        <div class="government-name">PEMERINTAH KABUPATEN SELUMA</div>
+                        <div class="village-name">KECAMATAN SEMIDANG ALAS MARAS</div><div class="village-name">DESA KETAPANG BARU</div>
+                        <div class="contact-info">Alamat : Jln Lintas Bengkulu – Manna Desa Ketapang Baru Kode Pos 38575</div>
+                        <div class="contact-info">Website: ketapangbaru.selumakab.go.id</div>
                     </td>
                 </tr>
             </table>
@@ -150,12 +152,12 @@
         </div>
 
         <!-- Data Pemohon -->
-        <div style="margin: 20px 0;">
+        <div style="margin: 10px 0;">
             <table style="width: 100%; border-collapse: collapse;">
                 <tr>
                     <td style="width: 150px; padding: 3px 0; vertical-align: top;">Nama</td>
                     <td style="width: 20px; text-align: center; vertical-align: top;">:</td>
-                    <td style="vertical-align: top;">{{ strtoupper($nama_pemohon ?? 'PRENGKI PIRMANSAH') }}</td>
+                    <td style="vertical-align: top;">{{ strtoupper($nama_pemohon ?? '-') }}</td>
                 </tr>
                 <tr>
                     <td style="padding: 3px 0; vertical-align: top;">Nik</td>
@@ -186,50 +188,55 @@
         </div>
 
         <!-- Statement -->
-        <div style="margin: 20px 0; text-align: justify; line-height: 1.8;">
+        <div style="margin: 10px 0; text-align: justify; line-height: 1.8;">
             <p style="margin: 0;">
                 Orang tersebut adalah benar penduduk Desa Ketapang Baru, Kecamatan Semidang Alas Maras, Kabupaten Seluma dan Berdasarkan pengetahuan kami orang tersebut diatas benar-benar berkelakuan baik dan tidak terlibat G 30 S PKI, dan Organisasi terlarang maupun pekara pidana lainnya.
             </p>
         </div>
 
-        <div style="margin: 20px 0; text-align: justify;">
+        <div style="margin: 10px 0; text-align: justify;">
             <p style="margin: 0;">
                 Demikian surat keterangan ini dibuat atas dasar yang sebenarnya dan dapat dipergunakan sebagaimana mestinya.
             </p>
         </div>
 
         <!-- Footer -->
-        <div class="footer">
-            <div class="signature-left">
-                <!-- QR Code Section (if exists) -->
-                @if(isset($tracking_qr_code) && $tracking_qr_code)
-                <div class="qr-section">
-                    <img src="data:image/png;base64,{{ $tracking_qr_code }}" class="qr-code" alt="QR Code">
-                    <div class="tracking-info">
-                        Tracking: {{ $tracking_number ?? '' }}
-                    </div>
-                </div>
-                @endif
-            </div>
-
-            <div class="signature-right">
-                <div class="signature-section">
-                    <div class="signature-date">{{ $tempat_surat ?? 'Ketapang Baru' }}, {{ $tanggal_surat ?? now()->format('d F Y') }}</div>
-                    <div>Kepala Desa Ketapang Baru</div>
-
-                    @if(isset($jenis_ttd) && $jenis_ttd === 'qrcode' && isset($qr_ttd_base64))
-                        <!-- QR Code TTD -->
-                        <div style="margin: 20px 0;">
-                            <img src="data:image/png;base64,{{ $qr_ttd_base64 }}" style="width: 80px; height: 80px;" alt="QR TTD">
+        <div style="margin-top: 20px;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                    <td style="width: 50%;"></td>
+                    <td style="width: 50%; text-align: center;">
+                        <div style="margin-bottom: 0px; font-size: 10pt;">
+                            {{ $tempat_surat ?? 'Ketapang Baru' }}, {{ $tanggal_surat ?? '07 Mei 2025' }}
                         </div>
-                    @else
-                        <!-- Space for manual signature -->
-                        <div style="height: 60px;"></div>
-                    @endif
+                        
+                        <div style="font-weight: bold; margin-bottom: 0px; font-size: 10pt;">Kepala Desa</div>
 
-                    <div class="signature-name">{{ $kepala_desa_nama ?? 'ZULTAN ALHARA' }}</div>
-                </div>
-            </div>
+                        @if(isset($jenis_ttd) && $jenis_ttd == 'qrcode')
+                            <div style="margin-bottom: 0px;">
+                                <img src="{{ $qr_ttd_base64 }}" style="width: 110px; height: auto;" alt="QR Code TTD">
+                            </div>
+                        @elseif(isset($jenis_ttd) && $jenis_ttd == 'gambar')
+                            <div style="margin-bottom: 0px;">
+                                <img src="data:image/png;base64,{{ $ttd_base64 }}" style="width: 150px; height: auto;" alt="TTD Gambar">
+                            </div>
+                        @elseif(isset($jenis_ttd) && $jenis_ttd == 'manual')
+                            <div style="height: 50px; margin-bottom: 0px;"></div>
+                        @else
+                            <div style="height: 50px; margin-bottom: 0px;"></div>
+                        @endif
+
+                        @if(isset($qr_base64) && $qr_base64)
+                        <div style="margin-bottom: 0px;">
+                            <img src="data:image/png;base64,{{ $qr_base64 }}" alt="QR Code Verifikasi" style="width: 60px; height: 60px;">
+                        </div>
+                        @endif
+
+                        <div style="font-weight: bold; text-decoration: underline; font-size: 10pt;">{{ strtoupper($kepala_desa_nama ?? 'ZULTAN ALHARA') }}</div>
+                        <div style="font-size: 10pt;">NIP. {{ $nip ?? '-' }}</div>
+                    </td>
+                </tr>
+            </table>
         </div>
 
         <!-- Tembusan Section -->

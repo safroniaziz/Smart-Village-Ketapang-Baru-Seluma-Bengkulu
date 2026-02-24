@@ -60,7 +60,14 @@
                                 <span class="path1"></span>
                                 <span class="path2"></span>
                             </i>
-                            <input type="text" data-kt-customer-table-filter="search" class="form-control form-control-solid w-250px ps-13" placeholder="Cari koordinat warga..." />
+                            <input
+                                type="text"
+                                id="wargaSearchInput"
+                                data-kt-customer-table-filter="search"
+                                class="form-control form-control-solid w-250px ps-13"
+                                placeholder="Cari NIK, nama, dusun, no. KK..."
+                                value="{{ request('q') }}"
+                            />
                         </div>
                     </div>
                     <div class="card-toolbar">
@@ -91,7 +98,7 @@
                             </thead>
                             <tbody>
                                 @forelse($warga as $index => $item)
-                                <tr>
+                                <tr id="warga-row-{{ $item->id }}" data-warga-id="{{ $item->id }}">
                                     <td class="text-gray-700 fw-semibold">{{ $warga->firstItem() + $index }}</td>
                                     <td class="text-gray-700">{{ $item->nik }}</td>
                                     <td>
@@ -111,10 +118,16 @@
                                             </div>
                                         </div>
                                     </td>
-                                    <td>
-                                        <span class="badge badge-light-success fs-7 fw-semibold">
-                                            {{ $item->lat }}, {{ $item->long }}
-                                        </span>
+                                    <td id="warga-koordinat-{{ $item->id }}">
+                                        @if(filled($item->lat) && filled($item->long))
+                                            <span class="badge badge-light-success fs-7 fw-semibold">
+                                                {{ $item->lat }}, {{ $item->long }}
+                                            </span>
+                                        @else
+                                            <span class="badge badge-light-warning fs-7 fw-semibold">
+                                                Belum diisi
+                                            </span>
+                                        @endif
                                     </td>
                                     <td>
                                         @if($item->foto)
@@ -136,8 +149,8 @@
                                             <button type="button" class="btn btn-sm btn-light-info" onclick="showWarga({{ $item->id }})" title="Lihat Detail">
                                                 <i class="fas fa-eye"></i>
                                             </button>
-                                            <button type="button" class="btn btn-sm btn-light-warning" onclick="editWarga({{ $item->id }})" title="Edit Koordinat">
-                                                <i class="fas fa-edit"></i>
+                                            <button id="warga-edit-btn-{{ $item->id }}" type="button" class="btn btn-sm {{ filled($item->lat) && filled($item->long) ? 'btn-light-warning' : 'btn-light-primary' }}" onclick="editWarga({{ $item->id }})" title="{{ filled($item->lat) && filled($item->long) ? 'Edit Koordinat' : 'Tambah Koordinat' }}">
+                                                <i class="fas {{ filled($item->lat) && filled($item->long) ? 'fa-edit' : 'fa-plus' }}"></i>
                                             </button>
                                         </div>
                                     </td>
@@ -147,8 +160,8 @@
                                     <td colspan="8" class="text-center py-10">
                                         <div class="text-muted">
                                             <i class="fas fa-user fs-3x mb-3"></i>
-                                            <div class="fw-bold fs-5">Belum ada koordinat warga</div>
-                                            <div>Warga belum memiliki koordinat GPS</div>
+                                            <div class="fw-bold fs-5">Belum ada data kepala keluarga</div>
+                                            <div>Silakan tambah data warga terlebih dahulu</div>
                                         </div>
                                     </td>
                                 </tr>
@@ -161,7 +174,7 @@
                     @if($warga->hasPages())
                     <div class="d-flex justify-content-between align-items-center mt-6">
                         <div class="text-muted">
-                            Menampilkan {{ $warga->firstItem() ?? 0 }} - {{ $warga->lastItem() ?? 0 }} dari {{ $warga->total() }} koordinat warga
+                            Menampilkan {{ $warga->firstItem() ?? 0 }} - {{ $warga->lastItem() ?? 0 }} dari {{ $warga->total() }} kepala keluarga
                         </div>
                         <div class="d-flex align-items-center">
                             <nav aria-label="Warga pagination">
@@ -229,19 +242,245 @@
             </div>
         </div>
     </div>
+
+    <!-- Detail Warga Modal -->
+    <div class="modal fade" id="detailWargaModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Detail Warga</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label text-muted">NIK</label>
+                        <div class="fw-semibold" id="detail_nik">-</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted">Nama Lengkap</label>
+                        <div class="fw-semibold" id="detail_nama">-</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted">Dusun</label>
+                        <div class="fw-semibold" id="detail_dusun">-</div>
+                    </div>
+                    <div class="mb-0">
+                        <label class="form-label text-muted">Koordinat</label>
+                        <div class="fw-semibold" id="detail_koordinat">Belum diisi</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Koordinat Modal -->
+    <div class="modal fade" id="editKoordinatModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Tambah/Edit Koordinat Warga</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="editKoordinatForm">
+                    <div class="modal-body">
+                        <input type="hidden" id="edit_warga_id" value="">
+
+                        <div class="mb-3">
+                            <label class="form-label">Nama Warga</label>
+                            <input type="text" id="edit_nama_warga" class="form-control form-control-solid" readonly>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="edit_lat" class="form-label required">Latitude</label>
+                            <input type="number" step="any" id="edit_lat" class="form-control" placeholder="-6.123456" required>
+                            <div class="form-text">Rentang: -90 sampai 90</div>
+                        </div>
+
+                        <div class="mb-0">
+                            <label for="edit_long" class="form-label required">Longitude</label>
+                            <input type="number" step="any" id="edit_long" class="form-control" placeholder="106.123456" required>
+                            <div class="form-text">Rentang: -180 sampai 180</div>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary" id="btn_simpan_koordinat">
+                            Simpan Koordinat
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('scripts')
 <script>
-// Placeholder functions for future implementation
+const detailWargaModal = new bootstrap.Modal(document.getElementById('detailWargaModal'));
+const editKoordinatModal = new bootstrap.Modal(document.getElementById('editKoordinatModal'));
+const showWargaUrlTemplate = @json(route('admin.peta-desa.warga.show', ['id' => '__ID__']));
+const updateWargaUrlTemplate = @json(route('admin.peta-desa.warga.update', ['id' => '__ID__']));
+const wargaIndexUrl = @json(route('admin.peta-desa.warga.index'));
+
+function buildWargaUrl(urlTemplate, id) {
+    return urlTemplate.replace('__ID__', id);
+}
+
+function hasCoordinate(value) {
+    return value !== null && value !== undefined && value !== '';
+}
+
+function showSwal(icon, title, text = '') {
+    return Swal.fire({
+        icon: icon,
+        title: title,
+        text: text,
+        confirmButtonText: 'OK'
+    });
+}
+
+function showSwalHtml(icon, title, html = '') {
+    return Swal.fire({
+        icon: icon,
+        title: title,
+        html: html,
+        confirmButtonText: 'OK'
+    });
+}
+
+function renderCoordinateBadge(lat, long) {
+    if (hasCoordinate(lat) && hasCoordinate(long)) {
+        return `<span class="badge badge-light-success fs-7 fw-semibold">${lat}, ${long}</span>`;
+    }
+
+    return '<span class="badge badge-light-warning fs-7 fw-semibold">Belum diisi</span>';
+}
+
+function updateKoordinatRow(warga) {
+    const koordinatCell = document.getElementById(`warga-koordinat-${warga.id}`);
+    if (koordinatCell) {
+        koordinatCell.innerHTML = renderCoordinateBadge(warga.lat, warga.long);
+    }
+
+    const editButton = document.getElementById(`warga-edit-btn-${warga.id}`);
+    if (editButton) {
+        const filled = hasCoordinate(warga.lat) && hasCoordinate(warga.long);
+        editButton.classList.remove('btn-light-warning', 'btn-light-primary');
+        editButton.classList.add(filled ? 'btn-light-warning' : 'btn-light-primary');
+        editButton.title = filled ? 'Edit Koordinat' : 'Tambah Koordinat';
+        editButton.innerHTML = `<i class="fas ${filled ? 'fa-edit' : 'fa-plus'}"></i>`;
+    }
+}
+
+function applySearch(keyword) {
+    const url = new URL(wargaIndexUrl, window.location.origin);
+    const trimmed = keyword.trim();
+
+    if (trimmed !== '') {
+        url.searchParams.set('q', trimmed);
+    }
+
+    window.location.href = url.toString();
+}
+
+function initSearch() {
+    const searchInput = document.getElementById('wargaSearchInput');
+    if (!searchInput) {
+        return;
+    }
+
+    let debounceTimer;
+
+    searchInput.addEventListener('input', function() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(function() {
+            applySearch(searchInput.value);
+        }, 500);
+    });
+
+    searchInput.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            clearTimeout(debounceTimer);
+            applySearch(searchInput.value);
+        }
+    });
+}
+
 function showWarga(id) {
-    console.log('Show warga:', id);
-    // TODO: Implement show modal
+    $.get(buildWargaUrl(showWargaUrlTemplate, id))
+        .done(function(response) {
+            const warga = response.data;
+            document.getElementById('detail_nik').textContent = warga.nik || '-';
+            document.getElementById('detail_nama').textContent = warga.nama_lengkap || '-';
+            document.getElementById('detail_dusun').textContent = warga.dusun || '-';
+            document.getElementById('detail_koordinat').textContent =
+                (hasCoordinate(warga.lat) && hasCoordinate(warga.long)) ? `${warga.lat}, ${warga.long}` : 'Belum diisi';
+            detailWargaModal.show();
+        })
+        .fail(function() {
+            showSwal('error', 'Error', 'Gagal memuat detail warga.');
+        });
 }
 
 function editWarga(id) {
-    console.log('Edit warga:', id);
-    // TODO: Implement edit modal
+    $.get(buildWargaUrl(showWargaUrlTemplate, id))
+        .done(function(response) {
+            const warga = response.data;
+            document.getElementById('edit_warga_id').value = warga.id;
+            document.getElementById('edit_nama_warga').value = warga.nama_lengkap || '';
+            document.getElementById('edit_lat').value = hasCoordinate(warga.lat) ? warga.lat : '';
+            document.getElementById('edit_long').value = hasCoordinate(warga.long) ? warga.long : '';
+            editKoordinatModal.show();
+        })
+        .fail(function() {
+            showSwal('error', 'Error', 'Gagal memuat data warga.');
+        });
 }
+
+document.getElementById('editKoordinatForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const wargaId = document.getElementById('edit_warga_id').value;
+    const lat = document.getElementById('edit_lat').value;
+    const long = document.getElementById('edit_long').value;
+    const submitButton = document.getElementById('btn_simpan_koordinat');
+    const originalText = submitButton.innerHTML;
+
+    submitButton.disabled = true;
+    submitButton.innerHTML = 'Menyimpan...';
+
+    $.ajax({
+        url: buildWargaUrl(updateWargaUrlTemplate, wargaId),
+        method: 'PUT',
+        data: {
+            _token: @json(csrf_token()),
+            lat: lat,
+            long: long
+        }
+    }).done(function(response) {
+        updateKoordinatRow(response.data || { id: wargaId, lat: lat, long: long });
+        editKoordinatModal.hide();
+        showSwal('success', 'Berhasil', response.message || 'Koordinat berhasil disimpan.');
+    }).fail(function(xhr) {
+        if (xhr.status === 422 && xhr.responseJSON && xhr.responseJSON.errors) {
+            const errors = [];
+            Object.values(xhr.responseJSON.errors).forEach(function(messages) {
+                messages.forEach(function(message) {
+                    errors.push(message);
+                });
+            });
+            showSwalHtml('warning', 'Validasi gagal', errors.join('<br>'));
+        } else {
+            showSwal('error', 'Error', 'Terjadi kesalahan saat menyimpan koordinat.');
+        }
+    }).always(function() {
+        submitButton.disabled = false;
+        submitButton.innerHTML = originalText;
+    });
+});
+
+initSearch();
 </script>
 @endpush

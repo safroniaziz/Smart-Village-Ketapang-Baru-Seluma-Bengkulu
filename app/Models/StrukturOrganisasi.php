@@ -17,6 +17,7 @@ class StrukturOrganisasi extends Model
     protected $fillable = [
         'nama',
         'jabatan',
+        'nip',
         'foto',
         'tugas',
         'wewenang',

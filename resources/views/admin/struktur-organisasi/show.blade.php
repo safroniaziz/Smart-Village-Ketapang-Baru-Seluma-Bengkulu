@@ -43,6 +43,12 @@
                                         </span>
                                         <h3 class="fw-semibold text-gray-700 mb-0">{{ $strukturOrganisasi->jabatan }}</h3>
                                     </div>
+                                    @if($strukturOrganisasi->nip)
+                                    <div class="mb-2">
+                                        <span class="text-muted">NIP:</span>
+                                        <span class="fw-semibold text-gray-800">{{ $strukturOrganisasi->nip }}</span>
+                                    </div>
+                                    @endif
                                     <div class="d-flex align-items-center">
                                         <span class="badge badge-light-{{ $strukturOrganisasi->kategori == 'pemerintahan' ? 'primary' : 'success' }} me-3">
                                             {{ $strukturOrganisasi->kategori == 'pemerintahan' ? '🏛️ Pemerintahan Desa' : '⚖️ BPD' }}

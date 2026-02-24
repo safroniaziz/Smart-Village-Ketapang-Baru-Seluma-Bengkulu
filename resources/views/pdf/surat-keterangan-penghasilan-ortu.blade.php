@@ -1,410 +1,224 @@
 <!DOCTYPE html>
-<html lang="id">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Surat Keterangan Penghasilan Orang Tua</title>
+    <meta charset="utf-8">
+    <title>Surat Keterangan Miskin</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        @page {
+            size: A4 portrait;
+            margin: 8mm 13mm;
         }
 
         body {
-            font-family: 'Times New Roman', serif;
-            font-size: 12pt;
-            line-height: 1.6;
+            font-family: 'DejaVu Sans', Arial, sans-serif;
+            font-size: 9.5pt;
+            line-height: 1.25;
             color: #000;
-            padding: 20mm;
-            background-color: #fff;
+            margin: 0;
+            padding: 0;
         }
 
+        .page {
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
+            background: #fff;
+        }
+
+        /* Header */
         .header {
-            text-align: center;
-            margin-bottom: 30px;
+            border-bottom: 2px double #000;
+            padding-bottom: 3px;
+            margin-bottom: 6px;
         }
-
-        .kop-surat {
-            border-bottom: 3px solid #000;
-            padding-bottom: 15px;
-            margin-bottom: 25px;
+        .header-table { width: 100%; border-collapse: collapse; }
+        .header-table td { vertical-align: middle; }
+        .logo-cell { width: 85px; text-align: center; }
+        .logo img { width: 72px; }
+        .text-cell { text-align: center; }
+        .government-name {
+            font-size: 16px; font-weight: 700; text-transform: uppercase;
         }
-
-        .logo {
-            float: left;
-            width: 80px;
-            height: 80px;
-            margin-right: 20px;
+        .village-name {
+            font-size: 14px; font-weight: 700; text-transform: uppercase;
         }
+        .contact-info { font-size: 11px; }
 
-        .info-header {
-            text-align: center;
-            line-height: 1.4;
-        }
-
-        .info-header h1 {
-            font-size: 18pt;
-            font-weight: bold;
-            margin-bottom: 5px;
-            text-transform: uppercase;
-        }
-
-        .info-header h2 {
-            font-size: 14pt;
-            font-weight: bold;
-            margin-bottom: 3px;
-        }
-
-        .info-header p {
-            font-size: 11pt;
-            margin-bottom: 2px;
-        }
-
-        .clearfix::after {
-            content: "";
-            display: table;
-            clear: both;
-        }
-
-        .title {
-            text-align: center;
-            margin: 30px 0;
-        }
-
-        .title h3 {
-            font-size: 16pt;
-            font-weight: bold;
+        /* Title */
+        .document-title { text-align: center; margin: 4px 0; }
+        .title-main {
+            font-size: 11pt; font-weight: 700; text-transform: uppercase;
+            margin-bottom: 0px; letter-spacing: 0.5px;
             text-decoration: underline;
-            margin-bottom: 10px;
         }
+        .document-number { font-size: 9.5pt; }
 
-        .nomor {
-            font-size: 12pt;
-            font-weight: bold;
-        }
-
-        .content {
-            margin: 25px 0;
+        /* Content */
+        .intro-text {
             text-align: justify;
+            font-size: 9.5pt;
+            line-height: 1.35;
+            margin-bottom: 6px;
         }
 
-        .content p {
-            margin-bottom: 15px;
-            text-indent: 0;
-        }
-
-        .data-anak {
-            margin: 20px 0;
-            margin-left: 20px;
-        }
-
-        .data-anak table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .data-anak td {
-            padding: 3px 0;
+        .data-table { width: 100%; border-collapse: collapse; }
+        .data-table td {
+            padding: 1.5px 2px;
             vertical-align: top;
+            font-size: 9.5pt;
+            line-height: 1.2;
         }
-
-        .data-anak .label {
-            width: 150px;
-        }
-
-        .data-anak .colon {
-            width: 20px;
-            text-align: center;
-        }
-
-        .data-ortu {
-            margin: 20px 0;
-            margin-left: 0;
-        }
-
-        .data-ortu table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .data-ortu td {
-            padding: 3px 0;
-            vertical-align: top;
-        }
-
-        .data-ortu .label {
-            width: 150px;
-        }
-
-        .data-ortu .colon {
-            width: 20px;
-            text-align: center;
+        .data-table td:first-child {
+            width: 155px;
         }
 
         .section-title {
             font-weight: bold;
-            margin: 20px 0 10px 0;
+            margin: 6px 0 4px 0;
+            font-size: 9.5pt;
         }
 
-        .signature-section {
-            margin-top: 40px;
-            text-align: right;
-            width: 100%;
-        }
-
-        .signature-right {
-            display: inline-block;
-            text-align: center;
-            width: 300px;
-        }
-
-        .signature-space {
-            height: 100px;
-            margin: 20px 0;
-        }
-
-        .signature-name {
-            font-weight: bold;
-            text-decoration: underline;
-        }
-
-        .tracking-section {
-            position: fixed;
-            bottom: 20mm;
-            right: 20mm;
-            text-align: center;
-        }
-
-        .tracking-qr {
-            width: 60px;
-            height: 60px;
-            margin-bottom: 5px;
-        }
-
-        .tracking-number {
-            font-size: 8pt;
-            color: #666;
-        }
-
-        .tembusan {
-            margin-top: 30px;
-            page-break-inside: avoid;
-        }
-
-        .tembusan h4 {
-            font-size: 12pt;
-            font-weight: bold;
+        .closing-text {
+            text-align: left;
+            margin-top: 8px;
             margin-bottom: 10px;
+            font-size: 9.5pt;
+            text-indent: 40px;
         }
 
-        .tembusan ol {
-            margin-left: 20px;
-        }
-
-        .tembusan li {
-            margin-bottom: 5px;
-        }
+        /* Footer */
+        .footer { margin-top: 10px; }
 
         @media print {
-            body {
-                padding: 15mm;
-            }
-
-            .tracking-section {
-                bottom: 15mm;
-                right: 15mm;
-            }
+            body { background: white; padding: 0; }
+            .page { box-shadow: none; border: none; }
         }
     </style>
 </head>
 <body>
-    <!-- Kop Surat -->
-    <div class="kop-surat clearfix">
-        <div class="logo">
-            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==" alt="Logo" style="width: 80px; height: 80px; background: #ddd;">
-        </div>
-        <div class="info-header">
-            <h1>PEMERINTAH KABUPATEN SELUMA</h1>
-            <h2>KECAMATAN SEMIDANG ALAS MARAS</h2>
-            <h2>DESA KETAPANG BARU</h2>
-            <p>Alamat: Ketapang Baru, Kec. Semidang Alas Maras, Kab. Seluma, Provinsi Bengkulu</p>
-            <p>Kode Pos: 38874 | Email: ketapangbaru@seluma.go.id</p>
-        </div>
-    </div>
-
-    <!-- Judul Surat -->
-    <div class="title">
-        <h3>SURAT KETERANGAN PENGHASILAN ORANG TUA</h3>
-        <div class="nomor">Nomor : {{ $nomor_surat }}</div>
-    </div>
-
-    <!-- Isi Surat -->
-    <div class="content">
-        <p>Yang bertanda tangan dibawah ini Kepala Desa Ketapang Baru Kecamatan Semidang Alas Maras Kabupaten Seluma dengan ini menerangkan bahwa :</p>
-
-        <div class="data-anak">
-            <table>
+    <div class="page">
+        <!-- Header -->
+        <div class="header">
+            <table class="header-table">
                 <tr>
-                    <td class="label">Nama</td>
-                    <td class="colon">:</td>
-                    <td>{{ strtoupper($nama) }}</td>
-                </tr>
-                <tr>
-                    <td class="label">Tempat/Tgl Lahir</td>
-                    <td class="colon">:</td>
-                    <td>{{ $tempat_lahir }}, {{ $tanggal_lahir }}</td>
-                </tr>
-                <tr>
-                    <td class="label">Jenis Kelamin</td>
-                    <td class="colon">:</td>
-                    <td>{{ $jenis_kelamin }}</td>
-                </tr>
-                <tr>
-                    <td class="label">Pekerjaan</td>
-                    <td class="colon">:</td>
-                    <td>{{ $pekerjaan }}</td>
-                </tr>
-                <tr>
-                    <td class="label">Alamat</td>
-                    <td class="colon">:</td>
-                    <td>{{ $alamat }}</td>
+                    <td class="logo-cell">
+                        <div class="logo">
+                            <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('assets/images/seluma.png'))) }}" alt="Logo Seluma">
+                        </div>
+                    </td>
+                    <td class="text-cell">
+                        <div class="government-name">PEMERINTAH KABUPATEN SELUMA</div>
+                        <div class="village-name">KECAMATAN SEMIDANG ALAS MARAS</div><div class="village-name">DESA KETAPANG BARU</div>
+                        <div class="contact-info">Alamat : Jln Lintas Bengkulu – Manna Desa Ketapang Baru Kode Pos 38575</div>
+                        <div class="contact-info">Website: ketapangbaru.selumakab.go.id</div>
+                    </td>
                 </tr>
             </table>
         </div>
 
-        <div class="section-title">Anak dari Bapak :</div>
-
-        <div class="data-ortu">
-            <table>
-                <tr>
-                    <td class="label">Nama</td>
-                    <td class="colon">:</td>
-                    <td>{{ strtoupper($nama_ayah) }}</td>
-                </tr>
-                <tr>
-                    <td class="label">Tempat/Tgl lahir</td>
-                    <td class="colon">:</td>
-                    <td>{{ $tempat_lahir_ayah }}, {{ $tanggal_lahir_ayah }}</td>
-                </tr>
-                <tr>
-                    <td class="label">Jenis kelamin</td>
-                    <td class="colon">:</td>
-                    <td>Laki-Laki</td>
-                </tr>
-                <tr>
-                    <td class="label">Agama</td>
-                    <td class="colon">:</td>
-                    <td>{{ $agama_ayah }}</td>
-                </tr>
-                <tr>
-                    <td class="label">Pekerjaan</td>
-                    <td class="colon">:</td>
-                    <td>{{ $pekerjaan_ayah }}</td>
-                </tr>
-                <tr>
-                    <td class="label">Kebangsaan</td>
-                    <td class="colon">:</td>
-                    <td>Indonesia</td>
-                </tr>
-                <tr>
-                    <td class="label">Penghasilan</td>
-                    <td class="colon">:</td>
-                    <td>Rp {{ number_format($penghasilan_ayah, 0, ',', '.') }}</td>
-                </tr>
-                <tr>
-                    <td class="label">Alamat</td>
-                    <td class="colon">:</td>
-                    <td>{{ $alamat_ayah }}</td>
-                </tr>
-            </table>
-        </div>
-
-        <div class="section-title">Ibu :</div>
-
-        <div class="data-ortu">
-            <table>
-                <tr>
-                    <td class="label">Nama</td>
-                    <td class="colon">:</td>
-                    <td>{{ strtoupper($nama_ibu) }}</td>
-                </tr>
-                <tr>
-                    <td class="label">Tempat/Tgl lahir</td>
-                    <td class="colon">:</td>
-                    <td>{{ $tempat_lahir_ibu }}, {{ $tanggal_lahir_ibu }}</td>
-                </tr>
-                <tr>
-                    <td class="label">Jenis kelamin</td>
-                    <td class="colon">:</td>
-                    <td>Perempuan</td>
-                </tr>
-                <tr>
-                    <td class="label">Agama</td>
-                    <td class="colon">:</td>
-                    <td>{{ $agama_ibu }}</td>
-                </tr>
-                <tr>
-                    <td class="label">Pekerjaan</td>
-                    <td class="colon">:</td>
-                    <td>{{ $pekerjaan_ibu }}</td>
-                </tr>
-                <tr>
-                    <td class="label">Kebangsaan</td>
-                    <td class="colon">:</td>
-                    <td>Indonesia</td>
-                </tr>
-                <tr>
-                    <td class="label">Penghasilan</td>
-                    <td class="colon">:</td>
-                    <td>Rp {{ number_format($penghasilan_ibu, 0, ',', '.') }}</td>
-                </tr>
-                <tr>
-                    <td class="label">Alamat</td>
-                    <td class="colon">:</td>
-                    <td>{{ $alamat_ibu }}</td>
-                </tr>
-            </table>
-        </div>
-
-        <p style="margin-top: 25px;">Demikian surat Keterangan Penghasilan Orang Tua ini dibuat atas dasar yang sebenarnya dan dapat dipergunakan sebagaimana mestinya.</p>
-
-        <!-- Tanda Tangan -->
-        <div class="signature-section">
-            <div class="signature-right">
-                <p>{{ $tanggal_surat }}</p>
-                <p>Kepala Desa Ketapang Baru</p>
-                <div class="signature-space">
-                    @if(isset($jenis_ttd) && $jenis_ttd === 'qrcode' && isset($qr_ttd_base64))
-                        <img src="data:image/png;base64,{{ $qr_ttd_base64 }}" alt="QR TTD Kepala Desa" style="width: 80px; height: 80px; margin: 10px auto;">
-                        <p style="font-size: 8pt; color: #666;">*Scan QR untuk verifikasi tanda tangan</p>
-                    @elseif(isset($jenis_ttd) && $jenis_ttd === 'gambar')
-                        <img src="{{ asset('images/ttd-kepala-desa.png') }}" alt="TTD Kepala Desa" style="width: 120px; height: auto; margin: 10px auto;">
-                    @endif
-                </div>
-                <p class="signature-name">{{ $kepala_desa_nama }}</p>
+        <!-- Title -->
+        <div class="document-title">
+            <div class="title-main">SURAT KETERANGAN MISKIN</div>
+            <div class="document-number">
+                Nomor: {{ $nomor_surat ?? '-' }}
             </div>
+        </div>
+
+        <!-- Intro -->
+        <div class="intro-text">
+            Yang bertandatangan dibawah ini Kepala Desa Ketapang Baru Kecamatan Semidang Alas Maras, Kabupaten Seluma dengan ini menerangkan bahwa :
+        </div>
+
+        <!-- Data Anak -->
+        <table class="data-table">
+            <tr><td>Nama</td><td>: <strong>{{ strtoupper($nama ?? '-') }}</strong></td></tr>
+            <tr><td>Tempat/Tgl Lahir</td><td>: {{ $tempat_lahir ?? '-' }}, {{ $tanggal_lahir ?? '-' }}</td></tr>
+            <tr><td>Jenis Kelamin</td><td>: {{ $jenis_kelamin ?? '-' }}</td></tr>
+            <tr><td>Pekerjaan</td><td>: {{ $pekerjaan ?? '-' }}</td></tr>
+            <tr><td>Alamat</td><td>: {{ $alamat ?? '-' }}</td></tr>
+        </table>
+
+        <div class="intro-text" style="margin-top: 10px;">
+            Adalah benar anak kandung dari :
+        </div>
+
+        <!-- Data Ayah -->
+        <div class="section-title">1. Ayah</div>
+        <table class="data-table">
+            <tr><td>Nama</td><td>: {{ strtoupper($nama_ayah ?? '-') }}</td></tr>
+            <tr><td>Tempat/Tgl Lahir</td><td>: {{ $tempat_lahir_ayah ?? '-' }}, {{ $tanggal_lahir_ayah ?? '-' }}</td></tr>
+            <tr><td>Agama</td><td>: {{ $agama_ayah ?? '-' }}</td></tr>
+            <tr><td>Pekerjaan</td><td>: {{ $pekerjaan_ayah ?? '-' }}</td></tr>
+            <tr><td>Kebangsaan</td><td>: Indonesia</td></tr>
+            <tr><td>Penghasilan</td><td>: Rp {{ number_format($penghasilan_ayah ?? 0, 0, ',', '.') }} / Bulan</td></tr>
+            <tr><td>Alamat</td><td>: {{ $alamat_ayah ?? '-' }}</td></tr>
+        </table>
+
+        <!-- Data Ibu -->
+        <div class="section-title">2. Ibu</div>
+        <table class="data-table">
+            <tr><td>Nama</td><td>: {{ strtoupper($nama_ibu ?? '-') }}</td></tr>
+            <tr><td>Tempat/Tgl Lahir</td><td>: {{ $tempat_lahir_ibu ?? '-' }}, {{ $tanggal_lahir_ibu ?? '-' }}</td></tr>
+            <tr><td>Agama</td><td>: {{ $agama_ibu ?? '-' }}</td></tr>
+            <tr><td>Pekerjaan</td><td>: {{ $pekerjaan_ibu ?? '-' }}</td></tr>
+            <tr><td>Kebangsaan</td><td>: Indonesia</td></tr>
+            <tr><td>Penghasilan</td><td>: Rp {{ number_format($penghasilan_ibu ?? 0, 0, ',', '.') }} / Bulan</td></tr>
+            <tr><td>Alamat</td><td>: {{ $alamat_ibu ?? '-' }}</td></tr>
+        </table>
+
+
+        <div class="closing-text">
+            Demikian Surat Keterangan Miskin ini dibuat dengan sebenarnya untuk dapat dipergunakan sebagai persyaratan <strong>{{ $keperluan ?? 'Administrasi' }}</strong>.
+        </div>
+
+        <!-- Footer with Signature -->
+        <div class="footer">
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                    <td style="width: 50%; vertical-align: top;"></td>
+                    <td style="width: 50%; vertical-align: top; text-align: center;">
+                        <div style="font-size: 10pt; margin-bottom: 6px;">
+                            {{ $tempat_surat ?? 'Ketapang Baru' }}, {{ $tanggal_surat ?? now()->translatedFormat('d F Y') }}
+                        </div>
+                        <div style="font-weight: bold; margin-bottom: 6px; font-size: 10pt;">Kepala Desa</div>
+
+                        <!-- TTD berdasarkan pilihan admin -->
+                        @if(isset($jenis_ttd) && $jenis_ttd == 'gambar' && isset($ttd_base64) && $ttd_base64)
+                            <div style="margin-bottom: 4px;">
+                                <img src="data:image/png;base64,{{ $ttd_base64 }}" style="width: 140px; height: auto;" alt="TTD Gambar">
+                            </div>
+                        @elseif(isset($jenis_ttd) && $jenis_ttd == 'qrcode')
+                            <div style="margin-bottom: 4px;">
+                                @if(isset($qr_ttd_base64) && $qr_ttd_base64)
+                                    <img src="{{ $qr_ttd_base64 }}" style="width: 110px; height: auto;" alt="QR Code TTD">
+                                @else
+                                    <div style="height: 50px;"></div>
+                                @endif
+                            </div>
+                        @elseif(isset($jenis_ttd) && $jenis_ttd == 'manual')
+                            <div style="height: 50px; margin-bottom: 4px;"></div>
+                        @else
+                            <div style="height: 50px; margin-bottom: 4px;"></div>
+                        @endif
+
+                        <div style="font-weight: bold; text-decoration: underline; font-size: 10pt;">{{ strtoupper($kepala_desa_nama ?? 'ZULTAN ALHARA') }}</div>
+                        <div style="font-size: 10pt;">NIP. {{ $nip ?? '-' }}</div>
+                    </td>
+                </tr>
+            </table>
         </div>
 
         <!-- Tembusan -->
-        @if(isset($tembusan) && count($tembusan) > 0)
-            <div class="tembusan">
-                <h4>Tembusan:</h4>
-                <ol>
-                    @foreach($tembusan as $item)
-                        <li>{{ $item }}</li>
-                    @endforeach
-                </ol>
+        @if(isset($tembusan) && !empty($tembusan))
+        <div style="margin-top: 15px;">
+            <div style="font-weight: bold; margin-bottom: 4px; font-size: 10pt;">Tembusan :</div>
+            @foreach($tembusan as $index => $item)
+            <div style="margin-left: 15px; margin-bottom: 2px; font-size: 10pt;">
+                {{ $index + 1 }}. {{ $item }}
             </div>
+            @endforeach
+        </div>
         @endif
     </div>
-
-    <!-- Tracking QR Code -->
-    @if(isset($tracking_qr_code))
-        <div class="tracking-section">
-            <img src="data:image/png;base64,{{ $tracking_qr_code }}" alt="Tracking QR" class="tracking-qr">
-            <div class="tracking-number">{{ $tracking_number }}</div>
-        </div>
-    @endif
 </body>
 </html>

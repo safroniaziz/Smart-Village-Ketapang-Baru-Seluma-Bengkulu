@@ -5,60 +5,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Surat Keterangan Pengantar Akta Kelahiran</title>
     <style>
+        @page {
+            size: A4 portrait;
+            margin: 10mm 15mm;
+        }
+
         body {
-            font-family: 'Times New Roman', serif;
-            font-size: 11pt;
-            line-height: 1.4;
-            margin: 0;
-            padding: 20px;
-            color: #000;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-            border-bottom: 3px solid #000;
-            padding-bottom: 15px;
-        }
-
-        .logo {
-            width: 80px;
-            height: 80px;
-            float: left;
-            margin-right: 20px;
-        }
-
-        .header-text {
-            text-align: center;
-            font-weight: bold;
-        }
-
-        .header-text h1 {
-            font-size: 16pt;
-            margin: 5px 0;
-            text-transform: uppercase;
-        }
-
-        .header-text h2 {
-            font-size: 14pt;
-            margin: 2px 0;
-            text-transform: uppercase;
-        }
-
-        .header-text p {
+            font-family: 'DejaVu Sans', Arial, sans-serif;
             font-size: 10pt;
-            margin: 2px 0;
-            font-weight: normal;
+            line-height: 1.3;
+            color: #000;
+            margin: 0;
+            padding: 0;
         }
 
-        .clearfix::after {
-            content: "";
-            display: table;
-            clear: both;
+        .page {
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
+            background: #fff;
         }
+
+        /* Header */
+        .header {
+            border-bottom: 2px double #000;
+            padding-bottom: 5px;
+            margin-bottom: 8px;
+        }
+        .header-table { width: 100%; border-collapse: collapse; }
+        .header-table td { vertical-align: middle; }
+        .logo-cell { width: 100px; text-align: center; }
+        .logo img { width: 80px; }
+        .text-cell { text-align: center; }
+        .government-name {
+            font-size: 18px; font-weight: 700; text-transform: uppercase;
+        }
+        .village-name {
+            font-size: 16px; font-weight: 700; text-transform: uppercase;
+        }
+        .contact-info { font-size: 12px; }
 
         .form-header {
-            margin: 20px 0;
+            margin: 10px 0;
         }
 
         .form-header table {
@@ -75,18 +63,18 @@
             text-align: center;
             font-size: 14pt;
             font-weight: bold;
-            margin: 30px 0 20px 0;
+            margin: 15px 0 20px 0;
             text-transform: uppercase;
             text-decoration: underline;
         }
 
         .section {
-            margin: 20px 0;
+            margin: 10px 0;
         }
 
         .section-title {
             font-weight: bold;
-            margin-bottom: 10px;
+            margin-bottom: 0px;
             text-decoration: underline;
         }
 
@@ -116,7 +104,7 @@
         }
 
         .signature-section {
-            margin-top: 50px;
+            margin-top: 20px;
             display: table;
             width: 100%;
         }
@@ -170,15 +158,24 @@
 <body>
     <div class="watermark">DESA KETAPANG BARU</div>
 
-    <div class="header clearfix">
-        <img src="data:image/png;base64,{{ $logoBase64 ?? '' }}" alt="Logo Desa" class="logo">
-        <div class="header-text">
-            <h1>PEMERINTAH KABUPATEN SELUMA</h1>
-            <h2>KECAMATAN TALO</h2>
-            <h2>DESA KETAPANG BARU</h2>
-            <p>Alamat: Jl. Raya Ketapang Baru, Kec. Talo, Kab. Seluma, Bengkulu</p>
-            <p>Email: desaketapangbaru@gmail.com | Telp: (0739) 123456</p>
-        </div>
+<div class="page">
+    <!-- Header -->
+    <div class="header">
+        <table class="header-table">
+            <tr>
+                <td class="logo-cell">
+                    <div class="logo">
+                        <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('assets/images/seluma.png'))) }}" alt="Logo Seluma">
+                    </div>
+                </td>
+                <td class="text-cell">
+                    <div class="government-name">PEMERINTAH KABUPATEN SELUMA</div>
+                    <div class="village-name">KECAMATAN SEMIDANG ALAS MARAS</div><div class="village-name">DESA KETAPANG BARU</div>
+                    <div class="contact-info">Alamat : Jln Lintas Bengkulu – Manna Desa Ketapang Baru Kode Pos 38575</div>
+                    <div class="contact-info">Website: ketapangbaru.selumakab.go.id</div>
+                </td>
+            </tr>
+        </table>
     </div>
 
     <div class="form-header">
@@ -208,7 +205,7 @@
             <tr>
                 <td class="label">Nama Kepala Keluarga</td>
                 <td class="colon">:</td>
-                <td class="value">{{ $nama_kepala_keluarga ?? 'ROZI PUTRA HANDI' }}</td>
+                <td class="value">{{ $nama_kepala_keluarga ?? '-' }}</td>
             </tr>
             <tr>
                 <td class="label">NO. Kartu Keluarga</td>
@@ -234,7 +231,7 @@
             <tr>
                 <td class="label">Nama</td>
                 <td class="colon">:</td>
-                <td class="value">{{ $nama_bayi ?? 'RAIQAL JUSTIN GILBERT' }}</td>
+                <td class="value">{{ $nama_bayi ?? '-' }}</td>
             </tr>
             <tr>
                 <td class="label">Jenis Kelamin</td>
@@ -295,7 +292,7 @@
             <tr>
                 <td class="label">Nama Lengkap</td>
                 <td class="colon">:</td>
-                <td class="value">{{ $nama_ibu ?? 'HAVEZA DIANA' }}</td>
+                <td class="value">{{ $nama_ibu ?? '-' }}</td>
             </tr>
             <tr>
                 <td class="label">Tanggal Kelahiran</td>
@@ -341,7 +338,7 @@
             <tr>
                 <td class="label">Nama Lengkap</td>
                 <td class="colon">:</td>
-                <td class="value">{{ $nama_ayah ?? 'ROZI PUTRA HANDI' }}</td>
+                <td class="value">{{ $nama_ayah ?? '-' }}</td>
             </tr>
             <tr>
                 <td class="label">Tanggal Kelahiran</td>
@@ -377,7 +374,7 @@
             <tr>
                 <td class="label">Nama Lengkap</td>
                 <td class="colon">:</td>
-                <td class="value">{{ $nama_pelapor ?? 'HAVEZA DIANA' }}</td>
+                <td class="value">{{ $nama_pelapor ?? '-' }}</td>
             </tr>
             <tr>
                 <td class="label">Umur</td>
@@ -403,7 +400,7 @@
             <tr>
                 <td class="label">Nama Lengkap</td>
                 <td class="colon">:</td>
-                <td class="value">{{ $nama_saksi1 ?? 'UMIYATI' }}</td>
+                <td class="value">{{ $nama_saksi1 ?? '-' }}</td>
             </tr>
             <tr>
                 <td class="label">Umur</td>
@@ -439,7 +436,7 @@
             <tr>
                 <td class="label">Nama Lengkap</td>
                 <td class="colon">:</td>
-                <td class="value">{{ $nama_saksi2 ?? 'HERMAYATI' }}</td>
+                <td class="value">{{ $nama_saksi2 ?? '-' }}</td>
             </tr>
             <tr>
                 <td class="label">Umur</td>
@@ -464,18 +461,47 @@
         </table>
     </div>
 
-    <div class="signature-section">
-        <div class="signature-left">
-            <p><strong>Mengetahui</strong></p>
-            <p><strong>Kepala Desa Ketapang Baru</strong></p>
-            <br><br><br><br>
-            <p class="signature-name">{{ $kepala_desa ?? 'ZULTAN ALHARA' }}</p>
-        </div>
-        <div class="signature-right">
-            <p><strong>PELAPOR</strong></p>
-            <br><br><br><br><br>
-            <p class="signature-name">{{ $nama_pelapor ?? 'HAVEZA DIANA' }}</p>
-        </div>
+    <!-- Footer -->
+    <div style="margin-top: 20px;">
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+                <td style="width: 50%;"></td>
+                <td style="width: 50%; text-align: center;">
+                    <div style="margin-bottom: 0px; font-size: 10pt;">
+                        {{ $tempat_surat ?? 'Ketapang Baru' }}, {{ $tanggal_surat ?? '07 Mei 2025' }}
+                    </div>
+                    
+                    <div style="font-weight: bold; margin-bottom: 0px; font-size: 10pt;">Kepala Desa</div>
+
+                    @if(isset($jenis_ttd) && $jenis_ttd == 'gambar' && isset($ttd_base64) && $ttd_base64)
+                        <div style="margin-bottom: 0px;">
+                            <img src="data:image/png;base64,{{ $ttd_base64 }}" style="width: 140px; height: auto;" alt="TTD Gambar">
+                        </div>
+                    @elseif(isset($jenis_ttd) && $jenis_ttd == 'qrcode')
+                        <div style="margin-bottom: 0px;">
+                            @if(isset($ttd_base64) && $ttd_base64)
+                                <img src="{{ $ttd_base64 }}" style="width: 110px; height: auto;" alt="QR Code TTD">
+                            @else
+                                <div style="width: 120px; height: 120px; border: 2px dashed #ccc; margin: 0 auto;"></div>
+                            @endif
+                        </div>
+                    @elseif(isset($jenis_ttd) && $jenis_ttd == 'manual')
+                        <div style="height: 50px; margin-bottom: 0px;"></div>
+                    @else
+                        <div style="height: 50px; margin-bottom: 0px;"></div>
+                    @endif
+
+                    @if(isset($qr_base64) && $qr_base64)
+                    <div style="margin-bottom: 0px;">
+                        <img src="data:image/png;base64,{{ $qr_base64 }}" alt="QR Code Verifikasi" style="width: 60px; height: 60px;">
+                    </div>
+                    @endif
+
+                    <div style="font-weight: bold; text-decoration: underline; font-size: 10pt;">{{ strtoupper($kepala_desa_nama ?? 'ZULTAN ALHARA') }}</div>
+                    <div style="font-size: 10pt;">NIP. {{ $nip ?? '-' }}</div>
+                </td>
+            </tr>
+        </table>
     </div>
 
     @if($qrCode ?? null)
@@ -483,5 +509,6 @@
             <img src="data:image/png;base64,{{ $qrCode }}" alt="QR Code" style="width: 100%; height: 100%;">
         </div>
     @endif
+</div>
 </body>
 </html>

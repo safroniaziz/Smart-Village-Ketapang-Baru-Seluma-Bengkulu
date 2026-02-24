@@ -296,15 +296,26 @@ class PetaDesaController extends Controller
 
     // === WARGA COORDINATES MANAGEMENT ===
 
-    public function wargaIndex()
+    public function wargaIndex(Request $request)
     {
-        $warga = User::whereNotNull('lat')
-            ->whereNotNull('long')
-            ->where('lat', '!=', '')
-            ->where('long', '!=', '')
-            ->where('is_kepala_keluarga', true)
+        $wargaQuery = User::where('is_kepala_keluarga', true)
+            ->whereNotNull('nik')
+            ->where('nik', '!=', '-');
+
+        if ($request->filled('q')) {
+            $search = trim($request->q);
+            $wargaQuery->where(function ($query) use ($search) {
+                $query->where('nik', 'like', "%{$search}%")
+                    ->orWhere('nama_lengkap', 'like', "%{$search}%")
+                    ->orWhere('dusun', 'like', "%{$search}%")
+                    ->orWhere('no_kk', 'like', "%{$search}%");
+            });
+        }
+
+        $warga = $wargaQuery
             ->orderBy('created_at', 'desc')
-            ->paginate(10);
+            ->paginate(10)
+            ->withQueryString();
 
         return view('admin.peta-desa.warga.index', compact('warga'));
     }

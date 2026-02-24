@@ -49,7 +49,10 @@ class AdminPengajuanSuratController extends Controller
      */
     public function create()
     {
-        $users = \App\Models\User::where('role', '!=', 'admin')
+        // Get all users (since there's no role column, we'll get all users)
+        // In a real scenario, you might want to add a role column or use a different method to identify admins
+        $users = \App\Models\User::whereNotNull('nama_lengkap')
+                    ->where('nama_lengkap', '!=', '')
                     ->orderBy('nama_lengkap')
                     ->get(['id', 'nama_lengkap', 'nik', 'alamat', 'no_hp', 'tempat_lahir', 'tanggal_lahir', 'mata_pencaharian']);
 
@@ -62,18 +65,59 @@ class AdminPengajuanSuratController extends Controller
     public function store(Request $request)
     {
         try {
-            // Basic validation
-            $request->validate([
-                'user_id' => 'required|exists:users,id',
+            // Surat types that don't require warga selection
+            $noWargaTypes = ['perjanjian_perdamaian', 'surat_undangan', 'sppd'];
+            
+            // Basic validation - user_id is conditional
+            $rules = [
                 'jenis_surat' => 'required|string',
+                'no_surat' => 'required|string|max:255',
                 'jenis_ttd' => 'required|in:manual,gambar,qrcode',
                 'kirim_wa' => 'nullable|boolean'
-            ]);
+            ];
+            
+            // User ID only required for surat types that need warga selection
+            if (!in_array($request->jenis_surat, $noWargaTypes)) {
+                $rules['user_id'] = 'required|exists:users,id';
+            }
+            
+            $request->validate($rules);
 
-            $user = \App\Models\User::findOrFail($request->user_id);
+            // Get user data if user_id is provided, otherwise use admin as placeholder
+            $user = null;
+            if ($request->user_id) {
+                $user = \App\Models\User::findOrFail($request->user_id);
+            } else {
+                // For surat without warga selection, use admin as placeholder
+                $user = Auth::user();
+            }
 
             // Validate specific fields based on jenis_surat
             $dataSurat = $this->validateAndGetSuratData($request);
+
+            // AUTO-FILL DATA FOR SURAT HIBAH
+            if ($request->jenis_surat === 'surat_hibah') {
+                $dataSurat['nama_penghibah'] = $user->nama_lengkap;
+                $dataSurat['umur_penghibah'] = $user->tanggal_lahir ? \Carbon\Carbon::parse($user->tanggal_lahir)->age : '-';
+                $dataSurat['pekerjaan_penghibah'] = $user->mata_pencaharian ?? $user->pekerjaan ?? '-';
+                $dataSurat['agama_penghibah'] = $user->agama ?? '-';
+                $dataSurat['alamat_penghibah'] = $user->alamat ?? '-';
+            }
+
+            // AUTO-FILL DATA FOR SURAT PINDAH
+            if ($request->jenis_surat === 'surat_pindah') {
+                $dataSurat['nama'] = $user->nama_lengkap;
+                $dataSurat['nik'] = $user->nik;
+                $dataSurat['tempat_lahir'] = $user->tempat_lahir ?? '-';
+                $dataSurat['tanggal_lahir'] = $user->tanggal_lahir ?? null;
+                $dataSurat['jenis_kelamin'] = $user->jenis_kelamin ?? '-';
+                $dataSurat['agama'] = $user->agama ?? '-';
+                $dataSurat['status_perkawinan'] = $user->status_perkawinan ?? '-';
+                $dataSurat['pekerjaan'] = $user->mata_pencaharian ?? $user->pekerjaan ?? '-';
+                $dataSurat['pendidikan'] = $user->pendidikan ?? '-';
+                $dataSurat['kewarganegaraan'] = $user->kewarganegaraan ?? 'WNI';
+                $dataSurat['alamat_asal'] = $user->alamat ?? '-';
+            }
 
             // Handle file upload if exists
             $lampiranPath = null;
@@ -84,12 +128,7 @@ class AdminPengajuanSuratController extends Controller
             }
 
             // Create pengajuan surat
-            $pengajuan = PengajuanSurat::create([
-                'user_id' => $user->id,
-                'nama_lengkap' => $user->nama_lengkap,
-                'nik' => $user->nik,
-                'no_hp' => $user->no_hp,
-                'alamat' => $user->alamat,
+            $pengajuanData = [
                 'jenis_surat' => $request->jenis_surat,
                 'jenis_ttd' => $request->jenis_ttd,
                 'keperluan' => $request->keperluan ?? 'Dibuat langsung oleh admin',
@@ -98,8 +137,42 @@ class AdminPengajuanSuratController extends Controller
                 'status' => 'Valid', // Admin created surat is auto-approved
                 'approved_by' => Auth::id(),
                 'approved_at' => now(),
-                'is_public' => false
-            ]);
+                'is_public' => false,
+                'no_surat' => $request->no_surat ?? null
+            ];
+            
+            // Add user data based on surat type
+            if (in_array($request->jenis_surat, $noWargaTypes)) {
+                // For surat without warga selection, use Pihak 1 name or generic label
+                if ($request->jenis_surat === 'perjanjian_perdamaian') {
+                    $pengajuanData['user_id'] = Auth::id(); // Use admin as reference
+                    $pengajuanData['nama_lengkap'] = $dataSurat['pihak1_nama'] ?? 'Perjanjian Perdamaian';
+                    $pengajuanData['nik'] = '-';
+                    $pengajuanData['no_hp'] = '';
+                    $pengajuanData['alamat'] = $dataSurat['pihak1_alamat'] ?? '-';
+                } elseif ($request->jenis_surat === 'surat_undangan') {
+                    $pengajuanData['user_id'] = Auth::id();
+                    $pengajuanData['nama_lengkap'] = $dataSurat['kepada'] ?? 'Undangan';
+                    $pengajuanData['nik'] = '-';
+                    $pengajuanData['no_hp'] = '';
+                    $pengajuanData['alamat'] = '-';
+                } else {
+                    // SPPD - already handled separately
+                    $pengajuanData['user_id'] = $user->id;
+                    $pengajuanData['nama_lengkap'] = $user->nama_lengkap;
+                    $pengajuanData['nik'] = $user->nik;
+                    $pengajuanData['no_hp'] = $user->no_hp ?? '';
+                    $pengajuanData['alamat'] = $user->alamat ?? '';
+                }
+            } else {
+                $pengajuanData['user_id'] = $user->id;
+                $pengajuanData['nama_lengkap'] = $user->nama_lengkap;
+                $pengajuanData['nik'] = $user->nik;
+                $pengajuanData['no_hp'] = $user->no_hp ?? '';
+                $pengajuanData['alamat'] = $user->alamat ?? '';
+            }
+            
+            $pengajuan = PengajuanSurat::create($pengajuanData);
 
             // Generate QR Code if needed
             if ($request->jenis_ttd === 'qrcode') {
@@ -135,13 +208,249 @@ class AdminPengajuanSuratController extends Controller
                 $waMessage = ' User belum memiliki nomor HP untuk notifikasi WhatsApp.';
             }
 
+            // Return JSON for AJAX requests
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Surat berhasil dibuat!' . $waMessage,
+                    'redirect' => route('admin.pengajuan-surat.show', $pengajuan->id)
+                ]);
+            }
+
             return redirect()->route('admin.pengajuan-surat.show', $pengajuan->id)
                            ->with('success', 'Surat berhasil dibuat!' . $waMessage);
 
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validasi gagal',
+                    'errors' => $e->errors()
+                ], 422);
+            }
+            throw $e;
+            
         } catch (\Exception $e) {
             Log::error('Failed to create surat: ' . $e->getMessage());
+            
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal membuat surat: ' . $e->getMessage()
+                ], 500);
+            }
+            
             return back()->withInput()->with('error', 'Gagal membuat surat: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Get validation rules for specific surat type
+     */
+    private function validateAndGetSuratDataRules($jenisSurat)
+    {
+        $rules = [];
+
+        switch ($jenisSurat) {
+            case 'surat_kehilangan':
+                $rules = [
+                    'jenis_dokumen' => 'required|string',
+                    'nomor_dokumen' => 'nullable|string',
+                    'nama_barang_lainnya' => 'nullable|string',
+                    'tempat_kehilangan' => 'required|string',
+                    'waktu_kehilangan' => 'required|string',
+                    'keterangan_waktu' => 'nullable|string',
+                ];
+                break;
+
+            case 'surat_bersih_diri':
+                $rules = [
+                    'nama_ayah' => 'required|string',
+                    'umur_ayah' => 'required|integer',
+                    'pekerjaan_ayah' => 'required|string',
+                    'nama_ibu' => 'required|string',
+                    'umur_ibu' => 'required|integer',
+                    'pekerjaan_ibu' => 'required|string',
+                    'keterangan_tambahan' => 'nullable|string',
+                ];
+                break;
+
+            case 'izin_keramaian':
+                $rules = [
+                    'nama_kegiatan' => 'nullable|string',
+                    'jenis_kegiatan' => 'nullable|string',
+                    'tanggal_kegiatan' => 'nullable|date',
+                    'waktu_kegiatan' => 'nullable|string',
+                    'tempat_kegiatan' => 'nullable|string',
+                    'keperluan_acara' => 'nullable|string',
+                ];
+                break;
+
+            case 'ket_belum_menikah':
+                $rules = [
+                    'keperluan' => 'nullable|string',
+                ];
+                break;
+
+            case 'surat_menikah':
+                $rules = [
+                    'tanggal_menikah' => 'required|date',
+                ];
+                break;
+
+            case 'surat_kematian':
+                $rules = [
+                    'nama_almarhum' => 'required|string',
+                    'hari_kematian' => 'required|string',
+                    'tanggal_kematian' => 'required|date',
+                    'tempat_kematian' => 'required|string',
+                    'sebab_kematian' => 'required|string',
+                ];
+                break;
+
+            case 'surat_miskin':
+                $rules = [
+                    'keperluan' => 'required|string',
+                ];
+                break;
+
+            case 'surat_penghasilan_ortu':
+                $rules = [
+                    'nama_ayah' => 'required|string',
+                    'tempat_lahir_ayah' => 'nullable|string',
+                    'tanggal_lahir_ayah' => 'nullable|date',
+                    'pekerjaan_ayah' => 'required|string',
+                    'penghasilan_ayah' => 'required|numeric',
+                    'nama_ibu' => 'required|string',
+                    'tempat_lahir_ibu' => 'nullable|string',
+                    'tanggal_lahir_ibu' => 'nullable|date',
+                    'pekerjaan_ibu' => 'required|string',
+                    'penghasilan_ibu' => 'required|numeric',
+                ];
+                break;
+
+            case 'pengantar_nikah':
+                $rules = [
+                    // Status Perkawinan
+                    'status_pria' => 'required|in:Jejaka,Duda,Beristri',
+                    'beristri_ke' => 'nullable|integer|min:1',
+                    'status_wanita' => 'required|in:Perawan,Janda',
+                    'nama_pasangan_terdahulu' => 'nullable|string',
+                    
+                    // Data Ayah (Orang Tua Pemohon)
+                    'ayah_nama' => 'required|string',
+                    'ayah_bin' => 'nullable|string',
+                    'ayah_nik' => 'required|string|max:16',
+                    'ayah_tempat_tanggal_lahir' => 'required|string',
+                    'ayah_agama' => 'required|string',
+                    'ayah_pekerjaan' => 'required|string',
+                    'ayah_alamat' => 'required|string',
+
+                    // Data Ibu (Orang Tua Pemohon)
+                    'ibu_nama' => 'required|string',
+                    'ibu_bin' => 'nullable|string',
+                    'ibu_nik' => 'required|string|max:16',
+                    'ibu_tempat_tanggal_lahir' => 'required|string',
+                    'ibu_warga_negara' => 'required|string',
+                    'ibu_agama' => 'required|string',
+                    'ibu_pekerjaan' => 'required|string',
+                    'ibu_alamat' => 'required|string',
+
+                    // Data Calon Istri (untuk halaman 2 - Surat Persetujuan Mempelai)
+                    'calon_istri_nama' => 'required|string',
+                    'calon_istri_bin' => 'required|string',
+                    'calon_istri_nik' => 'required|string|max:16',
+                    'calon_istri_tempat_tanggal_lahir' => 'required|string',
+                    'calon_istri_warga_negara' => 'required|string',
+                    'calon_istri_agama' => 'required|string',
+                    'calon_istri_pekerjaan' => 'required|string',
+                    'calon_istri_alamat' => 'required|string',
+                ];
+                break;
+
+            case 'surat_hibah':
+                $rules = [
+                    'hari_tanggal' => 'required|string',
+                    'luas_tanah' => 'required|numeric',
+                    'batas_utara' => 'required|string',
+                    'pemilik_utara' => 'required|string',
+                    'batas_barat' => 'required|string',
+                    'pemilik_barat' => 'required|string',
+                    'batas_selatan' => 'required|string',
+                    'pemilik_selatan' => 'required|string',
+                    'batas_timur' => 'required|string',
+                    'pemilik_timur' => 'required|string',
+                    'saksi_1' => 'required|string',
+                    'saksi_2' => 'required|string',
+                    'saksi_3' => 'required|string'
+                ];
+                break;
+
+            case 'perjanjian_perdamaian':
+                $rules = [
+                    'pihak1_nama' => 'required|string',
+                    'pihak1_umur' => 'required|integer',
+                    'pihak1_pekerjaan' => 'required|string',
+                    'pihak1_agama' => 'required|string',
+                    'pihak1_alamat' => 'required|string',
+                    'pihak2_nama' => 'required|string',
+                    'pihak2_umur' => 'required|integer',
+                    'pihak2_pekerjaan' => 'required|string',
+                    'pihak2_agama' => 'required|string',
+                    'pihak2_alamat' => 'required|string',
+                    'hari_tanggal_perjanjian' => 'required|string',
+                    'hari_tanggal_kejadian' => 'required|string',
+                    'waktu_kejadian' => 'required|string',
+                    'jenis_denda' => 'required|string',
+                    'nominal_denda' => 'required|numeric',
+                    'terbilang_denda' => 'required|string',
+                    'saksi_1' => 'required|string',
+                    'saksi_2' => 'required|string',
+                    'saksi_3' => 'required|string',
+                    'saksi_4' => 'required|string'
+                ];
+                break;
+
+            case 'sppd':
+                $rules = [
+                    'personel' => 'required|array|min:1',
+                    'personel.*.warga_id' => 'required|exists:users,id',
+                    'personel.*.jabatan' => 'required|string',
+                    'tujuan_perjalanan' => 'required|string',
+                    'keperluan' => 'required|string',
+                    'tanggal_berangkat' => 'required|date',
+                    'tanggal_kembali' => 'required|date',
+                    'transportasi' => 'required|string',
+                    'biaya' => 'nullable|array',
+                    'biaya.*.uraian' => 'nullable|string',
+                    'biaya.*.jumlah' => 'nullable|numeric',
+                    'biaya.*.ket' => 'nullable|string'
+                ];
+                break;
+
+            case 'surat_undangan':
+                $rules = [
+                    'lampiran' => 'nullable|string',
+                    'perihal' => 'required|string',
+                    'tanggal_surat' => 'required|date',
+                    'kepada' => 'required|string',
+                    'pembukaan' => 'required|string',
+                    'hari_tanggal' => 'required|string',
+                    'jam' => 'required|string',
+                    'acara' => 'required|string',
+                    'tempat' => 'required|string',
+                    'penutup' => 'nullable|string',
+                    'tanggal_ttd' => 'required|date',
+                    'kepala_desa' => 'nullable|string'
+                ];
+                break;
+
+            default:
+                $rules = [];
+                break;
+        }
+
+        return $rules;
     }
 
     /**
@@ -159,7 +468,7 @@ class AdminPengajuanSuratController extends Controller
                     'nama_barang_lainnya' => 'nullable|string',
                     'nomor_dokumen' => 'nullable|string',
                     'tempat_kehilangan' => 'required|string',
-                    'waktu_kehilangan' => 'required|date',
+                    'waktu_kehilangan' => 'required|string',
                     'keterangan_waktu' => 'nullable|string',
                     'keperluan' => 'required|string'
                 ];
@@ -187,21 +496,14 @@ class AdminPengajuanSuratController extends Controller
 
             case 'surat_domisili':
                 $rules = [
-                    'keperluan' => 'required|string',
-                    'alamat_domisili' => 'required|string',
-                    'lama_tinggal' => 'required|string'
+                    'keperluan' => 'required|string'
                 ];
                 break;
 
-            case 'surat_usaha':
+            case 'ket_usaha':
                 $rules = [
                     'nama_usaha' => 'required|string',
-                    'jenis_usaha' => 'required|string',
-                    'alamat_usaha' => 'required|string',
-                    'modal_usaha' => 'required|string',
-                    'mulai_usaha' => 'required|date',
-                    'jumlah_karyawan' => 'nullable|integer|min:0',
-                    'keperluan' => 'required|string'
+                    'jenis_usaha' => 'required|string'
                 ];
                 break;
 
@@ -231,18 +533,52 @@ class AdminPengajuanSuratController extends Controller
             case 'ket_usaha':
                 $rules = [
                     'nama_usaha' => 'required|string',
-                    'jenis_usaha' => 'required|string',
-                    'alamat_usaha' => 'required|string',
-                    'modal_usaha' => 'required|string',
-                    'mulai_usaha' => 'required|date',
-                    'jumlah_karyawan' => 'nullable|integer|min:0',
-                    'keperluan' => 'required|string'
+                    'jenis_usaha' => 'required|string'
                 ];
                 break;
 
             case 'ket_menikah':
                 $rules = [
                     'tanggal_menikah' => 'required|date'
+                ];
+                break;
+
+            case 'pengantar_nikah':
+                $rules = [
+                    // Status Perkawinan
+                    'status_pria' => 'required|in:Jejaka,Duda,Beristri',
+                    'beristri_ke' => 'nullable|integer|min:1',
+                    'status_wanita' => 'required|in:Perawan,Janda',
+                    'nama_pasangan_terdahulu' => 'nullable|string',
+                    
+                    // Data Ayah (Orang Tua Pemohon)
+                    'ayah_nama' => 'required|string',
+                    'ayah_bin' => 'nullable|string',
+                    'ayah_nik' => 'required|string|max:16',
+                    'ayah_tempat_tanggal_lahir' => 'required|string',
+                    'ayah_agama' => 'required|string',
+                    'ayah_pekerjaan' => 'required|string',
+                    'ayah_alamat' => 'required|string',
+
+                    // Data Ibu (Orang Tua Pemohon)
+                    'ibu_nama' => 'required|string',
+                    'ibu_bin' => 'nullable|string',
+                    'ibu_nik' => 'required|string|max:16',
+                    'ibu_tempat_tanggal_lahir' => 'required|string',
+                    'ibu_warga_negara' => 'required|string',
+                    'ibu_agama' => 'required|string',
+                    'ibu_pekerjaan' => 'required|string',
+                    'ibu_alamat' => 'required|string',
+
+                    // Data Calon Istri (untuk halaman 2 - Surat Persetujuan Mempelai)
+                    'calon_istri_nama' => 'required|string',
+                    'calon_istri_bin' => 'required|string',
+                    'calon_istri_nik' => 'required|string|max:16',
+                    'calon_istri_tempat_tanggal_lahir' => 'required|string',
+                    'calon_istri_warga_negara' => 'required|string',
+                    'calon_istri_agama' => 'required|string',
+                    'calon_istri_pekerjaan' => 'required|string',
+                    'calon_istri_alamat' => 'required|string',
                 ];
                 break;
 
@@ -280,49 +616,67 @@ class AdminPengajuanSuratController extends Controller
                 ];
                 break;
 
+            case 'izin_keramaian':
+                $rules = [
+                    'nama_kegiatan' => 'nullable|string',
+                    'jenis_kegiatan' => 'nullable|string',
+                    'tanggal_kegiatan' => 'nullable|date',
+                    'waktu_kegiatan' => 'nullable|string',
+                    'tempat_kegiatan' => 'nullable|string',
+                    'keperluan_acara' => 'nullable|string'
+                ];
+                break;
+
             case 'pengantar_nikah':
                 $rules = [
-                    'nama' => 'required|string',
-                    'nik' => 'required|string',
-                    'tempat_lahir' => 'required|string',
-                    'tanggal_lahir' => 'required|date',
-                    'warga_negara' => 'required|string',
-                    'agama' => 'required|string',
-                    'pekerjaan' => 'required|string',
-                    'alamat' => 'required|string',
+                    // Status Perkawinan
+                    'status_pria' => 'required|in:Jejaka,Duda,Beristri',
+                    'beristri_ke' => 'nullable|integer|min:1',
+                    'status_wanita' => 'required|in:Perawan,Janda',
+                    'nama_pasangan_terdahulu' => 'nullable|string',
+                    
+                    // Data Ayah (Orang Tua Pemohon)
                     'ayah_nama' => 'required|string',
+                    'ayah_bin' => 'nullable|string',
+                    'ayah_nik' => 'required|string|max:16',
+                    'ayah_tempat_tanggal_lahir' => 'required|string',
+                    'ayah_agama' => 'required|string',
+                    'ayah_pekerjaan' => 'required|string',
+                    'ayah_alamat' => 'required|string',
+
+                    // Data Ibu (Orang Tua Pemohon)
                     'ibu_nama' => 'required|string',
-                    'wanita_nama' => 'required|string',
-                    'wanita_nik' => 'required|string',
-                    'wanita_tempat_lahir' => 'required|string',
-                    'wanita_tanggal_lahir' => 'required|date',
-                    'wanita_warga_negara' => 'required|string',
-                    'wanita_agama' => 'required|string',
-                    'wanita_pekerjaan' => 'required|string',
-                    'wanita_alamat' => 'required|string',
-                    'wanita_ayah_nama' => 'required|string',
-                    'wanita_ibu_nama' => 'required|string',
-                    'keperluan' => 'required|string'
+                    'ibu_bin' => 'nullable|string',
+                    'ibu_nik' => 'required|string|max:16',
+                    'ibu_tempat_tanggal_lahir' => 'required|string',
+                    'ibu_warga_negara' => 'required|string',
+                    'ibu_agama' => 'required|string',
+                    'ibu_pekerjaan' => 'required|string',
+                    'ibu_alamat' => 'required|string',
+
+                    // Data Calon Istri (untuk halaman 2 - Surat Persetujuan Mempelai)
+                    'calon_istri_nama' => 'required|string',
+                    'calon_istri_bin' => 'required|string',
+                    'calon_istri_nik' => 'required|string|max:16',
+                    'calon_istri_tempat_tanggal_lahir' => 'required|string',
+                    'calon_istri_warga_negara' => 'required|string',
+                    'calon_istri_agama' => 'required|string',
+                    'calon_istri_pekerjaan' => 'required|string',
+                    'calon_istri_alamat' => 'required|string',
                 ];
                 break;
 
             case 'surat_pindah':
                 $rules = [
-                    'nama' => 'required|string',
-                    'tempat_lahir' => 'required|string',
-                    'tanggal_lahir' => 'required|date',
-                    'jenis_kelamin' => 'required|string',
-                    'agama' => 'required|string',
-                    'status_perkawinan' => 'required|string',
-                    'pekerjaan' => 'required|string',
-                    'pendidikan' => 'required|string',
-                    'kewarganegaraan' => 'required|string',
-                    'alamat_asal' => 'required|string',
+                    // Data ini akan diisi otomatis dari user yang dipilih
+                    // Form hanya memerlukan data kepindahan
                     'alamat_tujuan' => 'required|string',
                     'tanggal_pindah' => 'required|date',
                     'alasan_pindah' => 'required|string',
+                    'jenis_pindah' => 'nullable|string',
+                    'keperluan' => 'nullable|string',
                     'pengikut_count' => 'nullable|integer|min:0|max:10',
-                    'pengikut' => 'nullable|json',
+                    'pengikut' => 'nullable|array',
                     'nama_camat' => 'nullable|string',
                     'nip_camat' => 'nullable|string'
                 ];
@@ -464,11 +818,6 @@ class AdminPengajuanSuratController extends Controller
 
             case 'surat_hibah':
                 $rules = [
-                    'nama_penghibah' => 'required|string',
-                    'umur_penghibah' => 'required|integer',
-                    'pekerjaan_penghibah' => 'required|string',
-                    'agama_penghibah' => 'required|string',
-                    'alamat_penghibah' => 'required|string',
                     'hari_tanggal' => 'required|string',
                     'luas_tanah' => 'required|numeric',
                     'batas_utara' => 'required|string',
@@ -510,6 +859,23 @@ class AdminPengajuanSuratController extends Controller
                 ];
                 break;
 
+            case 'sppd':
+                $rules = [
+                    'personel' => 'required|array|min:1',
+                    'personel.*.warga_id' => 'required|exists:users,id',
+                    'personel.*.jabatan' => 'required|string',
+                    'tujuan_perjalanan' => 'required|string',
+                    'keperluan' => 'required|string',
+                    'tanggal_berangkat' => 'required|date',
+                    'tanggal_kembali' => 'required|date',
+                    'transportasi' => 'required|string',
+                    'biaya' => 'nullable|array',
+                    'biaya.*.uraian' => 'nullable|string',
+                    'biaya.*.jumlah' => 'nullable|numeric',
+                    'biaya.*.ket' => 'nullable|string'
+                ];
+                break;
+
             default:
                 throw new \Exception('Jenis surat tidak didukung');
         }
@@ -518,10 +884,47 @@ class AdminPengajuanSuratController extends Controller
 
         // Return only the surat-specific data
         $dataSurat = [];
+
+        // Get all fields from request that match the validated rules
         foreach (array_keys($rules) as $field) {
             if ($request->has($field)) {
+                // Skip array fields that need special handling
+                if (in_array($field, ['personel', 'biaya', 'saksi', 'pengikut'])) {
+                    continue;
+                }
                 $dataSurat[$field] = $request->$field;
             }
+        }
+
+        // Special handling for SPPD personel
+        if ($jenisSurat === 'sppd' && $request->has('personel')) {
+            $personelList = [];
+            foreach ($request->personel as $personel) {
+                $warga = \App\Models\User::find($personel['warga_id']);
+                if ($warga) {
+                    $personelList[] = [
+                        'warga_id' => $warga->id, // Store warga_id for easier retrieval
+                        'nama' => $warga->nama_lengkap,
+                        'jabatan' => $personel['jabatan']
+                    ];
+                }
+            }
+            $dataSurat['personel'] = $personelList;
+        }
+
+        // Special handling for SPPD biaya
+        if ($jenisSurat === 'sppd' && $request->has('biaya')) {
+            $dataSurat['biaya'] = $request->biaya;
+        }
+
+        // Special handling for surat kehilangan saksi
+        if ($jenisSurat === 'surat_kehilangan' && $request->has('saksi')) {
+            $dataSurat['saksi'] = $request->saksi;
+        }
+
+        // Special handling for surat pindah pengikut
+        if ($jenisSurat === 'surat_pindah' && $request->has('pengikut')) {
+            $dataSurat['pengikut'] = $request->pengikut;
         }
 
         return $dataSurat;
@@ -560,7 +963,7 @@ class AdminPengajuanSuratController extends Controller
                 case 'surat_domisili':
                     $pdfResponse = $pdfController->generatePDFDomisili($pengajuan->id);
                     break;
-                case 'surat_usaha':
+                case 'ket_usaha':
                     $pdfResponse = $pdfController->generatePDFUsaha($pengajuan->id);
                     break;
                 case 'surat_tidak_mampu':
@@ -922,12 +1325,12 @@ class AdminPengajuanSuratController extends Controller
                 return app('App\Http\Controllers\SuratController')->generatePDFBerkelakuanBaik($id);
             case 'surat_domisili':
                 return app('App\Http\Controllers\SuratController')->generatePDFDomisili($id);
-            case 'surat_usaha':
-                return app('App\Http\Controllers\SuratController')->generatePDFUsaha($id);
-            case 'surat_tidak_mampu':
-                return app('App\Http\Controllers\SuratController')->generatePDFTidakMampu($id);
             case 'ket_usaha':
                 return app('App\Http\Controllers\SuratController')->generatePDFUsaha($id);
+            case 'surat_kematian':
+                return app('App\Http\Controllers\SuratController')->generatePDFKematian($id);
+            case 'surat_tidak_mampu':
+                return app('App\Http\Controllers\SuratController')->generatePDFTidakMampu($id);
             case 'ket_menikah':
                 return app('App\Http\Controllers\SuratController')->generatePDFMenikah($id);
             case 'ket_miskin_dtks':
@@ -985,6 +1388,209 @@ class AdminPengajuanSuratController extends Controller
             Log::error('Failed to generate QR TTD for pengajuan ' . $pengajuan->id . ': ' . $e->getMessage());
             return false;
         }
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit($id)
+    {
+        $pengajuan = PengajuanSurat::findOrFail($id);
+        $users = \App\Models\User::orderBy('nama_lengkap')->get();
+
+        return view('admin.pengajuan-surat.edit', compact('pengajuan', 'users'));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, $id)
+    {
+        try {
+            $pengajuan = PengajuanSurat::findOrFail($id);
+
+            // Basic validation - different for SPPD vs other surat types
+            $rules = [
+                'no_surat' => 'required|string|max:255',
+                'jenis_ttd' => 'required|in:manual,gambar,qrcode',
+            ];
+            
+            // Surat types that don't require warga selection
+            $noWargaTypes = ['perjanjian_perdamaian', 'surat_undangan'];
+
+            // For SPPD: validate personel (no main user_id needed)
+            // For other surat types: validate user_id and keperluan
+            if ($pengajuan->jenis_surat === 'sppd') {
+                $rules['jenis_ttd_camat'] = 'required|in:manual,gambar,qrcode';
+                $rules['personel'] = 'required|array|min:1';
+                $rules['personel.*.warga_id'] = 'required|exists:users,id';
+                $rules['personel.*.jabatan'] = 'required|string';
+                $rules['tujuan_perjalanan'] = 'required|string';
+                $rules['keperluan_sppd'] = 'required|string';
+                $rules['tanggal_berangkat'] = 'required|date';
+                $rules['tanggal_kembali'] = 'required|date';
+                $rules['transportasi'] = 'required|string';
+            } elseif (in_array($pengajuan->jenis_surat, $noWargaTypes)) {
+                // For surat types without warga selection, user_id is not required
+                // Add validation rules for specific surat type fields
+                $specificRules = $this->validateAndGetSuratDataRules($pengajuan->jenis_surat);
+                $rules = array_merge($rules, $specificRules);
+            } else {
+                $rules['user_id'] = 'required|exists:users,id';
+                // Keperluan is required for most surat types, except izin_keramaian, surat_usaha, ket_usaha
+                if (!in_array($pengajuan->jenis_surat, ['izin_keramaian', 'ket_usaha', 'ket_usaha'])) {
+                    $rules['keperluan'] = 'required|string';
+                }
+
+                // Add validation rules for specific surat type fields
+                $specificRules = $this->validateAndGetSuratDataRules($pengajuan->jenis_surat);
+                $rules = array_merge($rules, $specificRules);
+            }
+
+            $request->validate($rules);
+
+        // Prepare data_surat update
+        $dataSuratUpdate = $pengajuan->data_surat ?? [];
+
+        // Get validation rules for specific surat type to know which fields to update
+        $specificRules = $this->validateAndGetSuratDataRules($pengajuan->jenis_surat);
+
+        // Update data_surat with specific fields from request (excluding arrays that need special handling)
+        foreach (array_keys($specificRules) as $field) {
+            if ($request->has($field) && !in_array($field, ['personel', 'biaya', 'saksi', 'pengikut'])) {
+                $dataSuratUpdate[$field] = $request->$field;
+            }
+        }
+
+        // Special handling for surat pindah
+        if ($pengajuan->jenis_surat === 'surat_pindah') {
+            // Handle all surat pindah specific fields
+            $suratPindahFields = ['alasan_pindah', 'tanggal_pindah', 'alamat_tujuan', 'jenis_pindah', 'keperluan', 'nama_camat', 'nip_camat'];
+            foreach ($suratPindahFields as $field) {
+                if ($request->has($field)) {
+                    $dataSuratUpdate[$field] = $request->$field;
+                }
+            }
+            
+            // Handle pengikut array
+            if ($request->has('pengikut')) {
+                $dataSuratUpdate['pengikut'] = $request->pengikut;
+            } else {
+                // If pengikut is not in request, it means all pengikut were removed
+                $dataSuratUpdate['pengikut'] = [];
+            }
+        }
+
+        // Handle SPPD separately
+        if ($pengajuan->jenis_surat === 'sppd') {
+            // Process personel data
+            $personelList = [];
+            $firstPersonelUser = null;
+
+            foreach ($request->personel as $index => $personel) {
+                $warga = \App\Models\User::find($personel['warga_id']);
+                if ($warga) {
+                    $personelList[] = [
+                        'warga_id' => $warga->id, // Store warga_id for easier retrieval
+                        'nama' => $warga->nama_lengkap,
+                        'jabatan' => $personel['jabatan']
+                    ];
+                    // Use first personel as the main user
+                    if ($index === 0 || $firstPersonelUser === null) {
+                        $firstPersonelUser = $warga;
+                    }
+                }
+            }
+
+            $dataSuratUpdate['personel'] = $personelList;
+            $dataSuratUpdate['tujuan_perjalanan'] = $request->tujuan_perjalanan;
+            $dataSuratUpdate['keperluan'] = $request->keperluan_sppd;
+            $dataSuratUpdate['tanggal_berangkat'] = $request->tanggal_berangkat;
+            $dataSuratUpdate['tanggal_kembali'] = $request->tanggal_kembali;
+            $dataSuratUpdate['transportasi'] = $request->transportasi;
+
+            // Handle biaya if exists
+            if ($request->has('biaya')) {
+                $dataSuratUpdate['biaya'] = $request->biaya;
+            }
+
+            // Update pengajuan - only save user_id reference
+            // User details (nama, nik, no_hp, alamat) can be accessed via user relation
+            $pengajuan->update([
+                'user_id' => $firstPersonelUser->id,
+                'keperluan' => $request->keperluan_sppd,
+                'jenis_ttd' => $request->jenis_ttd,
+                'jenis_ttd_camat' => $request->jenis_ttd_camat,
+                'data_surat' => $dataSuratUpdate,
+                'no_surat' => $request->no_surat
+            ]);
+        } else {
+            // For non-SPPD surat types
+            // Surat types that don't require warga selection
+            $noWargaTypes = ['perjanjian_perdamaian', 'surat_undangan'];
+            
+            \Log::info('Updating non-SPPD surat', [
+                'pengajuan_id' => $pengajuan->id,
+                'no_surat_request' => $request->no_surat,
+                'user_id' => $request->user_id,
+                'keperluan' => $request->keperluan,
+                'jenis_surat' => $pengajuan->jenis_surat
+            ]);
+
+            $updateData = [
+                'jenis_ttd' => $request->jenis_ttd,
+                'data_surat' => $dataSuratUpdate,
+                'no_surat' => $request->no_surat
+            ];
+            
+            // Only update user_id if provided (not needed for perjanjian_perdamaian, surat_undangan)
+            if (!in_array($pengajuan->jenis_surat, $noWargaTypes)) {
+                $updateData['user_id'] = $request->user_id;
+            } else {
+                // For perjanjian_perdamaian, update nama_lengkap with pihak1_nama
+                if ($pengajuan->jenis_surat === 'perjanjian_perdamaian') {
+                    $updateData['nama_lengkap'] = $dataSuratUpdate['pihak1_nama'] ?? $pengajuan->nama_lengkap;
+                    $updateData['alamat'] = $dataSuratUpdate['pihak1_alamat'] ?? $pengajuan->alamat;
+                } elseif ($pengajuan->jenis_surat === 'surat_undangan') {
+                    $updateData['nama_lengkap'] = $dataSuratUpdate['kepada'] ?? $pengajuan->nama_lengkap;
+                }
+            }
+
+            // Only update keperluan if it's provided (some surat types like surat_usaha don't have it)
+            if ($request->has('keperluan') && $request->keperluan !== null) {
+                $updateData['keperluan'] = $request->keperluan;
+            }
+
+            $pengajuan->update($updateData);
+
+            \Log::info('After update', ['no_surat_db' => $pengajuan->fresh()->no_surat]);
+        }
+
+        return redirect()->route('admin.pengajuan-surat.show', $pengajuan->id)
+            ->with('success', 'Pengajuan surat berhasil diperbarui!');
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        // Validation error - redirect back with specific errors
+        $errors = $e->validator->errors();
+        $errorMessages = [];
+        foreach ($errors->all() as $error) {
+            $errorMessages[] = $error;
+        }
+        $errorMessage = 'Validasi gagal:\n' . implode('\n', $errorMessages);
+        
+        return back()
+            ->withInput()
+            ->withErrors($errors)
+            ->with('error', $errorMessage);
+    } catch (\Exception $e) {
+        // Other errors
+        \Log::error('Error updating pengajuan surat: ' . $e->getMessage(), [
+            'pengajuan_id' => $id,
+            'trace' => $e->getTraceAsString()
+        ]);
+        return back()
+            ->withInput()
+            ->with('error', 'Gagal memperbarui surat: ' . $e->getMessage());
+    }
     }
 
     /**

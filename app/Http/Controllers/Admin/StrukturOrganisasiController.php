@@ -56,6 +56,7 @@ class StrukturOrganisasiController extends Controller
         $request->validate([
             'nama' => 'required|string|max:255',
             'jabatan' => 'required|string|max:255',
+            'nip' => 'nullable|string|max:50',
             'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'tugas' => 'nullable|array',
             'tugas.*' => 'string|max:500',
@@ -64,11 +65,11 @@ class StrukturOrganisasiController extends Controller
             'parent_id' => 'nullable|exists:struktur_organisasi,id',
             'kategori' => 'required|in:pemerintahan,bpd',
             'level' => 'required|in:kepala,wakil,sekretaris,kasi_kaur,kadus,anggota',
-            'aktif' => 'boolean',
+            'aktif' => 'nullable',
         ]);
 
         $data = $request->only([
-            'nama', 'jabatan', 'parent_id', 'kategori', 'level'
+            'nama', 'jabatan', 'nip', 'parent_id', 'kategori', 'level'
         ]);
 
         // Handle foto upload
@@ -130,6 +131,7 @@ class StrukturOrganisasiController extends Controller
         $request->validate([
             'nama' => 'required|string|max:255',
             'jabatan' => 'required|string|max:255',
+            'nip' => 'nullable|string|max:50',
             'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'tugas' => 'nullable|array',
             'tugas.*' => 'string|max:500',
@@ -138,11 +140,11 @@ class StrukturOrganisasiController extends Controller
             'parent_id' => 'nullable|exists:struktur_organisasi,id',
             'kategori' => 'required|in:pemerintahan,bpd',
             'level' => 'required|in:kepala,wakil,sekretaris,kasi_kaur,kadus,anggota',
-            'aktif' => 'boolean',
+            'aktif' => 'nullable',
         ]);
 
         $data = $request->only([
-            'nama', 'jabatan', 'parent_id', 'kategori', 'level'
+            'nama', 'jabatan', 'nip', 'parent_id', 'kategori', 'level'
         ]);
 
         // Handle foto upload

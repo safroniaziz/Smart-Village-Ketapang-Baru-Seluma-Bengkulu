@@ -299,9 +299,9 @@ html {
                 <!-- Enhanced Quick Stats -->
                 <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8" data-aos="fade-up" data-aos-delay="700">
                     <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20 hover:bg-white/15 transition-all duration-300 text-center">
-                        <div class="text-2xl font-black text-yellow-400 mb-1">7</div>
+                        <div class="text-2xl font-black text-yellow-400 mb-1">6</div>
                         <div class="text-sm text-blue-100">Jenis Surat</div>
-                        <div class="text-xs text-blue-200 mt-1">
+                        <div class="text-xs text-blue-200 mt-1">[]
                             <i class="fas fa-list text-blue-300 mr-1"></i>
                             Layanan tersedia
                         </div>
@@ -702,24 +702,6 @@ html {
                 </div>
             </div>
 
-            <!-- Card 3: SPPD -->
-            <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 relative" data-aos="fade-up" data-aos-delay="200">
-                <div class="absolute top-3 right-3 bg-green-500 text-white text-xs px-2 py-1 rounded-full font-semibold">✓ Ready</div>
-                <div class="p-6 text-center h-full flex flex-col">
-                    <div class="bg-blue-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-route text-2xl text-blue-600"></i>
-                    </div>
-                    <h3 class="text-lg font-bold text-gray-900 mb-3">SPPD (Surat Perintah Perjalanan Dinas)</h3>
-                    <p class="text-gray-600 mb-4 flex-grow text-sm">Perintah perjalanan dinas</p>
-                    @auth
-                        <button onclick="openSuratModal('sppd', 'SPPD')" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-300 mt-auto text-sm">
-                            <i class="fas fa-edit mr-2"></i>Ajukan Sekarang
-                        </button>
-                    @else
-                        <button onclick="showLoginModal()" class="bg-gray-400 text-gray-200 font-semibold py-3 px-4 rounded-lg cursor-not-allowed mt-auto text-sm">Login untuk Ajukan</button>
-                    @endauth
-                </div>
-            </div>
 
             <!-- Card 4: Surat Izin Keramaian -->
             <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 relative" data-aos="fade-up" data-aos-delay="300">
@@ -792,9 +774,7 @@ html {
                             Ajukan Surat
                         </button>
                     @else
-                        <button onclick="showLoginModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 mt-auto text-sm">
-                            Ajukan Surat
-                        </button>
+                        <button onclick="showLoginModal()" class="bg-gray-400 text-gray-200 font-semibold py-3 px-4 rounded-lg cursor-not-allowed mt-auto text-sm">Login untuk Ajukan</button>
                     @endauth
                 </div>
             </div>
@@ -813,9 +793,7 @@ html {
                             Ajukan Surat
                         </button>
                     @else
-                        <button onclick="showLoginModal()" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 mt-auto text-sm">
-                            Ajukan Surat
-                        </button>
+                        <button onclick="showLoginModal()" class="bg-gray-400 text-gray-200 font-semibold py-3 px-4 rounded-lg cursor-not-allowed mt-auto text-sm">Login untuk Ajukan</button>
                     @endauth
                 </div>
             </div>
@@ -844,13 +822,11 @@ html {
                     <h3 class="text-lg font-bold text-gray-900 mb-3">Surat Keterangan Menikah</h3>
                     <p class="text-gray-600 mb-4 flex-grow text-sm">Keterangan status menikah</p>
                     @auth
-                        <button onclick="openSuratModal('surat_menikah', 'Surat Keterangan Menikah')" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 mt-auto text-sm">
+                        <button onclick="openSuratModal('ket_menikah', 'Surat Keterangan Menikah')" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 mt-auto text-sm">
                             Ajukan Surat
                         </button>
                     @else
-                        <button onclick="showLoginModal()" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 mt-auto text-sm">
-                            Ajukan Surat
-                        </button>
+                        <button onclick="showLoginModal()" class="bg-gray-400 text-gray-200 font-semibold py-3 px-4 rounded-lg cursor-not-allowed mt-auto text-sm">Login untuk Ajukan</button>
                     @endauth
                 </div>
             </div>
@@ -865,29 +841,31 @@ html {
                     <h3 class="text-lg font-bold text-gray-900 mb-3">Surat Keterangan Miskin DTKS</h3>
                     <p class="text-gray-600 mb-4 flex-grow text-sm">Keterangan keluarga miskin DTKS</p>
                     @auth
-                        <button onclick="openSuratModal('surat_miskin', 'Surat Keterangan Miskin DTKS')" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 mt-auto text-sm">
+                        <button onclick="openSuratModal('ket_miskin_dtks', 'Surat Keterangan Miskin DTKS')" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 mt-auto text-sm">
                             Ajukan Surat
                         </button>
                     @else
-                        <button onclick="showLoginModal()" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 mt-auto text-sm">
-                            Ajukan Surat
-                        </button>
+                        <button onclick="showLoginModal()" class="bg-gray-400 text-gray-200 font-semibold py-3 px-4 rounded-lg cursor-not-allowed mt-auto text-sm">Login untuk Ajukan</button>
                     @endauth
                 </div>
             </div>
 
             <!-- Card 11: Surat Keterangan Penduduk Desa -->
             <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 relative" data-aos="fade-up" data-aos-delay="200">
-                <div class="absolute top-3 right-3 bg-orange-500 text-white text-xs px-2 py-1 rounded-full font-semibold">Soon</div>
+                <div class="absolute top-3 right-3 bg-green-500 text-white text-xs px-2 py-1 rounded-full font-semibold">Aktif</div>
                 <div class="p-6 text-center h-full flex flex-col">
                     <div class="bg-green-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                         <i class="fas fa-users text-2xl text-green-600"></i>
                     </div>
                     <h3 class="text-lg font-bold text-gray-900 mb-3">Surat Keterangan Penduduk Desa</h3>
                     <p class="text-gray-600 mb-4 flex-grow text-sm">Keterangan sebagai penduduk desa</p>
-                    <button class="bg-gray-400 text-gray-200 font-semibold py-3 px-4 rounded-lg cursor-not-allowed mt-auto text-sm opacity-75" disabled>
-                        Segera Hadir
-                    </button>
+                    @auth
+                        <button onclick="openSuratModal('surat_penduduk_desa', 'Surat Keterangan Penduduk Desa')" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 mt-auto text-sm">
+                            Ajukan Surat
+                        </button>
+                    @else
+                        <button onclick="showLoginModal()" class="bg-gray-400 text-gray-200 font-semibold py-3 px-4 rounded-lg cursor-not-allowed mt-auto text-sm">Login untuk Ajukan</button>
+                    @endauth
                 </div>
             </div>
 
@@ -901,151 +879,108 @@ html {
                     <h3 class="text-lg font-bold text-gray-900 mb-3">Surat Keterangan Penghasilan Orang Tua</h3>
                     <p class="text-gray-600 mb-4 flex-grow text-sm">Keterangan penghasilan orang tua</p>
                     @auth
-                        <button onclick="openSuratModal('surat_penghasilan_ortu', 'Surat Keterangan Penghasilan Orang Tua')" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 mt-auto text-sm">
+                        <button onclick="openSuratModal('ket_penghasilan_ortu', 'Surat Keterangan Penghasilan Orang Tua')" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 mt-auto text-sm">
                             Ajukan Surat
                         </button>
                     @else
-                        <button onclick="showLoginModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 mt-auto text-sm">
-                            Ajukan Surat
-                        </button>
+                        <button onclick="showLoginModal()" class="bg-gray-400 text-gray-200 font-semibold py-3 px-4 rounded-lg cursor-not-allowed mt-auto text-sm">Login untuk Ajukan</button>
                     @endauth
                 </div>
             </div>
 
             <!-- Card 13: Surat Keterangan Usaha -->
             <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 relative" data-aos="fade-up" data-aos-delay="0">
-                <div class="absolute top-3 right-3 bg-orange-500 text-white text-xs px-2 py-1 rounded-full font-semibold">Soon</div>
+                <div class="absolute top-3 right-3 bg-green-500 text-white text-xs px-2 py-1 rounded-full font-semibold">Aktif</div>
                 <div class="p-6 text-center h-full flex flex-col">
                     <div class="bg-purple-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                         <i class="fas fa-store text-2xl text-purple-600"></i>
                     </div>
                     <h3 class="text-lg font-bold text-gray-900 mb-3">Surat Keterangan Usaha</h3>
                     <p class="text-gray-600 mb-4 flex-grow text-sm">Keterangan memiliki usaha</p>
-                    <button class="bg-gray-400 text-gray-200 font-semibold py-3 px-4 rounded-lg cursor-not-allowed mt-auto text-sm opacity-75" disabled>
-                        Segera Hadir
-                    </button>
+                    @auth
+                        <button onclick="openSuratModal('ket_usaha', 'Surat Keterangan Usaha')" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 mt-auto text-sm">
+                            Ajukan Surat
+                        </button>
+                    @else
+                        <button onclick="showLoginModal()" class="bg-gray-400 text-gray-200 font-semibold py-3 px-4 rounded-lg cursor-not-allowed mt-auto text-sm">Login untuk Ajukan</button>
+                    @endauth
                 </div>
             </div>
 
             <!-- Card 14: Surat Pengantar Nikah -->
             <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 relative" data-aos="fade-up" data-aos-delay="100">
-                <div class="absolute top-3 right-3 bg-orange-500 text-white text-xs px-2 py-1 rounded-full font-semibold">Soon</div>
+                <div class="absolute top-3 right-3 bg-green-500 text-white text-xs px-2 py-1 rounded-full font-semibold">Aktif</div>
                 <div class="p-6 text-center h-full flex flex-col">
                     <div class="bg-purple-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                         <i class="fas fa-rings-wedding text-2xl text-purple-600"></i>
                     </div>
-                    <h3 class="text-lg font-bold text-gray-900 mb-3">Surat Pengantar Nikah (N1-N4)</h3>
+                    <h3 class="text-lg font-bold text-gray-900 mb-3">Surat Pengantar Nikah</h3>
                     <p class="text-gray-600 mb-4 flex-grow text-sm">Pengantar untuk pernikahan</p>
-                    <button class="bg-gray-400 text-gray-200 font-semibold py-3 px-4 rounded-lg cursor-not-allowed mt-auto text-sm opacity-75" disabled>
-                        Segera Hadir
-                    </button>
+                    @auth
+                        <button onclick="openSuratModal('pengantar_nikah', 'Surat Pengantar Nikah')" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 mt-auto text-sm">
+                            Ajukan Surat
+                        </button>
+                    @else
+                        <button onclick="showLoginModal()" class="bg-gray-400 text-gray-200 font-semibold py-3 px-4 rounded-lg cursor-not-allowed mt-auto text-sm">Login untuk Ajukan</button>
+                    @endauth
                 </div>
             </div>
 
-            <!-- Card 15: Surat Perjanjian Perdamaian -->
+            <!-- Card 15: Surat Keterangan Hibah -->
             <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 relative" data-aos="fade-up" data-aos-delay="200">
-                <div class="absolute top-3 right-3 bg-orange-500 text-white text-xs px-2 py-1 rounded-full font-semibold">Soon</div>
+                <div class="absolute top-3 right-3 bg-green-500 text-white text-xs px-2 py-1 rounded-full font-semibold">Aktif</div>
+                <div class="p-6 text-center h-full flex flex-col">
+                    <div class="bg-pink-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-hand-holding-heart text-2xl text-pink-600"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-900 mb-3">Surat Keterangan Hibah</h3>
+                    <p class="text-gray-600 mb-4 flex-grow text-sm">Keterangan hibah tanah/properti</p>
+                    @auth
+                        <button onclick="openSuratModal('surat_hibah', 'Surat Keterangan Hibah')" class="bg-pink-600 hover:bg-pink-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 mt-auto text-sm">
+                            Ajukan Surat
+                        </button>
+                    @else
+                        <button onclick="showLoginModal()" class="bg-gray-400 text-gray-200 font-semibold py-3 px-4 rounded-lg cursor-not-allowed mt-auto text-sm">Login untuk Ajukan</button>
+                    @endauth
+            </div>
+            </div>
+
+            {{-- Card Surat Perjanjian Perdamaian - Hanya untuk Admin --}}
+            {{--
+            <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 relative" data-aos="fade-up" data-aos-delay="200">
+                <div class="absolute top-3 right-3 bg-green-500 text-white text-xs px-2 py-1 rounded-full font-semibold">Aktif</div>
                 <div class="p-6 text-center h-full flex flex-col">
                     <div class="bg-red-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                         <i class="fas fa-handshake text-2xl text-red-600"></i>
                     </div>
                     <h3 class="text-lg font-bold text-gray-900 mb-3">Surat Perjanjian Perdamaian</h3>
                     <p class="text-gray-600 mb-4 flex-grow text-sm">Perjanjian penyelesaian masalah</p>
-                    <button class="bg-gray-400 text-gray-200 font-semibold py-3 px-4 rounded-lg cursor-not-allowed mt-auto text-sm opacity-75" disabled>
-                        Segera Hadir
-                    </button>
+                    @auth
+                        <button onclick="openSuratModal('perjanjian_perdamaian', 'Surat Perjanjian Perdamaian')" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 mt-auto text-sm">
+                            Ajukan Surat
+                        </button>
+                    @else
+                        <button onclick="showLoginModal()" class="bg-gray-400 text-gray-200 font-semibold py-3 px-4 rounded-lg cursor-not-allowed mt-auto text-sm">Login untuk Ajukan</button>
+                    @endauth
                 </div>
             </div>
+            --}}
 
             <!-- Card 16: Surat Pindah -->
             <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 relative" data-aos="fade-up" data-aos-delay="300">
-                <div class="absolute top-3 right-3 bg-orange-500 text-white text-xs px-2 py-1 rounded-full font-semibold">Soon</div>
+                <div class="absolute top-3 right-3 bg-green-500 text-white text-xs px-2 py-1 rounded-full font-semibold">Aktif</div>
                 <div class="p-6 text-center h-full flex flex-col">
                     <div class="bg-green-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                         <i class="fas fa-truck-moving text-2xl text-green-600"></i>
                     </div>
                     <h3 class="text-lg font-bold text-gray-900 mb-3">Surat Pindah</h3>
                     <p class="text-gray-600 mb-4 flex-grow text-sm">Keterangan pindah domisili</p>
-                    <button class="bg-gray-400 text-gray-200 font-semibold py-3 px-4 rounded-lg cursor-not-allowed mt-auto text-sm opacity-75" disabled>
-                        Segera Hadir
-                    </button>
-                </div>
-            </div>
-
-            <!-- Card 17: Surat Rekomendasi -->
-            <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 relative" data-aos="fade-up" data-aos-delay="0">
-                <div class="absolute top-3 right-3 bg-orange-500 text-white text-xs px-2 py-1 rounded-full font-semibold">Soon</div>
-                <div class="p-6 text-center h-full flex flex-col">
-                    <div class="bg-blue-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-thumbs-up text-2xl text-blue-600"></i>
-                    </div>
-                    <h3 class="text-lg font-bold text-gray-900 mb-3">Surat Rekomendasi</h3>
-                    <p class="text-gray-600 mb-4 flex-grow text-sm">Rekomendasi untuk berbagai keperluan</p>
-                    <button class="bg-gray-400 text-gray-200 font-semibold py-3 px-4 rounded-lg cursor-not-allowed mt-auto text-sm opacity-75" disabled>
-                        Segera Hadir
-                    </button>
-                </div>
-            </div>
-
-            <!-- Card 18: Surat Undangan -->
-            <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 relative" data-aos="fade-up" data-aos-delay="100">
-                <div class="absolute top-3 right-3 bg-green-500 text-white text-xs px-2 py-1 rounded-full font-semibold">Aktif</div>
-                <div class="p-6 text-center h-full flex flex-col">
-                    <div class="bg-purple-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-envelope text-2xl text-purple-600"></i>
-                    </div>
-                    <h3 class="text-lg font-bold text-gray-900 mb-3">Surat Undangan</h3>
-                    <p class="text-gray-600 mb-4 flex-grow text-sm">Undangan kegiatan desa</p>
                     @auth
-                        <button onclick="openSuratModal('surat_undangan', 'Surat Undangan')" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 mt-auto text-sm">
+                        <button onclick="openSuratModal('surat_pindah', 'Surat Pindah')" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 mt-auto text-sm">
                             Ajukan Surat
                         </button>
                     @else
-                        <button onclick="showLoginModal()" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 mt-auto text-sm">
-                            Ajukan Surat
-                        </button>
-                    @endauth
-                </div>
-            </div>
-
-            <!-- Card 19: Surat Pengantar Kartu Keluarga -->
-            <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 relative" data-aos="fade-up" data-aos-delay="200">
-                <div class="absolute top-3 right-3 bg-green-500 text-white text-xs px-2 py-1 rounded-full font-semibold">Aktif</div>
-                <div class="p-6 text-center h-full flex flex-col">
-                    <div class="bg-blue-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-users text-2xl text-blue-600"></i>
-                    </div>
-                    <h3 class="text-lg font-bold text-gray-900 mb-3">Surat Pengantar Kartu Keluarga</h3>
-                    <p class="text-gray-600 mb-4 flex-grow text-sm">Pengantar untuk pengurusan KK</p>
-                    @auth
-                        <button onclick="openSuratModal('pengantar_kk', 'Surat Pengantar Kartu Keluarga')" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 mt-auto text-sm">
-                            Ajukan Surat
-                        </button>
-                    @else
-                        <button onclick="showLoginModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 mt-auto text-sm">
-                            Ajukan Surat
-                        </button>
-                    @endauth
-                </div>
-            </div>
-
-            <!-- Card 20: Surat Pengantar Akta Kelahiran -->
-            <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 relative" data-aos="fade-up" data-aos-delay="300">
-                <div class="absolute top-3 right-3 bg-green-500 text-white text-xs px-2 py-1 rounded-full font-semibold">Aktif</div>
-                <div class="p-6 text-center h-full flex flex-col">
-                    <div class="bg-pink-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-baby text-2xl text-pink-600"></i>
-                    </div>
-                    <h3 class="text-lg font-bold text-gray-900 mb-3">Surat Pengantar Akta Kelahiran</h3>
-                    <p class="text-gray-600 mb-4 flex-grow text-sm">Formulir pelaporan kelahiran</p>
-                    @auth
-                        <button onclick="openSuratModal('pengantar_akta_kelahiran', 'Surat Pengantar Akta Kelahiran')" class="bg-pink-600 hover:bg-pink-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 mt-auto text-sm">
-                            Ajukan Surat
-                        </button>
-                    @else
-                        <button onclick="showLoginModal()" class="bg-pink-600 hover:bg-pink-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 mt-auto text-sm">
-                            Ajukan Surat
-                        </button>
+                        <button onclick="showLoginModal()" class="bg-gray-400 text-gray-200 font-semibold py-3 px-4 rounded-lg cursor-not-allowed mt-auto text-sm">Login untuk Ajukan</button>
                     @endauth
                 </div>
             </div>
@@ -1455,10 +1390,16 @@ const userData = {
     tempat_lahir: '{{ Auth::user()->tempat_lahir ?? "Belum diisi" }}',
     tanggal_lahir: '{{ Auth::user()->tanggal_lahir ?? "Belum diisi" }}',
     alamat: '{{ Auth::user()->alamat ?? "Belum diisi" }}',
+    alamat_asal: '{{ Auth::user()->alamat ?? "Belum diisi" }}',
     rt_rw: '{{ Auth::user()->rt_rw ?? "Belum diisi" }}',
     dusun: '{{ Auth::user()->dusun ?? "Belum diisi" }}',
     no_hp: '{{ Auth::user()->no_hp ?? "Belum diisi" }}',
-    pekerjaan: '{{ Auth::user()->pekerjaan ?? "Belum diisi" }}'
+    pekerjaan: '{{ Auth::user()->mata_pencaharian ?? Auth::user()->pekerjaan ?? "Belum diisi" }}',
+    jenis_kelamin: '{{ Auth::user()->jenis_kelamin ?? "Belum diisi" }}',
+    agama: '{{ Auth::user()->agama ?? "Belum diisi" }}',
+    status_perkawinan: '{{ Auth::user()->status_perkawinan ?? "Belum diisi" }}',
+    pendidikan: '{{ Auth::user()->pendidikan ?? "Belum diisi" }}',
+    kewarganegaraan: '{{ Auth::user()->kewarganegaraan ?? "WNI" }}'
 };
 
 // Ajukan Surat AJAX
@@ -1564,28 +1505,17 @@ document.addEventListener('DOMContentLoaded', function() {
             { id: 'ket_usaha', name: 'Surat Keterangan Usaha', desc: 'Keterangan memiliki usaha', icon: 'fas fa-store' }
         ],
         'pengantar_nikah': [
-            { id: 'pengantar_nikah', name: 'Surat Pengantar Nikah (N1-N4)', desc: 'Pengantar untuk pernikahan', icon: 'fas fa-rings-wedding' }
+            { id: 'pengantar_nikah', name: 'Surat Pengantar Nikah', desc: 'Pengantar untuk pernikahan', icon: 'fas fa-rings-wedding' }
         ],
-        'perjanjian_perdamaian': [
-            { id: 'perjanjian_perdamaian', name: 'Surat Perjanjian Perdamaian', desc: 'Perjanjian penyelesaian masalah', icon: 'fas fa-handshake' }
-        ],
+        // perjanjian_perdamaian - Hanya untuk Admin
+        // 'perjanjian_perdamaian': [
+        //     { id: 'perjanjian_perdamaian', name: 'Surat Perjanjian Perdamaian', desc: 'Perjanjian penyelesaian masalah', icon: 'fas fa-handshake' }
+        // ],
         'surat_hibah': [
             { id: 'surat_hibah', name: 'Surat Keterangan Hibah', desc: 'Keterangan hibah tanah/properti', icon: 'fas fa-hand-holding-heart' }
         ],
         'surat_pindah': [
             { id: 'surat_pindah', name: 'Surat Pindah', desc: 'Keterangan pindah domisili', icon: 'fas fa-truck-moving' }
-        ],
-        'surat_rekomendasi': [
-            { id: 'surat_rekomendasi', name: 'Surat Rekomendasi', desc: 'Rekomendasi untuk berbagai keperluan', icon: 'fas fa-thumbs-up' }
-        ],
-        'surat_undangan': [
-            { id: 'surat_undangan', name: 'Surat Undangan', desc: 'Undangan kegiatan desa', icon: 'fas fa-envelope' }
-        ],
-        'pengantar_kk': [
-            { id: 'pengantar_kk', name: 'Pengantar Kartu Keluarga', desc: 'Pengantar untuk pengurusan KK', icon: 'fas fa-users' }
-        ],
-        'pengantar_akta_kelahiran': [
-            { id: 'pengantar_akta_kelahiran', name: 'Pengantar Akta Kelahiran', desc: 'Formulir pelaporan kelahiran', icon: 'fas fa-baby' }
         ]
     };
 
@@ -1612,11 +1542,7 @@ document.addEventListener('DOMContentLoaded', function() {
             title: 'Surat Keterangan Usaha',
             fields: [
                 { name: 'nama_usaha', label: 'Nama Usaha', type: 'text', icon: 'fas fa-store', required: true },
-                { name: 'jenis_usaha', label: 'Jenis Usaha', type: 'select', icon: 'fas fa-briefcase', required: true, options: ['Dagang', 'Jasa', 'Industri', 'Pertanian', 'Perikanan', 'Lainnya'] },
-                { name: 'alamat_usaha', label: 'Alamat Usaha', type: 'textarea', icon: 'fas fa-map-marker-alt', required: true },
-                { name: 'modal_usaha', label: 'Modal Usaha (Rp)', type: 'number', icon: 'fas fa-money-bill', required: true },
-                { name: 'mulai_usaha', label: 'Mulai Usaha', type: 'date', icon: 'fas fa-calendar', required: true },
-                { name: 'keperluan', label: 'Keperluan', type: 'textarea', icon: 'fas fa-clipboard', required: true },
+                { name: 'jenis_usaha', label: 'Jenis Usaha', type: 'select', icon: 'fas fa-briefcase', required: true, options: ['Perdagangan', 'Jasa', 'Industri', 'Pertanian', 'Perikanan', 'Peternakan', 'Lainnya'] },
                 { name: 'lampiran', label: 'Lampiran (Foto Usaha, KTP)', type: 'file', icon: 'fas fa-paperclip', required: true }
             ],
             note: 'Data pemohon (nama, NIK, alamat, dll) akan otomatis diambil dari profil Anda. Periksa kembali data profil sebelum submit.'
@@ -1651,11 +1577,11 @@ document.addEventListener('DOMContentLoaded', function() {
             title: 'Surat Keterangan Kehilangan',
             fields: [
                 { name: 'jenis_dokumen', label: 'Jenis Dokumen/Barang yang Hilang', type: 'select', icon: 'fas fa-id-card', required: true, options: ['KTP', 'KK', 'SIM', 'BPJS', 'Akta Kelahiran', 'Ijazah', 'Sertifikat', 'Dompet', 'HP/Smartphone', 'Motor', 'Mobil', 'Lainnya'] },
-                { name: 'nama_barang_lainnya', label: 'Nama Barang (jika pilih Lainnya)', type: 'text', icon: 'fas fa-tag', required: false, placeholder: 'Contoh: Jam tangan, Tas, Sepatu, dll' },
+                { name: 'nama_barang_lainnya', label: 'Nama Barang (jika pilih Lainnya)', type: 'text', icon: 'fas fa-tag', required: false, placeholder: 'Contoh: Jam tangan, Tas, Sepatu, dll', showWhen: { field: 'jenis_dokumen', value: 'Lainnya' } },
                 { name: 'nomor_dokumen', label: 'Nomor Dokumen/Barang', type: 'text', icon: 'fas fa-hashtag', required: false, placeholder: 'Contoh: 1705052511190005 (untuk KK), 1234567890123456 (untuk KTP), atau kosongkan jika tidak ada nomor' },
                 { name: 'tempat_kehilangan', label: 'Tempat Kehilangan', type: 'textarea', icon: 'fas fa-map-marker-alt', required: true, placeholder: 'Jelaskan detail lokasi kehilangan (contoh: Di pasar saat belanja, Di rumah kemungkinan terjatuh, Di jalan saat berjalan kaki, dll)' },
                 { name: 'waktu_kehilangan', label: 'Perkiraan Waktu Kehilangan', type: 'select', icon: 'fas fa-calendar', required: true, options: ['1 Bulan yang lalu', '2 Bulan yang lalu', '3 Bulan yang lalu', '4 Bulan yang lalu', '5 Bulan yang lalu', '6 Bulan yang lalu', 'Lebih dari 6 Bulan', 'Lainnya'] },
-                { name: 'keterangan_waktu', label: 'Keterangan Waktu (jika pilih Lainnya)', type: 'text', icon: 'fas fa-clock', required: false, placeholder: 'Contoh: 2 minggu yang lalu, 1 tahun yang lalu' },
+                { name: 'keterangan_waktu', label: 'Keterangan Waktu (jika pilih Lainnya)', type: 'text', icon: 'fas fa-clock', required: false, placeholder: 'Contoh: 2 minggu yang lalu, 1 tahun yang lalu', showWhen: { field: 'waktu_kehilangan', value: 'Lainnya' } },
                 { name: 'keperluan', label: 'Keperluan Surat', type: 'textarea', icon: 'fas fa-clipboard', required: true, placeholder: 'Jelaskan untuk apa surat ini diperlukan (contoh: Untuk pengurusan KK baru, Untuk keperluan administrasi, Untuk klaim asuransi, dll)' },
                 { name: 'lampiran', label: 'Lampiran (Foto Dokumen/Barang - Opsional)', type: 'file', icon: 'fas fa-paperclip', required: false }
             ]
@@ -1663,9 +1589,22 @@ document.addEventListener('DOMContentLoaded', function() {
         'surat_bersih_diri': {
             title: 'Surat Keterangan Bersih Diri',
             fields: [
-                { name: 'keperluan', label: 'Keperluan Surat', type: 'textarea', icon: 'fas fa-clipboard', required: true, placeholder: 'Jelaskan untuk apa surat ini diperlukan (contoh: Melamar pekerjaan, Pendaftaran sekolah, Persyaratan administrasi, dll)' },
-                { name: 'keterangan_tambahan', label: 'Keterangan Tambahan', type: 'textarea', icon: 'fas fa-sticky-note', required: false, placeholder: 'Informasi tambahan yang perlu dicantumkan (opsional)' },
-                { name: 'lampiran', label: 'Lampiran (KTP, KK)', type: 'file', icon: 'fas fa-paperclip', required: true }
+                // Data Ayah
+                { name: 'nama_ayah', label: 'Nama Ayah', type: 'text', icon: 'fas fa-user', required: true, placeholder: 'Nama lengkap ayah' },
+                { name: 'umur_ayah', label: 'Umur Ayah (Tahun)', type: 'number', icon: 'fas fa-calendar', required: true, placeholder: 'Umur' },
+                { name: 'agama_ayah', label: 'Agama Ayah', type: 'select', icon: 'fas fa-pray', required: true, options: ['Islam', 'Kristen', 'Katolik', 'Hindu', 'Buddha', 'Konghucu'] },
+                { name: 'pekerjaan_ayah', label: 'Pekerjaan Ayah', type: 'text', icon: 'fas fa-briefcase', required: true, placeholder: 'Pekerjaan ayah' },
+                { name: 'alamat_ayah', label: 'Alamat Ayah', type: 'text', icon: 'fas fa-map-marker-alt', required: true, placeholder: 'Alamat lengkap ayah' },
+                // Data Ibu
+                { name: 'nama_ibu', label: 'Nama Ibu', type: 'text', icon: 'fas fa-user', required: true, placeholder: 'Nama lengkap ibu' },
+                { name: 'umur_ibu', label: 'Umur Ibu (Tahun)', type: 'number', icon: 'fas fa-calendar', required: true, placeholder: 'Umur' },
+                { name: 'agama_ibu', label: 'Agama Ibu', type: 'select', icon: 'fas fa-pray', required: true, options: ['Islam', 'Kristen', 'Katolik', 'Hindu', 'Buddha', 'Konghucu'] },
+                { name: 'pekerjaan_ibu', label: 'Pekerjaan Ibu', type: 'text', icon: 'fas fa-briefcase', required: true, placeholder: 'Pekerjaan ibu' },
+                { name: 'alamat_ibu', label: 'Alamat Ibu', type: 'text', icon: 'fas fa-map-marker-alt', required: true, placeholder: 'Alamat lengkap ibu' },
+                // Keperluan Surat
+                { name: 'keperluan', label: 'Keperluan Surat', type: 'textarea', icon: 'fas fa-clipboard-list', required: true, placeholder: 'Contoh: Administrasi Anak Kandung Mendaftar SECATA PK TNI-AL, Persyaratan Kerja, Pendaftaran Polri, dll.' },
+                // Catatan: Data pemohon (nama, tempat lahir, tanggal lahir, agama, pekerjaan, alamat) akan diambil otomatis dari profil Anda
+                { name: 'lampiran', label: 'Lampiran (KTP, KK)', type: 'file', icon: 'fas fa-paperclip', required: false }
             ]
         },
         'sppd': {
@@ -1724,7 +1663,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 { name: 'lampiran', label: 'Lampiran (KTP, KK, Surat Dokter)', type: 'file', icon: 'fas fa-paperclip', required: true }
             ]
         },
-        'surat_menikah': {
+        'ket_menikah': {
             title: 'Surat Keterangan Menikah',
             preview: true,
             fields: [
@@ -1732,7 +1671,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 { name: 'lampiran', label: 'Lampiran (KTP, KK, Buku Nikah)', type: 'file', icon: 'fas fa-paperclip', required: true }
             ]
         },
-        'surat_miskin': {
+        'ket_miskin_dtks': {
             title: 'Surat Keterangan Miskin DTKS',
             preview: true,
             fields: [
@@ -1740,7 +1679,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 { name: 'lampiran', label: 'Lampiran (KTP, KK, KIS/BPJS)', type: 'file', icon: 'fas fa-paperclip', required: true }
             ]
         },
-        'surat_penghasilan_ortu': {
+        'ket_penghasilan_ortu': {
             title: 'Surat Keterangan Penghasilan Orang Tua',
             preview: true,
             fields: [
@@ -1765,52 +1704,57 @@ document.addEventListener('DOMContentLoaded', function() {
             ]
         },
         'pengantar_nikah': {
-            title: 'Surat Pengantar Nikah (N1-N4)',
+            title: 'Surat Pengantar Nikah',
+            note: 'Data pemohon (nama, NIK, dll) akan diambil otomatis dari profil Anda. Silakan isi data orang tua dan calon pasangan.',
             fields: [
-                // Data Calon Pengantin Pria
-                { name: 'nama', label: 'Nama Lengkap Pria', type: 'text', icon: 'fas fa-user', required: true },
-                { name: 'nik', label: 'NIK Pria', type: 'text', icon: 'fas fa-id-card', required: true },
-                { name: 'tempat_lahir', label: 'Tempat Lahir Pria', type: 'text', icon: 'fas fa-map-marker-alt', required: true },
-                { name: 'tanggal_lahir', label: 'Tanggal Lahir Pria', type: 'date', icon: 'fas fa-calendar', required: true },
-                { name: 'warga_negara', label: 'Kewarganegaraan Pria', type: 'select', icon: 'fas fa-flag', required: true, options: ['Warga Negara Indonesia', 'Warga Negara Asing'] },
-                { name: 'agama', label: 'Agama Pria', type: 'select', icon: 'fas fa-pray', required: true, options: ['Islam', 'Kristen Protestan', 'Kristen Katolik', 'Hindu', 'Buddha', 'Konghucu'] },
-                { name: 'pekerjaan', label: 'Pekerjaan Pria', type: 'text', icon: 'fas fa-briefcase', required: true },
-                { name: 'alamat', label: 'Alamat Pria', type: 'textarea', icon: 'fas fa-home', required: true },
+                // SECTION: STATUS PERKAWINAN
+                { type: 'header', title: 'Status Perkawinan', icon: 'fas fa-ring' },
+                { name: 'status_pria', label: 'Status Pria', type: 'select', icon: 'fas fa-male', required: true, options: ['Jejaka', 'Duda', 'Beristri'] },
+                { name: 'beristri_ke', label: 'Beristri Ke-', type: 'number', icon: 'fas fa-ring', required: false, placeholder: 'Isi jika beristri' },
+                { name: 'status_wanita', label: 'Status Wanita', type: 'select', icon: 'fas fa-female', required: true, options: ['Perawan', 'Janda'] },
+                { name: 'nama_pasangan_terdahulu', label: 'Nama Pasangan Terdahulu', type: 'text', icon: 'fas fa-user', required: false, placeholder: 'Jika duda/janda' },
 
-                // Data Orang Tua Pria
-                { name: 'ayah_nama', label: 'Nama Ayah Pria', type: 'text', icon: 'fas fa-male', required: true },
-                { name: 'ibu_nama', label: 'Nama Ibu Pria', type: 'text', icon: 'fas fa-female', required: true },
+                // SECTION: DATA AYAH
+                { type: 'header', title: 'Data Ayah (Orang Tua Pemohon)', icon: 'fas fa-male' },
+                { name: 'ayah_nama', label: 'Nama Ayah', type: 'text', icon: 'fas fa-male', required: true },
+                { name: 'ayah_bin', label: 'Bin (Nama Kakek)', type: 'text', icon: 'fas fa-user-friends', required: false, placeholder: 'Nama kakek dari pemohon' },
+                { name: 'ayah_nik', label: 'NIK Ayah', type: 'text', icon: 'fas fa-id-card', required: true, maxlength: 16 },
+                { name: 'ayah_tempat_tanggal_lahir', label: 'Tempat & Tanggal Lahir', type: 'text', icon: 'fas fa-calendar', required: true, placeholder: 'Bengkulu, 10 Januari 1965' },
+                { name: 'ayah_agama', label: 'Agama', type: 'select', icon: 'fas fa-pray', required: true, options: ['Islam', 'Kristen Protestan', 'Kristen Katolik', 'Hindu', 'Buddha', 'Konghucu'] },
+                { name: 'ayah_pekerjaan', label: 'Pekerjaan', type: 'text', icon: 'fas fa-briefcase', required: true },
+                { name: 'ayah_alamat', label: 'Alamat', type: 'text', icon: 'fas fa-home', required: true },
 
-                // Data Calon Pengantin Wanita
-                { name: 'wanita_nama', label: 'Nama Lengkap Wanita', type: 'text', icon: 'fas fa-user', required: true },
-                { name: 'wanita_nik', label: 'NIK Wanita', type: 'text', icon: 'fas fa-id-card', required: true },
-                { name: 'wanita_tempat_lahir', label: 'Tempat Lahir Wanita', type: 'text', icon: 'fas fa-map-marker-alt', required: true },
-                { name: 'wanita_tanggal_lahir', label: 'Tanggal Lahir Wanita', type: 'date', icon: 'fas fa-calendar', required: true },
-                { name: 'wanita_warga_negara', label: 'Kewarganegaraan Wanita', type: 'select', icon: 'fas fa-flag', required: true, options: ['Warga Negara Indonesia', 'Warga Negara Asing'] },
-                { name: 'wanita_agama', label: 'Agama Wanita', type: 'select', icon: 'fas fa-pray', required: true, options: ['Islam', 'Kristen Protestan', 'Kristen Katolik', 'Hindu', 'Buddha', 'Konghucu'] },
-                { name: 'wanita_pekerjaan', label: 'Pekerjaan Wanita', type: 'text', icon: 'fas fa-briefcase', required: true },
-                { name: 'wanita_alamat', label: 'Alamat Wanita', type: 'textarea', icon: 'fas fa-home', required: true },
+                // SECTION: DATA IBU
+                { type: 'header', title: 'Data Ibu (Orang Tua Pemohon)', icon: 'fas fa-female' },
+                { name: 'ibu_nama', label: 'Nama Ibu', type: 'text', icon: 'fas fa-female', required: true },
+                { name: 'ibu_bin', label: 'Binti (Nama Ayah Ibu)', type: 'text', icon: 'fas fa-user-friends', required: false, placeholder: 'Nama kakek dari pemohon (dari ibu)' },
+                { name: 'ibu_nik', label: 'NIK Ibu', type: 'text', icon: 'fas fa-id-card', required: true, maxlength: 16 },
+                { name: 'ibu_tempat_tanggal_lahir', label: 'Tempat & Tanggal Lahir', type: 'text', icon: 'fas fa-calendar', required: true, placeholder: 'Palembang, 5 Maret 1995' },
+                { name: 'ibu_warga_negara', label: 'Kewarganegaraan', type: 'select', icon: 'fas fa-flag', required: true, options: ['Indonesia', 'Warga Negara Asing'] },
+                { name: 'ibu_agama', label: 'Agama', type: 'select', icon: 'fas fa-pray', required: true, options: ['Islam', 'Kristen Protestan', 'Kristen Katolik', 'Hindu', 'Buddha', 'Konghucu'] },
+                { name: 'ibu_pekerjaan', label: 'Pekerjaan', type: 'text', icon: 'fas fa-briefcase', required: true },
+                { name: 'ibu_alamat', label: 'Alamat', type: 'text', icon: 'fas fa-home', required: true },
 
-                // Data Orang Tua Wanita
-                { name: 'wanita_ayah_nama', label: 'Nama Ayah Wanita', type: 'text', icon: 'fas fa-male', required: true },
-                { name: 'wanita_ibu_nama', label: 'Nama Ibu Wanita', type: 'text', icon: 'fas fa-female', required: true },
+                // SECTION: DATA CALON ISTRI
+                { type: 'header', title: 'Data Calon Istri (Untuk Surat Persetujuan Mempelai)', icon: 'fas fa-heart' },
+                { name: 'calon_istri_nama', label: 'Nama Lengkap', type: 'text', icon: 'fas fa-heart', required: true },
+                { name: 'calon_istri_bin', label: 'Bin/Binti', type: 'text', icon: 'fas fa-user-friends', required: true, placeholder: 'Nama ayah calon istri' },
+                { name: 'calon_istri_nik', label: 'NIK', type: 'text', icon: 'fas fa-id-card', required: true, maxlength: 16 },
+                { name: 'calon_istri_tempat_tanggal_lahir', label: 'Tempat & Tanggal Lahir', type: 'text', icon: 'fas fa-calendar', required: true, placeholder: 'Padang, 14 Juni 1990' },
+                { name: 'calon_istri_warga_negara', label: 'Kewarganegaraan', type: 'select', icon: 'fas fa-flag', required: true, options: ['Indonesia', 'Warga Negara Asing'] },
+                { name: 'calon_istri_agama', label: 'Agama', type: 'select', icon: 'fas fa-pray', required: true, options: ['Islam', 'Kristen Protestan', 'Kristen Katolik', 'Hindu', 'Buddha', 'Konghucu'] },
+                { name: 'calon_istri_pekerjaan', label: 'Pekerjaan', type: 'text', icon: 'fas fa-briefcase', required: true },
+                { name: 'calon_istri_alamat', label: 'Tempat Tinggal', type: 'text', icon: 'fas fa-home', required: true },
 
-                // Keperluan dan Lampiran
-                { name: 'keperluan', label: 'Keperluan', type: 'textarea', icon: 'fas fa-clipboard', required: true },
+                // Lampiran
                 { name: 'lampiran', label: 'Lampiran (KTP, KK, Foto)', type: 'file', icon: 'fas fa-paperclip', required: true }
             ],
-            note: 'Pastikan data kedua calon pengantin dan orang tua sudah benar sebelum submit. Hubungi admin jika ada kesalahan data.'
+            note: 'Pastikan data pemohon dan orang tua sudah benar sebelum submit. Surat ini untuk pengantar menikah ke KUA.'
         },
         'surat_hibah': {
             title: 'Surat Keterangan Hibah',
+            note: 'Data Penghibah (Nama, Umur, Pekerjaan, Agama, Alamat) akan diambil otomatis dari profil Anda yang sedang login.',
             fields: [
-                // Data Penghibah
-                { name: 'nama_penghibah', label: 'Nama Penghibah', type: 'text', icon: 'fas fa-user', required: true },
-                { name: 'umur_penghibah', label: 'Umur Penghibah', type: 'number', icon: 'fas fa-calendar', required: true },
-                { name: 'pekerjaan_penghibah', label: 'Pekerjaan Penghibah', type: 'text', icon: 'fas fa-briefcase', required: true },
-                { name: 'agama_penghibah', label: 'Agama Penghibah', type: 'select', icon: 'fas fa-pray', required: true, options: ['Islam', 'Kristen Protestan', 'Kristen Katolik', 'Hindu', 'Buddha', 'Konghucu'] },
-                { name: 'alamat_penghibah', label: 'Alamat Penghibah', type: 'textarea', icon: 'fas fa-home', required: true },
-
                 // Detail Hibah
                 { name: 'hari_tanggal', label: 'Hari/Tanggal Hibah', type: 'text', icon: 'fas fa-calendar-alt', required: true, placeholder: 'Contoh: Senin Tanggal Lima Bulan Mei' },
                 { name: 'luas_tanah', label: 'Luas Tanah (M²)', type: 'number', icon: 'fas fa-expand', required: true },
@@ -1831,9 +1775,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 { name: 'saksi_3', label: 'Nama Saksi 3', type: 'text', icon: 'fas fa-users', required: true },
 
                 { name: 'lampiran', label: 'Lampiran (Sertifikat/Surat Tanah, KTP)', type: 'file', icon: 'fas fa-paperclip', required: true }
-            ],
-            note: 'Pastikan semua data hibah dan batas-batas tanah sudah benar. Dokumen ini merupakan surat resmi hibah tanah.'
+            ]
         },
+        // perjanjian_perdamaian - Hanya untuk Admin
+        /*
         'perjanjian_perdamaian': {
             title: 'Surat Perjanjian Perdamaian',
             fields: [
@@ -1871,187 +1816,39 @@ document.addEventListener('DOMContentLoaded', function() {
             ],
             note: 'Pastikan semua data kedua pihak dan kronologi kejadian sudah benar. Perjanjian ini akan mengikat secara hukum.'
         },
+        */
         'surat_pindah': {
             title: 'Surat Keterangan Pindah Penduduk',
             fields: [
-                // Data Pemohon (akan auto-fill dari profil user)
-                { name: 'nama', label: 'Nama Lengkap', type: 'text', icon: 'fas fa-user', required: true, readonly: true },
-                { name: 'tempat_lahir', label: 'Tempat Lahir', type: 'text', icon: 'fas fa-map-marker-alt', required: true },
-                { name: 'tanggal_lahir', label: 'Tanggal Lahir', type: 'date', icon: 'fas fa-calendar', required: true },
-                { name: 'jenis_kelamin', label: 'Jenis Kelamin', type: 'select', icon: 'fas fa-venus-mars', required: true, options: ['Laki-laki', 'Perempuan'] },
-                { name: 'agama', label: 'Agama', type: 'select', icon: 'fas fa-pray', required: true, options: ['Islam', 'Kristen Protestan', 'Kristen Katolik', 'Hindu', 'Buddha', 'Konghucu'] },
-                { name: 'status_perkawinan', label: 'Status Perkawinan', type: 'select', icon: 'fas fa-ring', required: true, options: ['Belum Kawin', 'Kawin', 'Cerai Hidup', 'Cerai Mati'] },
-                { name: 'pekerjaan', label: 'Pekerjaan', type: 'text', icon: 'fas fa-briefcase', required: true },
-                { name: 'pendidikan', label: 'Pendidikan Terakhir', type: 'select', icon: 'fas fa-graduation-cap', required: true, options: ['Tidak/Belum Sekolah', 'SD', 'SMP', 'SMA/SMK', 'Diploma', 'Sarjana', 'Magister', 'Doktor'] },
-                { name: 'kewarganegaraan', label: 'Kewarganegaraan', type: 'select', icon: 'fas fa-flag', required: true, options: ['WNI', 'WNA'] },
-                { name: 'alamat_asal', label: 'Alamat Asal', type: 'textarea', icon: 'fas fa-home', required: true, readonly: true },
-
-                // Data Kepindahan
-                { name: 'alamat_tujuan', label: 'Alamat Tujuan Pindah', type: 'textarea', icon: 'fas fa-map-marked-alt', required: true, placeholder: 'Contoh: Ds. Karang Anyar, Kecamatan Semidang Alas Maras, Kabupaten Seluma' },
+                // Data Kepindahan (sesuai form admin)
+                { name: 'alasan_pindah', label: 'Alasan Pindah', type: 'select', icon: 'fas fa-question-circle', required: true, options: ['Pekerjaan', 'Pendidikan', 'Keamanan', 'Kesehatan', 'Perumahan', 'Keluarga', 'Lainnya'] },
                 { name: 'tanggal_pindah', label: 'Tanggal Pindah', type: 'date', icon: 'fas fa-calendar-alt', required: true },
-                { name: 'alasan_pindah', label: 'Alasan Pindah', type: 'select', icon: 'fas fa-question-circle', required: true, options: ['Ikut Suami/Istri', 'Pekerjaan', 'Pendidikan', 'Keamanan', 'Kesehatan', 'Perumahan', 'Keluarga', 'Lainnya'] },
+                { name: 'alamat_tujuan', label: 'Alamat Tujuan Pindah', type: 'textarea', icon: 'fas fa-map-marked-alt', required: true, placeholder: 'Alamat lengkap tujuan pindah' },
+                { name: 'jenis_pindah', label: 'Jenis Pindah', type: 'select', icon: 'fas fa-truck-moving', required: true, options: ['Dalam Provinsi', 'Antar Provinsi', 'Antar Negara'] },
+                { name: 'keperluan', label: 'Keperluan', type: 'textarea', icon: 'fas fa-clipboard-list', required: false, placeholder: 'Contoh: Untuk keperluan administrasi kependudukan' },
 
-                // Data Pengikut (Dinamis)
-                { name: 'pengikut_count', label: 'Jumlah Pengikut', type: 'number', icon: 'fas fa-users', required: false, min: 0, max: 10, placeholder: '0 jika tidak ada pengikut' },
+                // Data Camat (Opsional)
+                { name: 'nama_camat', label: 'Nama Camat (Opsional)', type: 'text', icon: 'fas fa-user-tie', required: false, placeholder: 'Nama lengkap Camat (kosongkan jika tidak diketahui)' },
+                { name: 'nip_camat', label: 'NIP Camat (Opsional)', type: 'text', icon: 'fas fa-id-badge', required: false, placeholder: 'NIP Camat (kosongkan jika tidak diketahui)' },
 
-                // TTD
-                { name: 'nama_camat', label: 'Nama Camat', type: 'text', icon: 'fas fa-user-tie', required: false, placeholder: 'Opsional - nama camat yang mengetahui' },
-                { name: 'nip_camat', label: 'NIP Camat', type: 'text', icon: 'fas fa-id-badge', required: false, placeholder: 'Opsional - NIP camat' },
+                // Data Pengikut (Dinamis) - field type khusus
+                { name: 'pengikut', label: 'Data Pengikut (Anggota Keluarga yang Ikut Pindah)', type: 'pengikut', icon: 'fas fa-users', required: false },
 
-                { name: 'lampiran', label: 'Lampiran (KTP, KK, Surat Keterangan)', type: 'file', icon: 'fas fa-paperclip', required: true }
+                // Lampiran
+                { name: 'lampiran', label: 'Lampiran (KTP, KK, Surat Keterangan)', type: 'file', icon: 'fas fa-paperclip', required: false }
             ],
-            note: 'Data pemohon akan otomatis diambil dari profil Anda. Pastikan alamat tujuan dan data pengikut sudah benar.',
-            hasCustomJS: true // Menandakan perlu JS khusus untuk pengikut dinamis
+            preview: true,
+            note: 'Data pemohon (Nama, NIK, Alamat, dll) akan otomatis diambil dari profil Anda. Pastikan alamat tujuan dan data pengikut sudah benar.',
+            hasCustomJS: true
         },
-        'surat_rekomendasi': {
-            title: 'Surat Rekomendasi',
+        'surat_penduduk_desa': {
+            title: 'Surat Keterangan Penduduk Desa',
+            preview: true,
             fields: [
-                // Data Pemohon (auto-fill)
-                { name: 'nama', label: 'Nama Lengkap', type: 'text', icon: 'fas fa-user', required: true, readonly: true },
-                { name: 'nik', label: 'NIK', type: 'text', icon: 'fas fa-id-card', required: true, readonly: true },
-                { name: 'jenis_kelamin', label: 'Jenis Kelamin', type: 'select', icon: 'fas fa-venus-mars', required: true, options: ['Laki-laki', 'Perempuan'] },
-                { name: 'agama', label: 'Agama', type: 'select', icon: 'fas fa-pray', required: true, options: ['Islam', 'Kristen Protestan', 'Kristen Katolik', 'Hindu', 'Buddha', 'Konghucu'] },
-                { name: 'pekerjaan', label: 'Pekerjaan', type: 'text', icon: 'fas fa-briefcase', required: true },
-                { name: 'alamat', label: 'Alamat', type: 'textarea', icon: 'fas fa-home', required: true, readonly: true },
-
-                // Jenis Rekomendasi
-                { name: 'jenis_rekomendasi', label: 'Jenis Rekomendasi', type: 'select', icon: 'fas fa-list', required: true, options: ['Rekomendasi Usaha', 'Rekomendasi Tempat Usaha', 'Rekomendasi Kegiatan', 'Rekomendasi Kerjasama', 'Rekomendasi Bantuan', 'Lainnya'] },
-                { name: 'tujuan_rekomendasi', label: 'Tujuan Rekomendasi', type: 'text', icon: 'fas fa-bullseye', required: true, placeholder: 'Contoh: Bank, Instansi, dll' },
-                { name: 'isi_rekomendasi', label: 'Isi Rekomendasi', type: 'textarea', icon: 'fas fa-file-alt', required: true, placeholder: 'Jelaskan detail rekomendasi yang dibutuhkan' },
-
-                // Detail Usaha (opsional)
-                { name: 'nama_usaha', label: 'Nama Usaha', type: 'text', icon: 'fas fa-store', required: false, placeholder: 'Opsional - jika rekomendasi tentang usaha' },
-                { name: 'alamat_usaha', label: 'Alamat Usaha', type: 'text', icon: 'fas fa-map-marker-alt', required: false },
-                { name: 'nomor_telepon', label: 'Nomor Telepon Usaha', type: 'text', icon: 'fas fa-phone', required: false },
-                { name: 'luas_lahan', label: 'Luas Lahan (M²)', type: 'number', icon: 'fas fa-expand', required: false },
-                { name: 'luas_bangunan', label: 'Luas Bangunan (M²)', type: 'number', icon: 'fas fa-building', required: false },
-                { name: 'kapasitas', label: 'Kapasitas (Ton)', type: 'number', icon: 'fas fa-weight', required: false },
-                { name: 'modal_usaha', label: 'Modal Usaha (Rp)', type: 'number', icon: 'fas fa-money-bill', required: false },
-                { name: 'penghasilan_bulanan', label: 'Penghasilan per Bulan (Rp)', type: 'number', icon: 'fas fa-chart-line', required: false },
-
-                // Penutup
-                { name: 'penutup', label: 'Penutup Surat', type: 'textarea', icon: 'fas fa-quote-right', required: false, placeholder: 'Opsional - kalimat penutup khusus' },
-
-                { name: 'lampiran', label: 'Lampiran (Foto Usaha, Dokumen Pendukung)', type: 'file', icon: 'fas fa-paperclip', required: false }
+                { name: 'keperluan', label: 'Keperluan Surat', type: 'textarea', icon: 'fas fa-clipboard-list', required: true, placeholder: 'Contoh: Untuk keperluan administrasi, pendaftaran sekolah, pendaftaran kerja, dll.' },
+                { name: 'lampiran', label: 'Lampiran (KTP, KK)', type: 'file', icon: 'fas fa-paperclip', required: true }
             ],
-            note: 'Data pemohon akan otomatis diambil dari profil Anda. Detail usaha hanya perlu diisi jika rekomendasi terkait usaha.',
-            hasConditionalFields: true // Menandakan ada field conditional
-        },
-        surat_undangan: {
-            title: 'Surat Undangan',
-            fields: [
-                { name: 'lampiran', label: 'Lampiran', type: 'text', icon: 'fas fa-paperclip', required: false, placeholder: '1 (satu) Berkas' },
-                { name: 'perihal', label: 'Perihal', type: 'text', icon: 'fas fa-heading', required: true, placeholder: 'Panggilan Penting' },
-                { name: 'tanggal_surat', label: 'Tanggal Surat', type: 'date', icon: 'fas fa-calendar', required: true },
-                { name: 'kepada', label: 'Kepada (Yang Diundang)', type: 'text', icon: 'fas fa-user', required: true, placeholder: 'Bapak/Ibu .....................' },
-                { name: 'pembukaan', label: 'Kalimat Pembukaan', type: 'textarea', icon: 'fas fa-quote-left', required: true,
-                  placeholder: 'Sehubungan dengan telah disepakati pembentukan time pendataan smart village pada tanggal 4 Juni 2025, mengingat acara ini sangat penting maka kami mengundang bapak/ibu untuk hadir:' },
-
-                // Detail Acara
-                { name: 'hari_tanggal', label: 'Hari & Tanggal Acara', type: 'text', icon: 'fas fa-calendar-day', required: true, placeholder: "Jum'at, 13 Juni 2025" },
-                { name: 'jam', label: 'Jam Acara', type: 'text', icon: 'fas fa-clock', required: true, placeholder: '09.30 WIB – selesai' },
-                { name: 'acara', label: 'Nama Acara', type: 'text', icon: 'fas fa-calendar-check', required: true, placeholder: 'Penegasan Tanggung jawab kerja pendataan smart village' },
-                { name: 'tempat', label: 'Tempat Acara', type: 'text', icon: 'fas fa-map-marker-alt', required: true, placeholder: 'Gedung Perpustakaan/Kantor Desa Ketapang Baru' },
-
-                { name: 'penutup', label: 'Kalimat Penutup', type: 'textarea', icon: 'fas fa-quote-right', required: false,
-                  placeholder: 'Demikian panggilan ini kami sampaikan dan semoga Bapak/Ibu dapat menghadiri dengan tepat waktu, atas perhatiannya Kami ucapkan terimakasih.' },
-                { name: 'tanggal_ttd', label: 'Tanggal Tanda Tangan', type: 'date', icon: 'fas fa-calendar', required: true },
-                { name: 'kepala_desa', label: 'Nama Kepala Desa', type: 'text', icon: 'fas fa-user-tie', required: false, placeholder: 'ZULTAN ALHARA' }
-            ],
-            note: 'Surat undangan akan dibuat dengan kop surat resmi desa dan dapat digunakan untuk berbagai kegiatan desa.'
-        },
-        pengantar_kk: {
-            title: 'Surat Pengantar Kartu Keluarga',
-            fields: [
-                // Data Kepala Keluarga
-                { name: 'nomor_kk', label: 'Nomor Kartu Keluarga', type: 'text', icon: 'fas fa-id-card', required: true, placeholder: '1705052309190002' },
-                { name: 'nama_kepala_keluarga', label: 'Nama Kepala Keluarga', type: 'text', icon: 'fas fa-user-tie', required: true, placeholder: 'ROZI PUTRA HANDI' },
-
-                // Alamat Lengkap
-                { name: 'alamat', label: 'Alamat', type: 'text', icon: 'fas fa-home', required: true, placeholder: 'DESA KETAPANG BARU' },
-                { name: 'rt_rw', label: 'RT/RW', type: 'text', icon: 'fas fa-map-pin', required: true, placeholder: 'DUSUN 1' },
-                { name: 'desa', label: 'Desa/Kelurahan', type: 'text', icon: 'fas fa-map-marker-alt', required: true, placeholder: 'KETAPANG BARU' },
-                { name: 'kecamatan', label: 'Kecamatan', type: 'text', icon: 'fas fa-map', required: true, placeholder: 'TALO' },
-                { name: 'kabupaten', label: 'Kabupaten/Kota', type: 'text', icon: 'fas fa-city', required: true, placeholder: 'SELUMA' },
-                { name: 'kode_pos', label: 'Kode Pos', type: 'text', icon: 'fas fa-mail-bulk', required: true, placeholder: '38875' },
-                { name: 'propinsi', label: 'Propinsi', type: 'text', icon: 'fas fa-globe', required: true, placeholder: 'BENGKULU' },
-
-                // Anggota Keluarga - Dynamic Fields
-                { name: 'anggota_keluarga', label: 'Data Anggota Keluarga', type: 'dynamic_family', icon: 'fas fa-users', required: true },
-
-                { name: 'tanggal_ttd', label: 'Tanggal Tanda Tangan', type: 'date', icon: 'fas fa-calendar', required: true },
-                { name: 'kepala_desa', label: 'Nama Kepala Desa', type: 'text', icon: 'fas fa-user-tie', required: false, placeholder: 'ZULTAN ALHARA' }
-            ],
-            note: 'Data keluarga akan otomatis diambil dari database warga yang terdaftar dengan nomor KK yang dimasukkan. Jika ada kesalahan data, harap hubungi admin untuk diperbaiki.'
-        },
-        pengantar_akta_kelahiran: {
-            title: 'Surat Pengantar Akta Kelahiran',
-            fields: [
-                // Data Wilayah
-                { name: 'kabupaten', label: 'Kabupaten/Kota', type: 'text', icon: 'fas fa-city', required: true, placeholder: 'Seluma' },
-                { name: 'kecamatan', label: 'Kecamatan', type: 'text', icon: 'fas fa-map', required: true, placeholder: 'Talo' },
-                { name: 'desa', label: 'Desa', type: 'text', icon: 'fas fa-map-marker-alt', required: true, placeholder: 'Ketapang Baru' },
-
-                // Data KK
-                { name: 'nama_kepala_keluarga', label: 'Nama Kepala Keluarga', type: 'text', icon: 'fas fa-user-tie', required: true, placeholder: 'ROZI PUTRA HANDI' },
-                { name: 'no_kk', label: 'Nomor Kartu Keluarga', type: 'text', icon: 'fas fa-id-card', required: true, placeholder: '1705052309190002' },
-                { name: 'surat_ket_kelahiran', label: 'Surat Keterangan Kelahiran', type: 'text', icon: 'fas fa-file-medical', required: false, placeholder: 'Nomor/Keterangan jika ada' },
-
-                // Data Bayi
-                { name: 'nama_bayi', label: 'Nama Bayi/Anak', type: 'text', icon: 'fas fa-baby', required: true, placeholder: 'RAIQAL JUSTIN GILBERT' },
-                { name: 'jenis_kelamin_bayi', label: 'Jenis Kelamin Bayi', type: 'select', icon: 'fas fa-venus-mars', required: true, options: ['Laki-Laki', 'Perempuan'] },
-                { name: 'tempat_lahir_bayi', label: 'Tempat Kelahiran', type: 'text', icon: 'fas fa-map-pin', required: true, placeholder: 'Seluma' },
-                { name: 'hari_tanggal_lahir', label: 'Hari dan Tanggal Lahir', type: 'date', icon: 'fas fa-calendar', required: true, placeholder: '2024-08-12' },
-                { name: 'pukul_lahir', label: 'Pukul Kelahiran', type: 'time', icon: 'fas fa-clock', required: false },
-                { name: 'jenis_kelahiran', label: 'Jenis Kelahiran', type: 'select', icon: 'fas fa-baby-carriage', required: true, options: ['Tunggal', 'Kembar Dua', 'Kembar Tiga', 'Lainnya'] },
-                { name: 'kelahiran_ke', label: 'Kelahiran Ke', type: 'text', icon: 'fas fa-sort-numeric-up', required: true, placeholder: '2 (Dua)' },
-                { name: 'penolong_kelahiran', label: 'Penolong Kelahiran', type: 'select', icon: 'fas fa-user-md', required: true, options: ['Dokter', 'Bidan', 'Dukun Beranak', 'Lainnya'] },
-                { name: 'berat_bayi', label: 'Berat Bayi (gram)', type: 'number', icon: 'fas fa-weight', required: false, placeholder: '3200' },
-                { name: 'panjang_bayi', label: 'Panjang Bayi (cm)', type: 'number', icon: 'fas fa-ruler', required: false, placeholder: '48' },
-
-                // Data Ibu
-                { name: 'nik_ibu', label: 'NIK Ibu', type: 'text', icon: 'fas fa-id-card', required: true, placeholder: '1705054507980001' },
-                { name: 'nama_ibu', label: 'Nama Lengkap Ibu', type: 'text', icon: 'fas fa-female', required: true, placeholder: 'HAVEZA DIANA' },
-                { name: 'tanggal_lahir_ibu', label: 'Tanggal Kelahiran Ibu', type: 'date', icon: 'fas fa-calendar', required: true, placeholder: '1998-07-15' },
-                { name: 'pekerjaan_ibu', label: 'Pekerjaan Ibu', type: 'text', icon: 'fas fa-briefcase', required: true, placeholder: 'Mengurus Rumah Tangga' },
-                { name: 'alamat_ibu', label: 'Alamat Ibu', type: 'textarea', icon: 'fas fa-home', required: true, placeholder: 'Ketapang Baru, Kec. Talo, Kab. Seluma' },
-                { name: 'kewarganegaraan_ibu', label: 'Kewarganegaraan Ibu', type: 'select', icon: 'fas fa-flag', required: true, options: ['WNI', 'WNA'] },
-                { name: 'kebangsaan_ibu', label: 'Kebangsaan Ibu', type: 'text', icon: 'fas fa-globe', required: true, placeholder: 'Indonesia' },
-                { name: 'tanggal_perkawinan', label: 'Tanggal Perkawinan', type: 'date', icon: 'fas fa-ring', required: true, placeholder: '2019-08-31' },
-
-                // Data Ayah
-                { name: 'nik_ayah', label: 'NIK Ayah', type: 'text', icon: 'fas fa-id-card', required: true, placeholder: '1705050208000002' },
-                { name: 'nama_ayah', label: 'Nama Lengkap Ayah', type: 'text', icon: 'fas fa-male', required: true, placeholder: 'ROZI PUTRA HANDI' },
-                { name: 'tanggal_lahir_ayah', label: 'Tanggal Kelahiran Ayah', type: 'date', icon: 'fas fa-calendar', required: true, placeholder: '1997-09-01' },
-                { name: 'pekerjaan_ayah', label: 'Pekerjaan Ayah', type: 'text', icon: 'fas fa-briefcase', required: true, placeholder: 'Wiraswasta' },
-                { name: 'alamat_ayah', label: 'Alamat Ayah', type: 'textarea', icon: 'fas fa-home', required: true, placeholder: 'Ketapang Baru, Kec. Talo, Kab. Seluma' },
-                { name: 'kewarganegaraan_ayah', label: 'Kewarganegaraan Ayah', type: 'select', icon: 'fas fa-flag', required: true, options: ['WNI', 'WNA'] },
-
-                // Data Pelapor
-                { name: 'nik_pelapor', label: 'NIK Pelapor', type: 'text', icon: 'fas fa-id-card', required: true, placeholder: '1705054507980001' },
-                { name: 'nama_pelapor', label: 'Nama Lengkap Pelapor', type: 'text', icon: 'fas fa-user', required: true, placeholder: 'HAVEZA DIANA' },
-                { name: 'umur_pelapor', label: 'Umur Pelapor', type: 'text', icon: 'fas fa-birthday-cake', required: true, placeholder: '28 Tahun' },
-                { name: 'jenis_kelamin_pelapor', label: 'Jenis Kelamin Pelapor', type: 'select', icon: 'fas fa-venus-mars', required: true, options: ['Laki-Laki', 'Perempuan'] },
-
-                // Data Saksi 1
-                { name: 'nik_saksi1', label: 'NIK Saksi 1', type: 'text', icon: 'fas fa-id-card', required: true, placeholder: '1605214503890002' },
-                { name: 'nama_saksi1', label: 'Nama Lengkap Saksi 1', type: 'text', icon: 'fas fa-user-friends', required: true, placeholder: 'UMIYATI' },
-                { name: 'umur_saksi1', label: 'Umur Saksi 1', type: 'text', icon: 'fas fa-birthday-cake', required: true, placeholder: '35 Tahun' },
-                { name: 'jenis_kelamin_saksi1', label: 'Jenis Kelamin Saksi 1', type: 'select', icon: 'fas fa-venus-mars', required: true, options: ['Laki-Laki', 'Perempuan'] },
-                { name: 'pekerjaan_saksi1', label: 'Pekerjaan Saksi 1', type: 'text', icon: 'fas fa-briefcase', required: true, placeholder: 'Bidan' },
-                { name: 'alamat_saksi1', label: 'Alamat Saksi 1', type: 'textarea', icon: 'fas fa-home', required: true, placeholder: 'Muara Timput, Kec. Talo, Kab. Seluma' },
-
-                // Data Saksi 2
-                { name: 'nik_saksi2', label: 'NIK Saksi 2', type: 'text', icon: 'fas fa-id-card', required: true, placeholder: '1705054107780042' },
-                { name: 'nama_saksi2', label: 'Nama Lengkap Saksi 2', type: 'text', icon: 'fas fa-user-friends', required: true, placeholder: 'HERMAYATI' },
-                { name: 'umur_saksi2', label: 'Umur Saksi 2', type: 'text', icon: 'fas fa-birthday-cake', required: true, placeholder: '47 Tahun' },
-                { name: 'jenis_kelamin_saksi2', label: 'Jenis Kelamin Saksi 2', type: 'select', icon: 'fas fa-venus-mars', required: true, options: ['Laki-Laki', 'Perempuan'] },
-                { name: 'pekerjaan_saksi2', label: 'Pekerjaan Saksi 2', type: 'text', icon: 'fas fa-briefcase', required: true, placeholder: 'Petani/Pekebun' },
-                { name: 'alamat_saksi2', label: 'Alamat Saksi 2', type: 'textarea', icon: 'fas fa-home', required: true, placeholder: 'Muara Timput, Kec. Talo, Kab. Seluma' },
-
-                { name: 'kepala_desa', label: 'Nama Kepala Desa', type: 'text', icon: 'fas fa-user-tie', required: false, placeholder: 'ZULTAN ALHARA' }
-            ],
-            note: 'Formulir pelaporan kelahiran harus diisi lengkap dan akurat. Data akan digunakan untuk pembuatan akta kelahiran resmi.'
+            note: 'Data pemohon (nama, NIK, alamat, dll) akan otomatis diambil dari profil Anda. Periksa kembali data profil sebelum submit.'
         }
     };
 
@@ -2347,10 +2144,30 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         const fieldsHtml = template.fields.map(field => {
+            // Handle section header
+            if (field.type === 'header') {
+                return `
+                    <div class="col-span-1 md:col-span-2 my-6">
+                        <div class="flex items-center space-x-3 border-b-2 border-blue-600 pb-3">
+                            <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+                                <i class="${field.icon} text-white text-lg"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-800">${field.title}</h3>
+                        </div>
+                    </div>
+                `;
+            }
+
             let inputHtml = '';
 
             if (field.type === 'select') {
-                const options = field.options.map(opt => `<option value="${opt}">${opt}</option>`).join('');
+                // Get auto-fill value from userData
+                const autoFillValue = userData[field.name] || '';
+                
+                const options = field.options.map(opt => {
+                    const selected = autoFillValue === opt ? 'selected' : '';
+                    return `<option value="${opt}" ${selected}>${opt}</option>`;
+                }).join('');
                 inputHtml = `
                     <div class="relative">
                         <select name="${field.name}" ${field.required ? 'required' : ''} class="w-full px-4 py-3 pr-10 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 appearance-none bg-white shadow-sm hover:border-gray-300">
@@ -2363,9 +2180,19 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 `;
             } else if (field.type === 'textarea') {
+                // Handle readonly textarea with auto-fill
+                const readonlyAttr = field.readonly ? 'readonly' : '';
+                const readonlyClass = field.readonly ? 'bg-gray-100 cursor-not-allowed' : 'bg-white hover:border-gray-300';
+                
+                // Get value from userData for auto-fill
+                let autoFillValue = '';
+                if (field.readonly && userData[field.name]) {
+                    autoFillValue = userData[field.name];
+                }
+                
                 inputHtml = `
                     <div class="relative">
-                        <textarea name="${field.name}" ${field.required ? 'required' : ''} rows="4" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm hover:border-gray-300 resize-none" placeholder="Masukkan ${field.label.toLowerCase()}..."></textarea>
+                        <textarea name="${field.name}" ${field.required ? 'required' : ''} ${readonlyAttr} rows="4" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ${readonlyClass} shadow-sm resize-none" placeholder="Masukkan ${field.label.toLowerCase()}...">${autoFillValue}</textarea>
                         <div class="absolute bottom-3 right-3 text-xs text-gray-400">
                             <i class="fas fa-edit"></i>
                         </div>
@@ -2410,25 +2237,48 @@ document.addEventListener('DOMContentLoaded', function() {
                                     <div class="flex items-center justify-between mb-3">
                                         <span class="text-sm font-medium text-gray-700">Personel 1</span>
                                     </div>
-                                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                                        <div class="w-full">
-                                            <label class="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap</label>
-                                            <input type="text" name="personel[0][nama]" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" placeholder="Masukkan nama lengkap personel">
-                                        </div>
-                                        <div class="w-full">
-                                            <label class="block text-sm font-medium text-gray-700 mb-2">Jabatan</label>
-                                            <input type="text" name="personel[0][jabatan]" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" placeholder="Masukkan jabatan personel">
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 `;
+            } else if (field.type === 'pengikut') {
+                // Pengikut field type for surat pindah
+                inputHtml = `
+                    <div class="space-y-4" id="pengikutContainerUser">
+                        <div class="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                            <div class="flex items-center justify-between mb-3">
+                                <h4 class="text-sm font-semibold text-blue-800 flex items-center">
+                                    <i class="fas fa-users mr-2"></i>
+                                    Data Pengikut (Anggota Keluarga yang Ikut Pindah)
+                                </h4>
+                                <button type="button" onclick="tambahPengikutUser()" class="bg-blue-600 text-white px-3 py-1 rounded-lg text-sm hover:bg-blue-700 transition-colors">
+                                    <i class="fas fa-plus mr-1"></i> Tambah Pengikut
+                                </button>
+                            </div>
+                            <div id="pengikutListUser" class="space-y-3">
+                                <!-- Pengikut items will be added here dynamically -->
+                            </div>
+                            <div class="text-gray-500 text-center py-3 text-sm" id="noPengikutTextUser">
+                                <i class="fas fa-info-circle mr-1"></i>Belum ada pengikut. Klik tombol "Tambah Pengikut" untuk menambahkan.
+                            </div>
+                        </div>
+                    </div>
+                `;
             } else {
+                // Handle readonly fields with auto-fill
+                const readonlyAttr = field.readonly ? 'readonly' : '';
+                const readonlyClass = field.readonly ? 'bg-gray-100 cursor-not-allowed' : 'bg-white hover:border-gray-300';
+                
+                // Get value from userData for auto-fill
+                let autoFillValue = '';
+                if (field.readonly && userData[field.name]) {
+                    autoFillValue = userData[field.name];
+                }
+                
                 inputHtml = `
                     <div class="relative">
-                        <input type="${field.type}" name="${field.name}" ${field.required ? 'required' : ''} class="w-full px-4 py-3 pl-10 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm hover:border-gray-300" placeholder="${field.placeholder || 'Masukkan ' + field.label.toLowerCase() + '...'}">
+                        <input type="${field.type}" name="${field.name}" ${field.required ? 'required' : ''} ${readonlyAttr} value="${autoFillValue}" class="w-full px-4 py-3 pl-10 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ${readonlyClass} shadow-sm" placeholder="${field.placeholder || 'Masukkan ' + field.label.toLowerCase() + '...'}">
                         <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                             <i class="${field.icon} text-gray-400"></i>
                         </div>
@@ -2437,11 +2287,16 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             // Determine if field should span full width
-            const isFullWidth = field.type === 'textarea' || field.type === 'file' || field.type === 'personel' || field.name === 'alamat' || field.name === 'tempat_acara';
+            const isFullWidth = field.type === 'textarea' || field.type === 'file' || field.type === 'personel' || field.type === 'pengikut' || field.name === 'alamat' || field.name === 'tempat_acara';
             const colSpan = isFullWidth ? 'md:col-span-2' : '';
+            
+            // Check if field has conditional visibility
+            const isConditional = field.showWhen ? true : false;
+            const hiddenClass = isConditional ? 'hidden' : '';
+            const showWhenAttr = isConditional ? `data-show-when-field="${field.showWhen.field}" data-show-when-value="${field.showWhen.value}"` : '';
 
             return `
-                <div class="form-group ${colSpan}">
+                <div class="form-group ${colSpan} ${hiddenClass}" ${showWhenAttr} id="field-wrapper-${field.name}">
                     <label class="block text-sm font-semibold mb-3 text-gray-800">
                         <span class="flex items-center">
                             <i class="${field.icon} mr-2 text-blue-600 w-4"></i>
@@ -2516,6 +2371,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Add file input change listeners for visual feedback
         addFileInputListeners();
+        
+        // Add conditional field visibility handlers
+        setupConditionalFields();
 
         // Set default date for tanggal_menikah to today
         const tanggalMenikahInput = document.querySelector('input[name="tanggal_menikah"]');
@@ -2524,6 +2382,44 @@ document.addEventListener('DOMContentLoaded', function() {
             const formattedDate = today.toISOString().split('T')[0]; // YYYY-MM-DD format
             tanggalMenikahInput.value = formattedDate;
         }
+    }
+    
+    // Setup conditional field visibility
+    function setupConditionalFields() {
+        const conditionalFields = document.querySelectorAll('[data-show-when-field]');
+        
+        conditionalFields.forEach(fieldWrapper => {
+            const triggerFieldName = fieldWrapper.getAttribute('data-show-when-field');
+            const triggerValue = fieldWrapper.getAttribute('data-show-when-value');
+            const triggerField = document.querySelector(`[name="${triggerFieldName}"]`);
+            
+            if (triggerField) {
+                // Add change event listener
+                triggerField.addEventListener('change', function() {
+                    if (this.value === triggerValue) {
+                        fieldWrapper.classList.remove('hidden');
+                        // Make the field required if it was originally required
+                        const input = fieldWrapper.querySelector('input, select, textarea');
+                        if (input && fieldWrapper.getAttribute('data-originally-required') === 'true') {
+                            input.setAttribute('required', 'required');
+                        }
+                    } else {
+                        fieldWrapper.classList.add('hidden');
+                        // Remove required attribute when hidden
+                        const input = fieldWrapper.querySelector('input, select, textarea');
+                        if (input) {
+                            input.removeAttribute('required');
+                            input.value = ''; // Clear the value when hidden
+                        }
+                    }
+                });
+                
+                // Initial check
+                if (triggerField.value === triggerValue) {
+                    fieldWrapper.classList.remove('hidden');
+                }
+            }
+        });
     }
 
     // Function to add file input change listeners
@@ -2831,6 +2727,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function generateFieldHTML(field) {
         let inputHtml = '';
+
+        // Handle section header
+        if (field.type === 'header') {
+            return `
+                <div class="col-span-2 md:col-span-2 my-6">
+                    <div class="flex items-center space-x-3 border-b-2 border-blue-600 pb-3">
+                        <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+                            <i class="${field.icon} text-white text-lg"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-800">${field.title}</h3>
+                    </div>
+                </div>
+            `;
+        }
 
         if (field.type === 'select') {
             const options = field.options.map(opt => `<option value="${opt}">${opt}</option>`).join('');
@@ -3882,17 +3792,12 @@ function showSubmitConfirmation(formData, form, submitBtn, originalText) {
         'izin_keramaian': 'Surat Izin Keramaian',
         'ket_belum_menikah': 'Surat Keterangan Belum Menikah',
         'surat_domisili': 'Surat Domisili',
-        'surat_usaha': 'Surat Usaha',
-        'surat_tidak_mampu': 'Surat Tidak Mampu',
-        'pengantar_nikah': 'Surat Pengantar Nikah (N1-N4)',
         'ket_usaha': 'Surat Keterangan Usaha',
+        // 'surat_tidak_mampu': 'Surat Tidak Mampu', // DISABLED
+        'pengantar_nikah': 'Surat Pengantar Nikah',
         'surat_hibah': 'Surat Keterangan Hibah',
-        'perjanjian_perdamaian': 'Surat Perjanjian Perdamaian',
-        'surat_pindah': 'Surat Keterangan Pindah Penduduk',
-        'surat_rekomendasi': 'Surat Rekomendasi',
-        'surat_undangan': 'Surat Undangan',
-        'pengantar_kk': 'Surat Pengantar Kartu Keluarga',
-        'pengantar_akta_kelahiran': 'Surat Pengantar Akta Kelahiran'
+        // 'perjanjian_perdamaian': 'Surat Perjanjian Perdamaian', // Hanya untuk Admin
+        'surat_pindah': 'Surat Keterangan Pindah Penduduk'
     };
 
     const suratName = suratNames[jenisSurat] || jenisSurat;
@@ -4031,6 +3936,113 @@ function removePersonel(button) {
         if (nameInput) nameInput.name = `personel[${index}][nama]`;
         if (jabatanInput) jabatanInput.name = `personel[${index}][jabatan]`;
     });
+}
+
+// ==================== PENGIKUT FUNCTIONS FOR USER FORM ====================
+var pengikutCounterUser = 0;
+
+function tambahPengikutUser() {
+    const pengikutList = document.getElementById('pengikutListUser');
+    const noPengikutText = document.getElementById('noPengikutTextUser');
+    
+    if (!pengikutList) return;
+    
+    const newPengikutHtml = `
+        <div class="pengikut-item-user bg-white border border-gray-200 rounded-lg p-4">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-sm font-semibold text-blue-700">
+                    <i class="fas fa-user mr-1"></i>Pengikut ${pengikutCounterUser + 1}
+                </span>
+                <button type="button" onclick="hapusPengikutUser(this)" class="text-red-600 hover:text-red-800 transition-colors">
+                    <i class="fas fa-trash text-sm"></i>
+                </button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Nama <span class="text-red-500">*</span></label>
+                    <input type="text" name="pengikut[${pengikutCounterUser}][nama]" required class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Nama lengkap">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Jenis Kelamin <span class="text-red-500">*</span></label>
+                    <select name="pengikut[${pengikutCounterUser}][jenis_kelamin]" required class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">Pilih...</option>
+                        <option value="Laki-laki">Laki-laki</option>
+                        <option value="Perempuan">Perempuan</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">TTL/Umur</label>
+                    <input type="text" name="pengikut[${pengikutCounterUser}][ttl_umur]" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Cth: 25 Th">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Hubungan <span class="text-red-500">*</span></label>
+                    <select name="pengikut[${pengikutCounterUser}][hubungan]" required class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">Pilih...</option>
+                        <option value="Istri">Istri</option>
+                        <option value="Suami">Suami</option>
+                        <option value="Anak">Anak</option>
+                        <option value="Orang Tua">Orang Tua</option>
+                        <option value="Mertua">Mertua</option>
+                        <option value="Saudara">Saudara</option>
+                        <option value="Lainnya">Lainnya</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Pendidikan</label>
+                    <select name="pengikut[${pengikutCounterUser}][pendidikan]" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">Pilih...</option>
+                        <option value="Tidak Sekolah">Tidak Sekolah</option>
+                        <option value="SD">SD</option>
+                        <option value="SLTP">SLTP</option>
+                        <option value="SLTA">SLTA</option>
+                        <option value="D1/D2/D3">D1/D2/D3</option>
+                        <option value="S1">S1</option>
+                        <option value="S2">S2</option>
+                        <option value="S3">S3</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    `;
+
+    pengikutList.insertAdjacentHTML('beforeend', newPengikutHtml);
+    pengikutCounterUser++;
+    
+    // Hide "no pengikut" text
+    if (noPengikutText) {
+        noPengikutText.style.display = 'none';
+    }
+}
+
+function hapusPengikutUser(button) {
+    const pengikutItem = button.closest('.pengikut-item-user');
+    if (pengikutItem) {
+        pengikutItem.remove();
+    }
+
+    // Re-number the remaining pengikut
+    const pengikutItems = document.querySelectorAll('.pengikut-item-user');
+    pengikutItems.forEach((item, index) => {
+        const label = item.querySelector('.text-blue-700');
+        if (label) {
+            label.innerHTML = `<i class="fas fa-user mr-1"></i>Pengikut ${index + 1}`;
+        }
+
+        // Update input names
+        const inputs = item.querySelectorAll('input, select');
+        inputs.forEach(input => {
+            const name = input.getAttribute('name');
+            if (name) {
+                input.setAttribute('name', name.replace(/pengikut\[\d+\]/, `pengikut[${index}]`));
+            }
+        });
+    });
+
+    // Show "no pengikut" text if empty
+    const noPengikutText = document.getElementById('noPengikutTextUser');
+    if (pengikutItems.length === 0 && noPengikutText) {
+        noPengikutText.style.display = 'block';
+    }
 }
 
 // Function to proceed with actual submission
@@ -4567,3 +4579,4 @@ document.head.appendChild(style);
 <!-- SweetAlert2 CDN -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 @endpush
+

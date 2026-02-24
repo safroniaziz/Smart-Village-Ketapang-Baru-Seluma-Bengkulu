@@ -238,3 +238,59 @@
         });
     </script>
     <!--end::Smart Village JavaScript-->
+
+    <!--begin::Laravel Flash Messages Handler-->
+    @if(session('success'))
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: '{{ session('success') }}',
+                timer: 3000,
+                timerProgressBar: true,
+                showConfirmButton: false
+            });
+        });
+    </script>
+    @endif
+
+    @if(session('error'))
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: '{{ session('error') }}',
+                confirmButtonText: 'OK'
+            });
+        });
+    </script>
+    @endif
+
+    @if(session('warning'))
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Perhatian!',
+                text: '{{ session('warning') }}',
+                confirmButtonText: 'OK'
+            });
+        });
+    </script>
+    @endif
+
+    @if(session('info'))
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+                icon: 'info',
+                title: 'Informasi',
+                text: '{{ session('info') }}',
+                confirmButtonText: 'OK'
+            });
+        });
+    </script>
+    @endif
+    <!--end::Laravel Flash Messages Handler-->

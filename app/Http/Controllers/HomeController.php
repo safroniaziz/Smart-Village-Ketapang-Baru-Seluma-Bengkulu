@@ -905,9 +905,9 @@ class HomeController extends Controller
 
         // Data statistik surat online berdasarkan status yang benar
         $totalPengajuan = PengajuanSurat::count();
-        $pengajuanDiterima = PengajuanSurat::where('status', 'Selesai')->count();
+        $pengajuanDiterima = PengajuanSurat::where('status', 'Valid')->count(); // Valid = sudah disetujui
         $pengajuanMenunggu = PengajuanSurat::where('status', 'Diajukan')->count();
-        $pengajuanValid = PengajuanSurat::where('status', 'Valid')->count();
+        $pengajuanValid = $pengajuanDiterima; // Sama dengan diterima
         $pengajuanDitolak = PengajuanSurat::where('status', 'Ditolak')->count();
 
         // Jenis-jenis surat yang tersedia (bisa dibuat static atau dari config)

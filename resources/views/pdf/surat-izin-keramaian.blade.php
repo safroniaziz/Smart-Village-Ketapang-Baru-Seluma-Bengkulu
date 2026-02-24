@@ -6,114 +6,68 @@
     <title>Surat Izin Keramaian</title>
     <style>
         @page {
-            margin: 2cm 2cm 2cm 2cm;
+            size: A4 portrait;
+            margin: 10mm 15mm;
         }
 
         body {
-            font-family: 'Times New Roman', serif;
-            font-size: 12pt;
-            line-height: 1.8;
+            font-family: 'DejaVu Sans', Arial, sans-serif;
+            font-size: 10pt;
+            line-height: 1.3;
             color: #000;
             margin: 0;
             padding: 0;
         }
 
-        /* Header Styles */
-        .header {
-            text-align: center;
-            border-bottom: 3px solid #000;
-            padding-bottom: 15px;
-            margin-bottom: 30px;
-        }
-
-        .header-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .logo-cell {
-            width: 80px;
-            text-align: left;
-            vertical-align: middle;
-            padding-right: 15px;
-        }
-
-        .logo {
-            width: 70px;
-            height: 70px;
-        }
-
-        .logo img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-
-        .text-cell {
-            text-align: center;
-            vertical-align: middle;
-        }
-
-        .government-name {
-            font-size: 16pt;
-            font-weight: 700;
-            text-transform: uppercase;
+        .page {
+            max-width: 100%;
             margin: 0;
-            letter-spacing: 1px;
+            padding: 0;
+            background: #fff;
         }
 
+        /* Header */
+        .header {
+            border-bottom: 2px double #000;
+            padding-bottom: 5px;
+            margin-bottom: 8px;
+        }
+        .header-table { width: 100%; border-collapse: collapse; }
+        .header-table td { vertical-align: middle; }
+        .logo-cell { width: 100px; text-align: center; }
+        .logo img { width: 80px; }
+        .text-cell { text-align: center; }
+        .government-name {
+            font-size: 18px; font-weight: 700; text-transform: uppercase;
+        }
         .village-name {
-            font-size: 14pt;
-            font-weight: 700;
-            text-transform: uppercase;
-            margin: 2px 0;
+            font-size: 16px; font-weight: 700; text-transform: uppercase;
         }
+        .contact-info { font-size: 12px; }
 
-        .district-info {
-            font-size: 12pt;
-            font-weight: 600;
-            text-transform: uppercase;
-            margin: 1px 0;
-        }
-
-        .contact-info {
-            font-size: 10pt;
-            font-style: italic;
-            margin: 1px 0;
-        }
-
-        /* Document Title */
-        .document-title {
-            text-align: center;
-            margin: 30px 0;
-            font-size: 14pt;
-            font-weight: 700;
+        /* Title */
+        .document-title { text-align: center; margin: 5px 0; }
+        .title-main {
+            font-size: 14pt; font-weight: bold; text-transform: uppercase;
+            margin-bottom: 0px; letter-spacing: 0.5px;
             text-decoration: underline;
-            text-transform: uppercase;
-            letter-spacing: 2px;
         }
-
-        .document-number {
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 12pt;
-            font-weight: 600;
-        }
+        .document-number { font-size: 10pt; font-family: 'DejaVu Sans', Arial, sans-serif; }
 
         /* Content Styles */
         .content {
-            margin: 30px 0;
+            margin: 15px 0;
             text-align: justify;
         }
 
         .pembuka {
-            margin-bottom: 20px;
+            margin-bottom: 0px;
             line-height: 1.8;
         }
 
         .data-table {
             width: 100%;
-            margin: 20px 0;
+            margin: 10px 0;
             border-collapse: collapse;
         }
 
@@ -124,7 +78,7 @@
 
         .label {
             width: 15%;
-            font-weight: 600;
+            font-weight: bold;
         }
 
         .separator {
@@ -137,85 +91,20 @@
         }
 
         .penutup {
-            margin-top: 30px;
+            margin-top: 15px;
             text-align: justify;
             line-height: 1.8;
         }
 
-        /* Footer */
-        .footer {
-            margin-top: 40px;
-        }
-
-        .signature-wrapper {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-        }
-
-        .tembusan-section {
-            width: 200px;
-            text-align: left;
-        }
-
-        .signature-section {
-            width: 300px;
-            text-align: center;
-        }
-
-        .signature-title {
-            margin-bottom: 60px;
-            font-weight: 600;
-        }
-
-        .official-name {
-            font-weight: 700;
-            text-decoration: underline;
-        }
-
-        .official-title {
-            font-weight: 600;
-            margin-top: 5px;
-        }
-
         /* QR Code */
         .qr-code {
-            width: 90px;
-            height: 90px;
-            border: 1px solid #ddd;
-            padding: 5px;
-        }
-
-        /* TTD Image */
-        .ttd-image {
-            max-width: 120px;
-            max-height: 80px;
-            margin: 10px 0;
-        }
-
-        /* Tracking QR */
-        .tracking-qr {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            width: 80px;
-            height: 80px;
-        }
-
-        .tracking-qr img {
-            width: 100%;
-            height: 100%;
+            width: 90px; height: 90px;
+            border: 1px solid #ddd; padding: 5px;
         }
 
         @media print {
-            body {
-                background: white;
-                padding: 0;
-            }
-            .page {
-                box-shadow: none;
-                border: none;
-            }
+            body { background: white; padding: 0; }
+            .page { box-shadow: none; border: none; }
         }
     </style>
 </head>
@@ -231,11 +120,10 @@
                         </div>
                     </td>
                     <td class="text-cell">
-                        <div class="government-name">Pemerintah Kabupaten Seluma</div>
-                        <div class="village-name">Desa Ketapang Baru</div>
-                        <div class="district-info">Kecamatan Semidang Alas Maras</div>
-                        <div class="district-info">Kabupaten Seluma, Provinsi Bengkulu</div>
-                        <div class="contact-info">Kode Pos: 38874 | Email: ketapangbaru@seluma.go.id</div>
+                        <div class="government-name">PEMERINTAH KABUPATEN SELUMA</div>
+                        <div class="village-name">KECAMATAN SEMIDANG ALAS MARAS</div><div class="village-name">DESA KETAPANG BARU</div>
+                        <div class="contact-info">Alamat : Jln Lintas Bengkulu – Manna Desa Ketapang Baru Kode Pos 38575</div>
+                        <div class="contact-info">Website: ketapangbaru.selumakab.go.id</div>
                     </td>
                 </tr>
             </table>
@@ -243,12 +131,10 @@
 
         <!-- Title -->
         <div class="document-title">
-            Surat Izin Keramaian
-        </div>
-
-        <!-- Document Number -->
-        <div class="document-number">
-            <strong>NOMOR : {{ $nomor_surat }}</strong>
+            <div class="title-main">Surat Izin Keramaian</div>
+            <div class="document-number">
+                Nomor: {{ $nomor_surat }}
+            </div>
         </div>
 
         <!-- Content -->
@@ -262,7 +148,7 @@
                 <tr>
                     <td class="label">Nama</td>
                     <td class="separator">:</td>
-                    <td class="value">{{ $kepala_desa_nama }}</td>
+                    <td class="value">{{ strtoupper($kepala_desa_nama) }}</td>
                 </tr>
                 <tr>
                     <td class="label">Jabatan</td>
@@ -271,7 +157,7 @@
                 </tr>
             </table>
 
-            <div style="margin: 20px 0;">
+            <div style="margin: 10px 0;">
                 Memberikan Izin Keramaian Kepada:
             </div>
 
@@ -309,50 +195,73 @@
             </div>
         </div>
 
-        <!-- Footer with Signature -->
-        <div class="footer">
-            <div class="signature-wrapper">
-                <!-- Tembusan (Left side) - Dinamis -->
-                @if(isset($tembusan) && !empty($tembusan))
-                <div class="tembusan-section">
-                    <div style="font-weight: 700; margin-bottom: 5px;">Tembusan :</div>
-                    @foreach($tembusan as $index => $item)
-                    <div style="margin-bottom: 2px;">
-                        {{ $index + 1 }}. {{ $item }}
-                    </div>
-                    @endforeach
+        <!-- Footer -->
+        <div style="margin-top: 15px;">
+            <table style="width: 100%;">
+                <tr>
+                    <td style="width: 50%;"></td>
+                    <td style="width: 50%; text-align: center;">
+                        <!-- Tanggal -->
+                        <div style="margin-bottom: 0px; font-size: 10pt;">
+                            {{ $tempat_surat ?? 'Ketapang Baru' }}, {{ $tanggal_surat ?? '07 Mei 2025' }}
+                        </div>
+                        
+                        <!-- Kepala Desa title -->
+                        <div style="font-weight: bold; margin-bottom: 0px; font-size: 10pt;">Kepala Desa Ketapang Baru</div>
+
+                        <!-- TTD berdasarkan pilihan admin -->
+                        @if(isset($jenis_ttd) && $jenis_ttd == 'qrcode')
+                            <!-- QR Code TTD -->
+                            <div style="margin-bottom: 0px;">
+                                @if(isset($qr_ttd_base64) && $qr_ttd_base64)
+                                    <img src="{{ $qr_ttd_base64 }}" style="width: 110px; height: auto;" alt="QR Code TTD">
+                                @else
+                                    <div style="height: 50px;"><!-- Ruang kosong --></div>
+                                @endif
+                            </div>
+                        @elseif(isset($jenis_ttd) && $jenis_ttd == 'gambar')
+                            <!-- Gambar TTD -->
+                            <div style="margin-bottom: 0px;">
+                                <img src="data:image/png;base64,{{ $ttd_base64 }}" style="width: 150px; height: auto;" alt="TTD Gambar">
+                            </div>
+                        @elseif(isset($jenis_ttd) && $jenis_ttd == 'manual')
+                            <!-- Manual TTD - Ruang kosong -->
+                            <div style="height: 50px; margin-bottom: 0px;">
+                                <!-- Ruang kosong untuk TTD manual -->
+                            </div>
+                        @else
+                            <!-- Default - Ruang kosong -->
+                            <div style="height: 50px; margin-bottom: 0px;">
+                                <!-- Ruang kosong untuk TTD -->
+                            </div>
+                        @endif
+
+                        <!-- QR Code Verifikasi Surat (untuk tracking, opsional) -->
+                        @if(isset($qr_base64) && $qr_base64)
+                        <div style="margin-bottom: 0px;">
+                            <img class="qr-code" src="data:image/png;base64,{{ $qr_base64 }}" alt="QR Code Verifikasi Surat" style="width: 60px; height: 60px;">
+                        </div>
+                        @endif
+
+                        <!-- Nama Kepala Desa -->
+                        <div style="font-weight: bold; text-decoration: underline; font-size: 10pt;">{{ strtoupper($kepala_desa_nama ?? 'ZULTAN ALHARA') }}</div>
+                        <div style="font-size: 10pt;">NIP. {{ $nip ?? '-' }}</div>
+                    </td>
+                </tr>
+            </table>
+
+            <!-- Tembusan -->
+            @if(isset($tembusan) && !empty($tembusan))
+            <div style="margin-top: 20px;">
+                <div style="font-weight: bold; margin-bottom: 0px;">Tembusan :</div>
+                @foreach($tembusan as $index => $item)
+                <div style="margin-left: 15px; margin-bottom: 2px;">
+                    {{ $index + 1 }}. {{ $item }}
                 </div>
-                @else
-                <div class="tembusan-section"></div>
-                @endif
-
-                <!-- Signature (Right side) -->
-                <div class="signature-section">
-                    <div class="signature-title">
-                        Ketapang Baru, {{ $tanggal_surat }}<br>
-                        <strong>KEPALA DESA KETAPANG BARU</strong>
-                    </div>
-
-                    @if($jenis_ttd === 'gambar')
-                        <img src="{{ public_path('assets/images/ttd.png') }}" alt="Tanda Tangan" class="ttd-image">
-                    @elseif($jenis_ttd === 'qrcode' && $qr_ttd_base64)
-                        <img src="data:image/png;base64,{{ $qr_ttd_base64 }}" alt="QR Code TTD" class="qr-code">
-                    @else
-                        <div style="height: 80px;"></div>
-                    @endif
-
-                    <div class="official-name">{{ $kepala_desa_nama }}</div>
-                    <div class="official-title">Kepala Desa</div>
-                </div>
+                @endforeach
             </div>
+            @endif
         </div>
     </div>
-
-    <!-- QR Code untuk tracking (pojok kanan bawah) -->
-    @if($tracking_qr_code)
-    <div class="tracking-qr">
-        <img src="data:image/png;base64,{{ $tracking_qr_code }}" alt="QR Code Tracking">
-    </div>
-    @endif
 </body>
 </html>

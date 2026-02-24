@@ -71,11 +71,6 @@ class PengajuanSurat extends Model
         return $this->data_surat['warga_data'] ?? null;
     }
 
-    public function getLampiranAttribute()
-    {
-        return $this->data_surat['lampiran'] ?? null;
-    }
-
     public function getTrackingNumberAttribute()
     {
         // Generate tracking number: SRT + Year + Month + ID (padded to 4 digits)

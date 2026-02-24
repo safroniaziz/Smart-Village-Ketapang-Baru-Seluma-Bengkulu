@@ -1,4 +1,4 @@
-@extends('layouts.dashboard.dashboard')
+    @extends('layouts.dashboard.dashboard')
 
 @section('title', 'Detail Pengajuan Surat')
 
@@ -25,6 +25,7 @@
 @section('content')
     <div id="kt_app_content" class="app-content flex-column-fluid">
         <div id="kt_app_content_container" class="app-container container-xxl">
+
             <div class="row g-5">
                 <!-- Data Pemohon -->
                 <div class="col-xl-4">
@@ -35,112 +36,115 @@
                             </div>
                         </div>
                         <div class="card-body pt-0">
-                            <div class="table-responsive">
-                                <table class="table align-middle table-row-bordered mb-0 fs-6 gy-5">
-                                    <tbody>
-                                        <tr>
-                                            <td class="fw-bold text-muted">Tracking Number</td>
-                                            <td class="text-end">
-                                                <span class="badge badge-light-primary">{{ $pengajuan->tracking_number }}</span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="fw-bold text-muted">Nama Lengkap</td>
-                                            <td class="text-end fw-bold">{{ $pengajuan->nama_lengkap ?? '-' }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="fw-bold text-muted">NIK</td>
-                                            <td class="text-end">{{ $pengajuan->nik ?? '-' }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="fw-bold text-muted">No. HP</td>
-                                            <td class="text-end">{{ $pengajuan->no_hp ?: '-' }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="fw-bold text-muted">Alamat</td>
-                                            <td class="text-end">{{ $pengajuan->alamat ?: '-' }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="fw-bold text-muted">Jenis Surat</td>
-                                            <td class="text-end">
-                                                @switch($pengajuan->jenis_surat)
-                                                    @case('surat_kehilangan')
-                                                        <span class="badge badge-light-danger">Surat Kehilangan</span>
-                                                        @break
-                                                    @case('surat_bersih_diri')
-                                                        <span class="badge badge-light-success">Surat Bersih Diri</span>
-                                                        @break
-                                                    @case('sppd')
-                                                        <span class="badge badge-light-primary">SPPD</span>
-                                                        @break
-                                                    @case('izin_keramaian')
-                                                        <span class="badge badge-light-warning">Surat Izin Keramaian</span>
-                                                        @break
-                                                    @case('ket_belum_menikah')
-                                                        <span class="badge badge-light-info">Surat Keterangan Belum Menikah</span>
-                                                        @break
-                                                    @case('surat_berkelakuan_baik')
-                                                        <span class="badge badge-light-success">Surat Keterangan Berkelakuan Baik</span>
-                                                        @break
-                                                    @case('surat_menikah')
-                                                        <span class="badge badge-light-primary">Surat Keterangan Menikah</span>
-                                                        @break
-                                                    @case('surat_kematian')
-                                                        <span class="badge badge-light-danger">Surat Keterangan Kematian</span>
-                                                        @break
-                                                    @case('surat_miskin')
-                                                        <span class="badge badge-light-warning">Surat Keterangan Miskin DTKS</span>
-                                                        @break
-                                                    @case('surat_penghasilan_ortu')
-                                                        <span class="badge badge-light-info">Surat Keterangan Penghasilan Orang Tua</span>
-                                                        @break
-                                                    @default
-                                                        <span class="badge badge-light-secondary">{{ ucfirst(str_replace('_', ' ', $pengajuan->jenis_surat)) }}</span>
-                                                @endswitch
-                                            </td>
-                                        </tr>
-                                        @if($pengajuan->no_surat)
-                                        <tr>
-                                            <td class="fw-bold text-muted">Nomor Surat</td>
-                                            <td class="text-end">
-                                                <span class="badge badge-light-info">{{ $pengajuan->no_surat }}</span>
-                                            </td>
-                                        </tr>
-                                        @endif
-                                        <tr>
-                                            <td class="fw-bold text-muted">Status</td>
-                                            <td class="text-end">
-                                                @switch($pengajuan->status)
-                                                    @case('Diajukan')
-                                                        <span class="badge badge-light-warning">{{ $pengajuan->status }}</span>
-                                                        @break
-                                                    @case('Valid')
-                                                        <span class="badge badge-light-success">Valid</span>
-                                                        @break
-                                                    @case('Ditolak')
-                                                        <span class="badge badge-light-danger">{{ $pengajuan->status }}</span>
-                                                        @break
-                                                    @default
-                                                        <span class="badge badge-light-secondary">{{ $pengajuan->status }}</span>
-                                                @endswitch
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="fw-bold text-muted">Jenis TTD</td>
-                                            <td class="text-end">
-                                                @if($pengajuan->jenis_ttd === 'qrcode')
-                                                    <span class="badge badge-light-info">QR Code</span>
-                                                @else
-                                                    <span class="badge badge-light-primary">TTD Biasa</span>
-                                                @endif
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="fw-bold text-muted">Tanggal Pengajuan</td>
-                                            <td class="text-end">{{ $pengajuan->created_at->format('d/m/Y H:i') }}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                            <div class="mb-5 pb-5 border-bottom border-gray-300">
+                                <label class="fw-bold text-muted fs-7 mb-1">Tracking Number</label>
+                                <div>
+                                    <span class="badge badge-light-primary">{{ $pengajuan->tracking_number }}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-5 pb-5 border-bottom border-gray-300">
+                                <label class="fw-bold text-muted fs-7 mb-1">Nama Lengkap</label>
+                                <div class="fw-bold text-gray-800">{{ $pengajuan->nama_lengkap ?? '-' }}</div>
+                            </div>
+                            
+                            <div class="mb-5 pb-5 border-bottom border-gray-300">
+                                <label class="fw-bold text-muted fs-7 mb-1">NIK</label>
+                                <div class="text-gray-800">{{ $pengajuan->nik ?? '-' }}</div>
+                            </div>
+                            
+                            <div class="mb-5 pb-5 border-bottom border-gray-300">
+                                <label class="fw-bold text-muted fs-7 mb-1">No. HP</label>
+                                <div class="text-gray-800">{{ $pengajuan->no_hp ?: '-' }}</div>
+                            </div>
+                            
+                            <div class="mb-5 pb-5 border-bottom border-gray-300">
+                                <label class="fw-bold text-muted fs-7 mb-1">Alamat</label>
+                                <div class="text-gray-800">{{ $pengajuan->alamat ?: '-' }}</div>
+                            </div>
+                            
+                            <div class="mb-5 pb-5 border-bottom border-gray-300">
+                                <label class="fw-bold text-muted fs-7 mb-1">Jenis Surat</label>
+                                <div>
+                                    @switch($pengajuan->jenis_surat)
+                                        @case('surat_kehilangan')
+                                            <span class="badge badge-light-danger">Surat Kehilangan</span>
+                                            @break
+                                        @case('surat_bersih_diri')
+                                            <span class="badge badge-light-success">Surat Bersih Diri</span>
+                                            @break
+                                        @case('sppd')
+                                            <span class="badge badge-light-primary">SPPD</span>
+                                            @break
+                                        @case('izin_keramaian')
+                                            <span class="badge badge-light-warning">Surat Izin Keramaian</span>
+                                            @break
+                                        @case('ket_belum_menikah')
+                                            <span class="badge badge-light-info">Surat Keterangan Belum Menikah</span>
+                                            @break
+                                        @case('surat_berkelakuan_baik')
+                                            <span class="badge badge-light-success">Surat Keterangan Berkelakuan Baik</span>
+                                            @break
+                                        @case('surat_menikah')
+                                            <span class="badge badge-light-primary">Surat Keterangan Menikah</span>
+                                            @break
+                                        @case('surat_kematian')
+                                            <span class="badge badge-light-danger">Surat Keterangan Kematian</span>
+                                            @break
+                                        @case('surat_miskin')
+                                            <span class="badge badge-light-warning">Surat Keterangan Miskin DTKS</span>
+                                            @break
+                                        @case('surat_penghasilan_ortu')
+                                            <span class="badge badge-light-info">Surat Keterangan Penghasilan Orang Tua</span>
+                                            @break
+                                        @default
+                                            <span class="badge badge-light-secondary">{{ ucfirst(str_replace('_', ' ', $pengajuan->jenis_surat)) }}</span>
+                                    @endswitch
+                                </div>
+                            </div>
+                            
+                            @if($pengajuan->no_surat)
+                            <div class="mb-5 pb-5 border-bottom border-gray-300">
+                                <label class="fw-bold text-muted fs-7 mb-1">Nomor Surat</label>
+                                <div>
+                                    <span class="badge badge-light-info">{{ $pengajuan->no_surat }}</span>
+                                </div>
+                            </div>
+                            @endif
+                            
+                            <div class="mb-5 pb-5 border-bottom border-gray-300">
+                                <label class="fw-bold text-muted fs-7 mb-1">Status</label>
+                                <div>
+                                    @switch($pengajuan->status)
+                                        @case('Diajukan')
+                                            <span class="badge badge-light-warning">{{ $pengajuan->status }}</span>
+                                            @break
+                                        @case('Valid')
+                                            <span class="badge badge-light-success">Valid</span>
+                                            @break
+                                        @case('Ditolak')
+                                            <span class="badge badge-light-danger">{{ $pengajuan->status }}</span>
+                                            @break
+                                        @default
+                                            <span class="badge badge-light-secondary">{{ $pengajuan->status }}</span>
+                                    @endswitch
+                                </div>
+                            </div>
+                            
+                            <div class="mb-5 pb-5 border-bottom border-gray-300">
+                                <label class="fw-bold text-muted fs-7 mb-1">Jenis TTD</label>
+                                <div>
+                                    @if($pengajuan->jenis_ttd === 'qrcode')
+                                        <span class="badge badge-light-info">QR Code</span>
+                                    @else
+                                        <span class="badge badge-light-primary">TTD Biasa</span>
+                                    @endif
+                                </div>
+                            </div>
+                            
+                            <div class="mb-0">
+                                <label class="fw-bold text-muted fs-7 mb-1">Tanggal Pengajuan</label>
+                                <div class="text-gray-800">{{ $pengajuan->created_at->format('d/m/Y H:i') }}</div>
                             </div>
                         </div>
                     </div>
@@ -154,7 +158,16 @@
                                 <h3 class="fw-bold m-0">Detail Pengajuan Surat</h3>
                             </div>
                             <div class="card-toolbar">
+                                <a href="{{ route('admin.pengajuan-surat.index') }}" class="btn btn-light-secondary btn-sm me-2">
+                                    <i class="ki-duotone ki-arrow-left fs-4"><span class="path1"></span><span class="path2"></span></i>
+                                    Kembali ke List
+                                </a>
                                 @if($pengajuan->status === 'Diajukan')
+                                    <a href="{{ route('admin.pengajuan-surat.edit', $pengajuan->id) }}"
+                                       class="btn btn-warning btn-sm me-2">
+                                        <i class="ki-duotone ki-pencil fs-4"><span class="path1"></span><span class="path2"></span></i>
+                                        Edit
+                                    </a>
                                     <button class="btn btn-success btn-sm me-2 approve-btn" data-id="{{ $pengajuan->id }}">
                                         <i class="ki-duotone ki-check fs-4"><span class="path1"></span><span class="path2"></span></i>
                                         Setujui
@@ -164,10 +177,21 @@
                                         Tolak
                                     </button>
                                 @elseif($pengajuan->status === 'Valid')
+                                    <a href="{{ route('admin.pengajuan-surat.edit', $pengajuan->id) }}"
+                                       class="btn btn-warning btn-sm me-2">
+                                        <i class="ki-duotone ki-pencil fs-4"><span class="path1"></span><span class="path2"></span></i>
+                                        Edit
+                                    </a>
                                     <a href="{{ route('admin.pengajuan-surat.generate-pdf', $pengajuan->id) }}"
                                        class="btn btn-primary btn-sm" target="_blank">
                                         <i class="ki-duotone ki-file-down fs-4"><span class="path1"></span><span class="path2"></span></i>
                                         Download PDF
+                                    </a>
+                                @elseif($pengajuan->status === 'Ditolak')
+                                    <a href="{{ route('admin.pengajuan-surat.edit', $pengajuan->id) }}"
+                                       class="btn btn-warning btn-sm">
+                                        <i class="ki-duotone ki-pencil fs-4"><span class="path1"></span><span class="path2"></span></i>
+                                        Edit
                                     </a>
                                 @endif
                             </div>
@@ -258,14 +282,14 @@
                     @if(isset($pengajuan->data_surat['tanggal_berangkat']) && $pengajuan->data_surat['tanggal_berangkat'])
                         <div class="col-md-6">
                             <label class="fs-6 fw-semibold mb-2">Tanggal Berangkat:</label>
-                            <div class="bg-light p-3 rounded">{{ \Carbon\Carbon::parse($pengajuan->data_surat['tanggal_berangkat'])->format('d F Y') }}</div>
+                            <div class="bg-light p-3 rounded">{{ \Carbon\Carbon::parse($pengajuan->data_surat['tanggal_berangkat'])->translatedFormat('d F Y') }}</div>
                         </div>
                     @endif
 
                     @if(isset($pengajuan->data_surat['tanggal_kembali']) && $pengajuan->data_surat['tanggal_kembali'])
                         <div class="col-md-6">
                             <label class="fs-6 fw-semibold mb-2">Tanggal Kembali:</label>
-                            <div class="bg-light p-3 rounded">{{ \Carbon\Carbon::parse($pengajuan->data_surat['tanggal_kembali'])->format('d F Y') }}</div>
+                            <div class="bg-light p-3 rounded">{{ \Carbon\Carbon::parse($pengajuan->data_surat['tanggal_kembali'])->translatedFormat('d F Y') }}</div>
                         </div>
                     @endif
 
@@ -296,7 +320,7 @@
                         <div class="col-12">
                             <label class="fs-6 fw-semibold mb-2">Tanggal Menikah:</label>
                             <div class="bg-light p-3 rounded">
-                                {{ \Carbon\Carbon::parse($pengajuan->data_surat['tanggal_menikah'])->format('d F Y') }}
+                                {{ \Carbon\Carbon::parse($pengajuan->data_surat['tanggal_menikah'])->translatedFormat('d F Y') }}
                             </div>
                         </div>
                     @endif
@@ -321,7 +345,7 @@
                         <div class="col-md-6">
                             <label class="fs-6 fw-semibold mb-2">Tanggal Kematian:</label>
                             <div class="bg-light p-3 rounded">
-                                {{ \Carbon\Carbon::parse($pengajuan->data_surat['tanggal_kematian'])->format('d F Y') }}
+                                {{ \Carbon\Carbon::parse($pengajuan->data_surat['tanggal_kematian'])->translatedFormat('d F Y') }}
                             </div>
                         </div>
                     @endif
@@ -423,7 +447,7 @@
                                     <div class="bg-light p-3 rounded">
                                         {{ $pengajuan->data_surat['tempat_lahir_ayah'] }},
                                         @if(isset($pengajuan->data_surat['tanggal_lahir_ayah']))
-                                            {{ \Carbon\Carbon::parse($pengajuan->data_surat['tanggal_lahir_ayah'])->format('d F Y') }}
+                                            {{ \Carbon\Carbon::parse($pengajuan->data_surat['tanggal_lahir_ayah'])->translatedFormat('d F Y') }}
                                         @endif
                                     </div>
                                 </div>
@@ -462,7 +486,7 @@
                                     <div class="bg-light p-3 rounded">
                                         {{ $pengajuan->data_surat['tempat_lahir_ibu'] }},
                                         @if(isset($pengajuan->data_surat['tanggal_lahir_ibu']))
-                                            {{ \Carbon\Carbon::parse($pengajuan->data_surat['tanggal_lahir_ibu'])->format('d F Y') }}
+                                            {{ \Carbon\Carbon::parse($pengajuan->data_surat['tanggal_lahir_ibu'])->translatedFormat('d F Y') }}
                                         @endif
                                     </div>
                                 </div>
@@ -525,18 +549,61 @@
                 </div>
 
             <!-- Lampiran -->
-            @if($pengajuan->lampiran)
-                                <div class="mb-7">
-                                    <label class="fs-6 fw-semibold mb-2">Lampiran:</label>
-                                    <div class="bg-light p-3 rounded">
-                                        <a href="{{ Storage::url($pengajuan->lampiran) }}" target="_blank"
-                                           class="btn btn-light-primary btn-sm">
-                                            <i class="ki-duotone ki-file fs-4"><span class="path1"></span><span class="path2"></span></i>
-                                            Lihat Lampiran
-                                        </a>
-                                    </div>
+                            <!-- Lampiran -->
+                            <div class="mb-7">
+                                <label class="fs-6 fw-semibold mb-2">Lampiran & Berkas:</label>
+                                <div class="row g-3">
+                                    <!-- Main Lampiran -->
+                                    @if($pengajuan->lampiran)
+                                        <div class="col-md-6">
+                                            <div class="bg-light p-3 rounded d-flex align-items-center justify-content-between">
+                                                <div class="d-flex align-items-center">
+                                                    <i class="ki-duotone ki-file fs-2 text-primary me-3"><span class="path1"></span><span class="path2"></span></i>
+                                                    <div class="d-flex flex-column">
+                                                        <span class="fw-bold text-gray-800">Lampiran Utama</span>
+                                                        <span class="text-muted fs-7">File Lampiran</span>
+                                                    </div>
+                                                </div>
+                                                <a href="{{ Storage::url($pengajuan->lampiran) }}" target="_blank" class="btn btn-icon btn-light-primary btn-sm">
+                                                    <i class="ki-duotone ki-eye fs-4"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    @endif
+
+                                    <!-- Lampiran from data_surat -->
+                                    @if(isset($pengajuan->data_surat) && is_array($pengajuan->data_surat))
+                                        @foreach($pengajuan->data_surat as $key => $value)
+                                            @if(is_string($value) && (
+                                                str_contains($key, 'lampiran') || 
+                                                str_contains($key, 'foto') || 
+                                                str_contains($key, 'file') || 
+                                                str_contains($key, 'bukti') ||
+                                                str_contains($key, 'scan') ||
+                                                str_starts_with($value, 'lampiran/')
+                                            ) && !empty($value))
+                                                <div class="col-md-6">
+                                                    <div class="bg-light p-3 rounded d-flex align-items-center justify-content-between">
+                                                        <div class="d-flex align-items-center">
+                                                            <i class="ki-duotone ki-file-added fs-2 text-info me-3"><span class="path1"></span><span class="path2"></span></i>
+                                                            <div class="d-flex flex-column">
+                                                                <span class="fw-bold text-gray-800">{{ ucwords(str_replace('_', ' ', $key)) }}</span>
+                                                                <span class="text-muted fs-7">Berkas Tambahan</span>
+                                                            </div>
+                                                        </div>
+                                                        <a href="{{ Storage::url($value) }}" target="_blank" class="btn btn-icon btn-light-primary btn-sm">
+                                                            <i class="ki-duotone ki-eye fs-4"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            @endif
+                                        @endforeach
+                                    @endif
                                 </div>
-                            @endif
+                                @if(!$pengajuan->lampiran && empty(array_filter($pengajuan->data_surat ?? [], fn($v, $k) => is_string($v) && (str_contains($k, 'lampiran') || str_contains($k, 'foto') || str_contains($k, 'file') || str_contains($k, 'bukti') || str_contains($k, 'scan') || str_starts_with($v, 'lampiran/')) && !empty($v), ARRAY_FILTER_USE_BOTH)))
+                                    <div class="text-muted fst-italic mt-2">Tidak ada lampiran file.</div>
+                                @endif
+                            </div>
 
                             <!-- Timeline Status -->
                             <div class="mb-7">
@@ -658,6 +725,33 @@
 
 @push('scripts')
 <script>
+$(document).ready(function() {
+    // Show success message in SweetAlert
+    @if(session('success'))
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil',
+            text: '{{ session('success') }}',
+            confirmButtonText: 'OK',
+            customClass: {
+                confirmButton: 'btn btn-primary'
+            }
+        });
+    @endif
+
+    // Show error message in SweetAlert
+    @if(session('error'))
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: '{{ session('error') }}',
+            confirmButtonText: 'OK',
+            customClass: {
+                confirmButton: 'btn btn-primary'
+            }
+        });
+    @endif
+});
 // Professional loading functions
 function showProcessingSteps() {
     const stepsHtml = `

@@ -119,6 +119,7 @@
 		<!--begin::Javascript-->
 		@include('layouts.dashboard.js')
 		@stack('scripts')
+		@yield('scripts')
 		<!--end::Javascript-->
 	</body>
 	<!--end::Body-->

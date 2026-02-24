@@ -4,268 +4,228 @@
     <meta charset="utf-8">
     <title>Surat Rekomendasi</title>
     <style>
+        @page {
+            size: A4 portrait;
+            margin: 10mm 15mm;
+        }
+
         body {
-            font-family: 'Times New Roman', serif;
-            font-size: 12pt;
-            line-height: 1.4;
-            margin: 0;
-            padding: 20px;
-        }
-
-        .kop-surat {
-            text-align: center;
-            border-bottom: 3px solid #000;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-
-        .kop-surat h1 {
-            font-size: 16pt;
-            font-weight: bold;
-            margin: 0;
-            text-transform: uppercase;
-        }
-
-        .kop-surat h2 {
-            font-size: 14pt;
-            font-weight: bold;
-            margin: 5px 0;
-            text-transform: uppercase;
-        }
-
-        .kop-surat p {
+            font-family: 'DejaVu Sans', Arial, sans-serif;
             font-size: 10pt;
-            margin: 2px 0;
+            line-height: 1.3;
+            color: #000;
+            margin: 0;
+            padding: 0;
         }
 
-        .title {
-            text-align: center;
-            font-size: 14pt;
-            font-weight: bold;
+        .page {
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
+            background: #fff;
+        }
+
+        /* Header */
+        .header {
+            border-bottom: 2px double #000;
+            padding-bottom: 5px;
+            margin-bottom: 8px;
+        }
+        .header-table { width: 100%; border-collapse: collapse; }
+        .header-table td { vertical-align: middle; }
+        .logo-cell { width: 100px; text-align: center; }
+        .logo img { width: 80px; }
+        .text-cell { text-align: center; }
+        .government-name {
+            font-size: 18px; font-weight: 700; text-transform: uppercase;
+        }
+        .village-name {
+            font-size: 16px; font-weight: 700; text-transform: uppercase;
+        }
+        .contact-info { font-size: 12px; }
+
+        /* Title */
+        .document-title { text-align: center; margin: 5px 0; }
+        .title-main {
+            font-size: 12pt; font-weight: 700; text-transform: uppercase;
+            margin-bottom: 0px; letter-spacing: 0.5px;
             text-decoration: underline;
-            margin: 20px 0;
-            text-transform: uppercase;
         }
+        .document-number { font-size: 10pt; }
 
-        .nomor-surat {
-            text-align: center;
-            font-size: 12pt;
-            margin: 15px 0 30px 0;
-        }
-
-        .content {
+        /* Content */
+        .intro-text {
             text-align: justify;
-            margin-bottom: 20px;
+            font-size: 10pt;
+            line-height: 1.4;
+            margin-bottom: 8px;
         }
 
-        .data-section {
-            margin: 15px 0;
-            margin-left: 40px;
+        .data-table { width: 100%; border-collapse: collapse; }
+        .data-table td {
+            padding: 2px 3px;
+            vertical-align: top;
+            font-size: 10pt;
+            line-height: 1.2;
+        }
+        .data-table td:first-child {
+            width: 150px;
         }
 
-        .data-row {
-            margin: 3px 0;
-            display: flex;
-            align-items: flex-start;
+        .closing-text {
+            text-align: left;
+            margin-top: 8px;
+            margin-bottom: 15px;
+            font-size: 10pt;
+            text-indent: 40px;
         }
 
-        .data-label {
-            width: 180px;
-            display: inline-block;
-        }
-
-        .data-colon {
-            width: 20px;
-            display: inline-block;
-            text-align: center;
-        }
-
-        .data-value {
-            flex: 1;
-        }
-
-        .usaha-section {
-            margin: 20px 0;
-            margin-left: 40px;
-        }
-
-        .usaha-section h4 {
+        .section-title {
             font-weight: bold;
-            margin: 15px 0 10px 0;
+            margin: 10px 0 5px 0;
+            font-size: 10pt;
         }
 
-        .signature-section {
-            margin-top: 40px;
-            text-align: right;
-            margin-right: 80px;
-        }
+        /* Footer */
+        .footer { margin-top: 15px; }
 
-        .signature-content {
-            text-align: center;
-        }
-
-        .spacing {
-            margin: 50px 0;
-        }
-
-        .underline {
-            border-bottom: 1px solid #000;
-            display: inline-block;
-            min-width: 200px;
-        }
-
-        .indent {
-            margin-left: 40px;
-        }
-
-        .text-justify {
-            text-align: justify;
-        }
-
-        .mt-20 {
-            margin-top: 20px;
+        @media print {
+            body { background: white; padding: 0; }
+            .page { box-shadow: none; border: none; }
         }
     </style>
 </head>
 <body>
-    <!-- Kop Surat -->
-    <div class="kop-surat">
-        <h1>Pemerintah Kabupaten Seluma</h1>
-        <h2>Kecamatan Semidang Alas Maras</h2>
-        <h2>Desa Ketapang Baru</h2>
-        <p>Alamat: Jl. Raya Ketapang Baru, Kecamatan Semidang Alas Maras</p>
-        <p>Kabupaten Seluma, Provinsi Bengkulu</p>
-    </div>
+    <div class="page">
+        <!-- Header -->
+        <div class="header">
+            <table class="header-table">
+                <tr>
+                    <td class="logo-cell">
+                        <div class="logo">
+                            <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('assets/images/seluma.png'))) }}" alt="Logo Seluma">
+                        </div>
+                    </td>
+                    <td class="text-cell">
+                        <div class="government-name">PEMERINTAH KABUPATEN SELUMA</div>
+                        <div class="village-name">KECAMATAN SEMIDANG ALAS MARAS</div><div class="village-name">DESA KETAPANG BARU</div>
+                        <div class="contact-info">Alamat : Jln Lintas Bengkulu – Manna Desa Ketapang Baru Kode Pos 38575</div>
+                        <div class="contact-info">Website: ketapangbaru.selumakab.go.id</div>
+                    </td>
+                </tr>
+            </table>
+        </div>
 
-    <!-- Title -->
-    <div class="title">
-        Surat Rekomendasi
-    </div>
-
-    <!-- Nomor Surat -->
-    <div class="nomor-surat">
-        <strong>Nomor : {{ $nomor_surat ?? '/170505/05/05/SK/KTB/...../2024' }}</strong>
-    </div>
-
-    <!-- Content -->
-    <div class="content">
-        <p>Yang bertanda tangan dibawa ini Kepala Desa Ketapang Baru Kecamatan Semidang Alas Maras Kabupaten Seluma dengan ini menerangkan bahwa :</p>
-
-        <!-- Data Pemohon -->
-        <div class="data-section">
-            <div class="data-row">
-                <span class="data-label">Nama</span>
-                <span class="data-colon">:</span>
-                <span class="data-value"><strong>{{ $nama ?? '................................' }}</strong></span>
-            </div>
-            <div class="data-row">
-                <span class="data-label">NIK</span>
-                <span class="data-colon">:</span>
-                <span class="data-value">{{ $nik ?? '1705050907500002' }}</span>
-            </div>
-            <div class="data-row">
-                <span class="data-label">Jenis Kelamin</span>
-                <span class="data-colon">:</span>
-                <span class="data-value">{{ $jenis_kelamin ?? 'Laki-laki' }}</span>
-            </div>
-            <div class="data-row">
-                <span class="data-label">Agama</span>
-                <span class="data-colon">:</span>
-                <span class="data-value">{{ $agama ?? 'Islam' }}</span>
-            </div>
-            <div class="data-row">
-                <span class="data-label">Pekerjaan</span>
-                <span class="data-colon">:</span>
-                <span class="data-value">{{ $pekerjaan ?? 'Pensiunan' }}</span>
-            </div>
-            <div class="data-row">
-                <span class="data-label">Alamat</span>
-                <span class="data-colon">:</span>
-                <span class="data-value">{{ $alamat ?? 'Desa Ketapang Baru Kecamatan Semidang Alas Maras Kabupaten Seluma.' }}</span>
+        <!-- Title -->
+        <div class="document-title">
+            <div class="title-main">Surat Rekomendasi</div>
+            <div class="document-number">
+                Nomor: {{ $nomor_surat ?? '-' }}
             </div>
         </div>
 
-        <!-- Isi Rekomendasi -->
-        <div class="mt-20">
-            <p class="text-justify">
-                {{ $isi_rekomendasi ?? 'Adalah benar penduduk Desa Ketapang Baru yang mempunyai Usaha Pupuk Bersubsidi yang terletak di Desa Ketapang Baru dengan Nama Usaha Sebagai Berikut :' }}
-            </p>
+        <!-- Intro -->
+        <div class="intro-text">
+            Yang bertandatangan dibawah ini Kepala Desa Ketapang Baru Kecamatan Semidang Alas Maras, Kabupaten Seluma dengan ini menerangkan bahwa :
+        </div>
+
+        <!-- Data Pemohon -->
+        <table class="data-table">
+            <tr><td>Nama</td><td>: <strong>{{ $nama ?? '-' }}</strong></td></tr>
+            <tr><td>NIK</td><td>: {{ $nik ?? '-' }}</td></tr>
+            <tr><td>Jenis Kelamin</td><td>: {{ $jenis_kelamin ?? '-' }}</td></tr>
+            <tr><td>Agama</td><td>: {{ $agama ?? '-' }}</td></tr>
+            <tr><td>Pekerjaan</td><td>: {{ $pekerjaan ?? '-' }}</td></tr>
+            <tr><td>Alamat</td><td>: {{ $alamat ?? '-' }}</td></tr>
+        </table>
+
+        <div class="closing-text">
+            {{ $isi_rekomendasi ?? 'Adalah benar penduduk Desa Ketapang Baru yang memerlukan rekomendasi untuk keperluan sebagaimana dimaksud.' }}
         </div>
 
         <!-- Detail Usaha (jika ada) -->
         @if(!empty($nama_usaha) || !empty($alamat_usaha))
-        <div class="usaha-section">
-            <div class="data-row">
-                <span class="data-label">Nama Usaha</span>
-                <span class="data-colon">:</span>
-                <span class="data-value">{{ $nama_usaha ?? 'Jual Pupuk Bersubsidi' }}</span>
-            </div>
-            <div class="data-row">
-                <span class="data-label">Alamat Usaha</span>
-                <span class="data-colon">:</span>
-                <span class="data-value">{{ $alamat_usaha ?? 'Desa Ketapang Baru' }}</span>
-            </div>
+        <div class="section-title">Detail Usaha :</div>
+        <table class="data-table">
+            @if(!empty($nama_usaha))
+            <tr><td>Nama Usaha</td><td>: {{ $nama_usaha }}</td></tr>
+            @endif
+            @if(!empty($alamat_usaha))
+            <tr><td>Alamat Usaha</td><td>: {{ $alamat_usaha }}</td></tr>
+            @endif
             @if(!empty($nomor_telepon))
-            <div class="data-row">
-                <span class="data-label">Nomor Telepon</span>
-                <span class="data-colon">:</span>
-                <span class="data-value">{{ $nomor_telepon }}</span>
-            </div>
+            <tr><td>Nomor Telepon</td><td>: {{ $nomor_telepon }}</td></tr>
             @endif
             @if(!empty($luas_lahan))
-            <div class="data-row">
-                <span class="data-label">Luas Lahan</span>
-                <span class="data-colon">:</span>
-                <span class="data-value">{{ $luas_lahan }} M<sup>2</sup></span>
-            </div>
+            <tr><td>Luas Lahan</td><td>: {{ $luas_lahan }} M<sup>2</sup></td></tr>
             @endif
             @if(!empty($luas_bangunan))
-            <div class="data-row">
-                <span class="data-label">Luas Bangunan</span>
-                <span class="data-colon">:</span>
-                <span class="data-value">{{ $luas_bangunan }} M<sup>2</sup></span>
-            </div>
+            <tr><td>Luas Bangunan</td><td>: {{ $luas_bangunan }} M<sup>2</sup></td></tr>
             @endif
             @if(!empty($kapasitas))
-            <div class="data-row">
-                <span class="data-label">Kapasitas</span>
-                <span class="data-colon">:</span>
-                <span class="data-value">{{ $kapasitas }} Ton</span>
-            </div>
+            <tr><td>Kapasitas</td><td>: {{ $kapasitas }} Ton</td></tr>
             @endif
             @if(!empty($modal_usaha))
-            <div class="data-row">
-                <span class="data-label">Modal Usaha</span>
-                <span class="data-colon">:</span>
-                <span class="data-value">Rp {{ number_format($modal_usaha, 0, ',', '.') }},00-</span>
-            </div>
+            <tr><td>Modal Usaha</td><td>: Rp {{ number_format($modal_usaha, 0, ',', '.') }},00</td></tr>
             @endif
             @if(!empty($penghasilan_bulanan))
-            <div class="data-row">
-                <span class="data-label">Penghasilan/Bln</span>
-                <span class="data-colon">:</span>
-                <span class="data-value">Rp {{ number_format($penghasilan_bulanan, 0, ',', '.') }},00</span>
-            </div>
+            <tr><td>Penghasilan/Bln</td><td>: Rp {{ number_format($penghasilan_bulanan, 0, ',', '.') }},00</td></tr>
             @endif
-        </div>
+        </table>
         @endif
 
-        <!-- Penutup -->
-        <div class="mt-20">
-            <p class="text-justify">
-                {{ $penutup ?? 'Demikianlah Surat keterangan ini dibuat dengan sebenarnya dan dapat dipergunakan sebagai mana mestinya.' }}
-            </p>
+        <div class="closing-text">
+            {{ $penutup ?? 'Demikianlah surat keterangan ini dibuat dengan sebenarnya dan dapat dipergunakan sebagaimana mestinya.' }}
         </div>
 
-        <!-- Tanda Tangan -->
-        <div class="signature-section">
-            <div class="signature-content">
-                <p><strong>Ketapang Baru, {{ $tanggal_surat ?? date('d F Y') }}</strong></p>
-                <p><strong>Kepala Desa Ketapang Baru</strong></p>
-                <div class="spacing"></div>
-                <p><strong><span class="underline">{{ $kepala_desa_nama ?? 'ZULTAN ALHARA' }}</span></strong></p>
-            </div>
+        <!-- Footer with Signature -->
+        <div class="footer">
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                    <td style="width: 50%; vertical-align: top;"></td>
+                    <td style="width: 50%; vertical-align: top; text-align: center;">
+                        <div style="font-size: 10pt; margin-bottom: 6px;">
+                            {{ $tempat_surat ?? 'Ketapang Baru' }}, {{ $tanggal_surat ?? now()->translatedFormat('d F Y') }}
+                        </div>
+                        <div style="font-weight: bold; margin-bottom: 6px; font-size: 10pt;">Kepala Desa</div>
+
+                        <!-- TTD berdasarkan pilihan admin -->
+                        @if(isset($jenis_ttd) && $jenis_ttd == 'gambar' && isset($ttd_base64) && $ttd_base64)
+                            <div style="margin-bottom: 4px;">
+                                <img src="data:image/png;base64,{{ $ttd_base64 }}" style="width: 140px; height: auto;" alt="TTD Gambar">
+                            </div>
+                        @elseif(isset($jenis_ttd) && $jenis_ttd == 'qrcode')
+                            <div style="margin-bottom: 4px;">
+                                @if(isset($qr_ttd_base64) && $qr_ttd_base64)
+                                    <img src="{{ $qr_ttd_base64 }}" style="width: 110px; height: auto;" alt="QR Code TTD">
+                                @else
+                                    <div style="height: 50px;"></div>
+                                @endif
+                            </div>
+                        @elseif(isset($jenis_ttd) && $jenis_ttd == 'manual')
+                            <div style="height: 50px; margin-bottom: 4px;"></div>
+                        @else
+                            <div style="height: 50px; margin-bottom: 4px;"></div>
+                        @endif
+
+                        <div style="font-weight: bold; text-decoration: underline; font-size: 10pt;">{{ strtoupper($kepala_desa_nama ?? 'ZULTAN ALHARA') }}</div>
+                        <div style="font-size: 10pt;">NIP. {{ $nip ?? '-' }}</div>
+                    </td>
+                </tr>
+            </table>
         </div>
+
+        <!-- Tembusan -->
+        @if(isset($tembusan) && !empty($tembusan))
+        <div style="margin-top: 15px;">
+            <div style="font-weight: bold; margin-bottom: 4px; font-size: 10pt;">Tembusan :</div>
+            @foreach($tembusan as $index => $item)
+            <div style="margin-left: 15px; margin-bottom: 2px; font-size: 10pt;">
+                {{ $index + 1 }}. {{ $item }}
+            </div>
+            @endforeach
+        </div>
+        @endif
     </div>
 </body>
 </html>

@@ -151,7 +151,7 @@
                                         </i>
                                         <div>
                                             <div class="text-gray-700 fw-semibold">Tempat, Tanggal Lahir</div>
-                                            <div class="text-muted">{{ $bantuan->user->tempat_lahir }}, {{ $bantuan->user->tanggal_lahir?->format('d F Y') }}</div>
+                                            <div class="text-muted">{{ $bantuan->user->tempat_lahir }}, {{ $bantuan->user->tanggal_lahir?->translatedFormat('d F Y') }}</div>
                                         </div>
                                     </div>
                                     @endif

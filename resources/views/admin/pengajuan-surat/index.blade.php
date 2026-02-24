@@ -76,18 +76,16 @@
                                     <option value="ket_belum_menikah" {{ request('jenis_surat') == 'ket_belum_menikah' ? 'selected' : '' }}>Surat Keterangan Belum Menikah</option>
                                     <option value="surat_berkelakuan_baik" {{ request('jenis_surat') == 'surat_berkelakuan_baik' ? 'selected' : '' }}>Surat Keterangan Berkelakuan Baik</option>
                                     <option value="surat_domisili" {{ request('jenis_surat') == 'surat_domisili' ? 'selected' : '' }}>Surat Keterangan Domisili</option>
-                                    <option value="surat_usaha" {{ request('jenis_surat') == 'surat_usaha' ? 'selected' : '' }}>Surat Keterangan Usaha</option>
-                                    <option value="surat_tidak_mampu" {{ request('jenis_surat') == 'surat_tidak_mampu' ? 'selected' : '' }}>Surat Keterangan Tidak Mampu</option>
+                                    <option value="ket_usaha" {{ request('jenis_surat') == 'ket_usaha' ? 'selected' : '' }}>Surat Keterangan Usaha</option>
+                                    {{-- <option value="surat_tidak_mampu" {{ request('jenis_surat') == 'surat_tidak_mampu' ? 'selected' : '' }}>Surat Keterangan Tidak Mampu</option> --}}
                                     <option value="surat_kematian" {{ request('jenis_surat') == 'surat_kematian' ? 'selected' : '' }}>Surat Keterangan Kematian</option>
                                     <option value="ket_menikah" {{ request('jenis_surat') == 'ket_menikah' ? 'selected' : '' }}>Surat Keterangan Menikah</option>
                                     <option value="ket_miskin_dtks" {{ request('jenis_surat') == 'ket_miskin_dtks' ? 'selected' : '' }}>Surat Keterangan Miskin DTKS</option>
                                     <option value="ket_penghasilan_ortu" {{ request('jenis_surat') == 'ket_penghasilan_ortu' ? 'selected' : '' }}>Surat Keterangan Penghasilan Orang Tua</option>
-                                    <option value="ket_usaha" {{ request('jenis_surat') == 'ket_usaha' ? 'selected' : '' }}>Surat Keterangan Usaha</option>
-                                    <option value="pengantar_nikah" {{ request('jenis_surat') == 'pengantar_nikah' ? 'selected' : '' }}>Surat Pengantar Nikah (N1-N4)</option>
+                                    <option value="pengantar_nikah" {{ request('jenis_surat') == 'pengantar_nikah' ? 'selected' : '' }}>Surat Pengantar Nikah</option>
                                     <option value="surat_hibah" {{ request('jenis_surat') == 'surat_hibah' ? 'selected' : '' }}>Surat Keterangan Hibah</option>
                                     <option value="perjanjian_perdamaian" {{ request('jenis_surat') == 'perjanjian_perdamaian' ? 'selected' : '' }}>Surat Perjanjian Perdamaian</option>
                                     <option value="surat_pindah" {{ request('jenis_surat') == 'surat_pindah' ? 'selected' : '' }}>Surat Pindah</option>
-                                    <option value="surat_rekomendasi" {{ request('jenis_surat') == 'surat_rekomendasi' ? 'selected' : '' }}>Surat Rekomendasi</option>
                                 </select>
 
                                 <button type="submit" class="btn btn-primary">
@@ -194,51 +192,31 @@
                                             </div>
                                         </td>
                                         <td class="text-end">
-                                            <a href="#" class="btn btn-light btn-active-light-primary btn-flex btn-center btn-sm"
-                                               data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
-                                                Aksi
-                                                <i class="ki-duotone ki-down fs-5 ms-1"></i>
-                                            </a>
-                                            <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-200px py-4" data-kt-menu="true">
-                                                <div class="menu-item px-3">
-                                                    <a href="{{ route('admin.pengajuan-surat.show', $pengajuan->id) }}" class="menu-link px-3">
-                                                        <i class="ki-duotone ki-eye fs-6 me-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i>
-                                                        Lihat Detail
+                                            <div class="d-flex justify-content-end gap-2">
+                                                @if(in_array($pengajuan->status, ['Valid', 'Selesai']))
+                                                    <a href="{{ route('admin.pengajuan-surat.generate-pdf', $pengajuan->id) }}"
+                                                       class="btn btn-success btn-sm"
+                                                       target="_blank"
+                                                       title="Cetak PDF">
+                                                        <i class="ki-duotone ki-printer fs-6 me-1">
+                                                            <span class="path1"></span>
+                                                            <span class="path2"></span>
+                                                            <span class="path3"></span>
+                                                            <span class="path4"></span>
+                                                            <span class="path5"></span>
+                                                        </i>
+                                                        Cetak
                                                     </a>
-                                                </div>
-
-                                                @if($pengajuan->status === 'Diajukan')
-                                                    <div class="menu-item px-3">
-                                                        <a href="#" class="menu-link px-3 approve-btn" data-id="{{ $pengajuan->id }}">
-                                                            <i class="ki-duotone ki-check fs-6 me-2 text-success"><span class="path1"></span><span class="path2"></span></i>
-                                                            Setujui
-                                                        </a>
-                                                    </div>
-                                                    <div class="menu-item px-3">
-                                                        <a href="#" class="menu-link px-3 reject-btn" data-id="{{ $pengajuan->id }}">
-                                                            <i class="ki-duotone ki-cross fs-6 me-2 text-danger"><span class="path1"></span><span class="path2"></span></i>
-                                                            Tolak
-                                                        </a>
-                                                    </div>
                                                 @endif
-
-                                                @if($pengajuan->status === 'Valid')
-                                                    <div class="menu-item px-3">
-                                                        <a href="{{ route('admin.pengajuan-surat.generate-pdf', $pengajuan->id) }}"
-                                                           class="menu-link px-3" target="_blank">
-                                                            <i class="ki-duotone ki-file-down fs-6 me-2 text-primary"><span class="path1"></span><span class="path2"></span></i>
-                                                            Download PDF
-                                                        </a>
-                                                    </div>
-                                                @endif
-
-                                                <div class="separator my-2"></div>
-                                                <div class="menu-item px-3">
-                                                    <a href="#" class="menu-link px-3 delete-btn" data-id="{{ $pengajuan->id }}">
-                                                        <i class="ki-duotone ki-trash fs-6 me-2 text-danger"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span></i>
-                                                        Hapus
-                                                    </a>
-                                                </div>
+                                                <a href="{{ route('admin.pengajuan-surat.show', $pengajuan->id) }}"
+                                                   class="btn btn-light btn-active-light-primary btn-sm">
+                                                    <i class="ki-duotone ki-eye fs-6 me-1">
+                                                        <span class="path1"></span>
+                                                        <span class="path2"></span>
+                                                        <span class="path3"></span>
+                                                    </i>
+                                                    Detail
+                                                </a>
                                             </div>
                                         </td>
                                     </tr>
@@ -262,8 +240,16 @@
 
                     <!-- Pagination -->
                     @if($pengajuanSurat->hasPages())
-                        <div class="d-flex justify-content-center mt-5">
-                            {{ $pengajuanSurat->appends(request()->query())->links() }}
+                        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between gap-3 mt-6">
+                            <div class="text-muted small">
+                                Menampilkan {{ $pengajuanSurat->firstItem() ?? 0 }} - {{ $pengajuanSurat->lastItem() ?? 0 }} dari {{ $pengajuanSurat->total() }} data
+                                @if(request('search') || request('status') || request('jenis_surat'))
+                                    <span class="text-info">(hasil pencarian)</span>
+                                @endif
+                            </div>
+                            <div class="ms-md-auto">
+                                {{ $pengajuanSurat->appends(request()->query())->links('pagination.custom') }}
+                            </div>
                         </div>
                     @endif
                 </div>
@@ -271,37 +257,110 @@
         </div>
     </div>
 
-    <!-- Modal Tolak -->
-    <div class="modal fade" id="rejectModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered mw-650px">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2 class="fw-bold">Tolak Pengajuan Surat</h2>
-                    <div class="btn btn-icon btn-sm btn-active-icon-primary" data-bs-dismiss="modal">
-                        <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
-                    </div>
-                </div>
-                <div class="modal-body scroll-y mx-5 mx-xl-15 my-7">
-                    <form id="rejectForm">
-                        <input type="hidden" id="rejectId" name="id">
-                        <div class="fv-row mb-7">
-                            <label class="required fs-6 fw-semibold mb-2">Alasan Penolakan</label>
-                            <textarea class="form-control form-control-solid" id="alasanReject" name="alasan_reject" rows="4"
-                                      placeholder="Masukkan alasan penolakan..." required></textarea>
-                        </div>
-                        <div class="text-center pt-15">
-                            <button type="reset" class="btn btn-light me-3" data-bs-dismiss="modal">Batal</button>
-                            <button type="submit" class="btn btn-primary">
-                                <span class="indicator-label">Tolak Pengajuan</span>
-                                <span class="indicator-progress">Memproses... <span class="spinner-border spinner-border-sm align-middle ms-2"></span></span>
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
 @endsection
+
+@push('styles')
+<style>
+/* Custom Pagination Styling */
+.pagination-wrapper .btn {
+    border: 1px solid var(--kt-gray-300);
+    margin: 0 2px;
+    min-width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    border-radius: 0.5rem;
+    font-weight: 600;
+}
+
+.pagination-wrapper .btn:hover:not(.disabled) {
+    background: linear-gradient(135deg, var(--kt-primary-light) 0%, var(--kt-primary) 100%);
+    border-color: var(--kt-primary);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(33, 150, 243, 0.3);
+}
+
+.pagination-wrapper .btn.btn-primary {
+    background: linear-gradient(135deg, var(--kt-primary) 0%, #1976d2 100%);
+    border-color: var(--kt-primary);
+    color: white;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
+}
+
+.pagination-wrapper .btn.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Enhanced Search Input */
+.form-control, .form-select {
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #3699ff;
+    box-shadow: 0 0 0 0.2rem rgba(54, 153, 255, 0.25);
+    transform: scale(1.02);
+}
+
+/* Modern Card Header */
+.card-header {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border-bottom: 3px solid #e4e6ea;
+}
+
+/* Table improvements */
+.table th {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+/* Badge improvements */
+.badge {
+    font-weight: 600;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+}
+
+/* Action buttons styling */
+.btn-icon {
+    width: 35px;
+    height: 35px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-icon i {
+    margin: 0 !important;
+}
+
+/* Loading animation */
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+.loading {
+    animation: pulse 1.5s ease-in-out infinite;
+}
+</style>
+@endpush
 
 @push('scripts')
 <script>
@@ -388,161 +447,6 @@ $(document).ready(function() {
             complete: function() {
                 // Remove loading state
                 $select.prop('disabled', false);
-            }
-        });
-    });
-
-    // Approve pengajuan
-    $('.approve-btn').on('click', function(e) {
-        e.preventDefault();
-        const pengajuanId = $(this).data('id');
-
-        Swal.fire({
-            text: "Apakah Anda yakin ingin menyetujui pengajuan ini?",
-            icon: "question",
-            showCancelButton: true,
-            buttonsStyling: false,
-            confirmButtonText: "Ya, setujui",
-            cancelButtonText: "Batal",
-            customClass: {
-                confirmButton: "btn btn-success",
-                cancelButton: "btn btn-secondary"
-            }
-        }).then((result) => {
-            if (result.value) {
-                $.ajax({
-                    url: `/admin/pengajuan-surat/${pengajuanId}/approve`,
-                    method: 'POST',
-                    data: {
-                        _token: $('meta[name="csrf-token"]').attr('content')
-                    },
-                    success: function(response) {
-                        Swal.fire({
-                            text: response.message,
-                            icon: "success",
-                            buttonsStyling: false,
-                            confirmButtonText: "Ok",
-                            customClass: {
-                                confirmButton: "btn btn-primary"
-                            }
-                        }).then(() => {
-                            location.reload();
-                        });
-                    },
-                    error: function() {
-                        Swal.fire({
-                            text: "Terjadi kesalahan saat menyetujui pengajuan",
-                            icon: "error",
-                            buttonsStyling: false,
-                            confirmButtonText: "Ok",
-                            customClass: {
-                                confirmButton: "btn btn-primary"
-                            }
-                        });
-                    }
-                });
-            }
-        });
-    });
-
-    // Reject pengajuan
-    $('.reject-btn').on('click', function(e) {
-        e.preventDefault();
-        const pengajuanId = $(this).data('id');
-        $('#rejectId').val(pengajuanId);
-        $('#rejectModal').modal('show');
-    });
-
-    // Handle reject form submission
-    $('#rejectForm').on('submit', function(e) {
-        e.preventDefault();
-        const pengajuanId = $('#rejectId').val();
-        const alasanReject = $('#alasanReject').val();
-
-        $.ajax({
-            url: `/admin/pengajuan-surat/${pengajuanId}/reject`,
-            method: 'POST',
-            data: {
-                alasan_reject: alasanReject,
-                _token: $('meta[name="csrf-token"]').attr('content')
-            },
-            success: function(response) {
-                $('#rejectModal').modal('hide');
-                Swal.fire({
-                    text: response.message,
-                    icon: "success",
-                    buttonsStyling: false,
-                    confirmButtonText: "Ok",
-                    customClass: {
-                        confirmButton: "btn btn-primary"
-                    }
-                }).then(() => {
-                    location.reload();
-                });
-            },
-            error: function() {
-                Swal.fire({
-                    text: "Terjadi kesalahan saat menolak pengajuan",
-                    icon: "error",
-                    buttonsStyling: false,
-                    confirmButtonText: "Ok",
-                    customClass: {
-                        confirmButton: "btn btn-primary"
-                    }
-                });
-            }
-        });
-    });
-
-    // Delete pengajuan
-    $('.delete-btn').on('click', function(e) {
-        e.preventDefault();
-        const pengajuanId = $(this).data('id');
-
-        Swal.fire({
-            text: "Apakah Anda yakin ingin menghapus pengajuan ini? Data akan dihapus permanen.",
-            icon: "warning",
-            showCancelButton: true,
-            buttonsStyling: false,
-            confirmButtonText: "Ya, hapus",
-            cancelButtonText: "Batal",
-            customClass: {
-                confirmButton: "btn btn-danger",
-                cancelButton: "btn btn-secondary"
-            }
-        }).then((result) => {
-            if (result.value) {
-                $.ajax({
-                    url: `/admin/pengajuan-surat/${pengajuanId}`,
-                    method: 'DELETE',
-                    data: {
-                        _token: $('meta[name="csrf-token"]').attr('content')
-                    },
-                    success: function(response) {
-                        Swal.fire({
-                            text: response.message,
-                            icon: "success",
-                            buttonsStyling: false,
-                            confirmButtonText: "Ok",
-                            customClass: {
-                                confirmButton: "btn btn-primary"
-                            }
-                        }).then(() => {
-                            location.reload();
-                        });
-                    },
-                    error: function() {
-                        Swal.fire({
-                            text: "Terjadi kesalahan saat menghapus pengajuan",
-                            icon: "error",
-                            buttonsStyling: false,
-                            confirmButtonText: "Ok",
-                            customClass: {
-                                confirmButton: "btn btn-primary"
-                            }
-                        });
-                    }
-                });
             }
         });
     });

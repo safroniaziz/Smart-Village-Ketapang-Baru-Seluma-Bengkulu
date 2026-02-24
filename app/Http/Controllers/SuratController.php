@@ -6,12 +6,29 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use App\Models\PengajuanSurat;
+use App\Models\StrukturOrganisasi;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 
 class SuratController extends Controller
 {
+    /**
+     * Helper function to get Kepala Desa data from database
+     */
+    private function getKepalaDesa()
+    {
+        $kepalaDesa = StrukturOrganisasi::where('level', 'kepala')
+            ->where('kategori', 'pemerintahan')
+            ->where('aktif', true)
+            ->first();
+
+        return [
+            'kepala_desa_nama' => $kepalaDesa->nama ?? 'Zultan Alhara',
+            'nip' => $kepalaDesa->nip ?? '-',
+        ];
+    }
+
     /**
      * Helper function to safely get data from array with fallback
      */
@@ -95,24 +112,43 @@ class SuratController extends Controller
         // Prepare TTD data based on jenis_ttd
         $ttdData = [];
         if ($pengajuan->jenis_ttd === 'qrcode') {
-            // Use QR Code TTD
+            // Use QR Code TTD - QR code yang berisi gambar TTD
+            $qrTtdBase64 = $pengajuan->data_surat['qr_ttd_base64'] ?? null;
+
+            // Jika QR code TTD belum ada, generate sekarang
+            if (!$qrTtdBase64) {
+                try {
+                    $qrCodeService = new \App\Services\QrCodeService();
+                    $qrTtdBase64 = $qrCodeService->generateSuratQrCode($pengajuan);
+                } catch (\Exception $e) {
+                    \Log::error('Failed to generate QR TTD: ' . $e->getMessage());
+                    $qrTtdBase64 = null;
+                }
+            }
+
             $ttdData = [
                 'jenis_ttd' => 'qrcode',
-                'qr_ttd_base64' => $pengajuan->data_surat['qr_ttd_base64'] ?? null,
+                'qr_ttd_base64' => $qrTtdBase64,
                 'verification_url' => $pengajuan->data_surat['verification_url'] ?? null
             ];
-        } else {
-            // Use regular TTD
+        } elseif ($pengajuan->jenis_ttd === 'gambar') {
+            // Use regular TTD - gambar TTD langsung
             $ttdData = [
                 'jenis_ttd' => 'gambar',
-                'ttd_image_path' => public_path('assets/images/ttd.png')
+                'ttd_base64' => file_exists(public_path('assets/images/ttd.png')) ? base64_encode(file_get_contents(public_path('assets/images/ttd.png'))) : null
+            ];
+        } else {
+            // Manual TTD - tidak ada gambar atau QR code
+            $ttdData = [
+                'jenis_ttd' => 'manual'
             ];
         }
 
         // Prepare data for PDF
         $pdfData = [
             'nomor_surat' => $nomorSurat,
-            'tanggal_surat' => now()->format('d F Y'),
+            'tanggal_surat' => now()->translatedFormat('d F Y'),
+        ] + $this->getKepalaDesa() + [
             'nama_pemohon' => $user->nama_lengkap ?? $pengajuan->nama_lengkap ?? '-',
             'nik' => $user->nik ?? $pengajuan->nik ?? '-',
             'tempat_lahir' => $user->tempat_lahir ?? '-',
@@ -127,7 +163,7 @@ class SuratController extends Controller
             'tempat_kehilangan' => $data['tempat_kehilangan'] ?? '-',
             'waktu_kehilangan' => $data['waktu_kehilangan'] ?? '-',
             'keterangan_waktu' => $data['keterangan_waktu'] ?? '-',
-            'keperluan' => $data['keperluan'] ?? '-',
+            'keperluan' => $pengajuan->keperluan ?? $data['keperluan'] ?? '-',
             'tembusan' => $data['tembusan'] ?? '',
             'tracking_number' => $pengajuan->tracking_number ?? '-'
         ] + $ttdData;
@@ -143,7 +179,7 @@ class SuratController extends Controller
                 'enable-local-file-access' => true
             ]);
 
-        return $pdf->download('Surat-Keterangan-Kehilangan-' . ($user->nama_lengkap ?? $pengajuan->nama_lengkap ?? 'Unknown') . '.pdf');
+        return $pdf->stream('Surat-Keterangan-Kehilangan-' . ($user->nama_lengkap ?? $pengajuan->nama_lengkap ?? 'Unknown') . '.pdf');
     }
 
     public function previewPDFKehilangan($pengajuanId)
@@ -158,7 +194,9 @@ class SuratController extends Controller
         // Prepare data for PDF
         $pdfData = [
             'nomor_surat' => $nomorSurat,
-            'tanggal_surat' => now()->format('d F Y'),
+            'tanggal_surat' => now()->translatedFormat('d F Y'),
+            'nama_pemohon'
+        ] + $this->getKepalaDesa() + [
             'nama_pemohon' => $user->nama_lengkap ?? $pengajuan->nama_lengkap ?? '-',
             'nik' => $user->nik ?? $pengajuan->nik ?? '-',
             'tempat_lahir' => $user->tempat_lahir ?? '-',
@@ -183,7 +221,7 @@ class SuratController extends Controller
         $pdfData['tempat_kehilangan'] = $data['tempat_kehilangan'] ?? '-';
         $pdfData['waktu_kehilangan'] = $data['waktu_kehilangan'] ?? '-';
         $pdfData['keterangan_waktu'] = $data['keterangan_waktu'] ?? '-';
-        $pdfData['keperluan'] = $data['keperluan'] ?? '-';
+        $pdfData['keperluan'] = $pengajuan->keperluan ?? $data['keperluan'] ?? '-';
 
         // Generate PDF for preview
         $pdf = Pdf::loadView('pdf.surat-kehilangan', $pdfData);
@@ -213,7 +251,9 @@ class SuratController extends Controller
         // Prepare data for PDF
         $pdfData = [
             'nomor_surat' => $nomorSurat,
-            'tanggal_surat' => now()->format('d F Y'),
+            'tanggal_surat' => now()->translatedFormat('d F Y'),
+            'nama_pemohon'
+        ] + $this->getKepalaDesa() + [
             'nama_pemohon' => $user->nama_lengkap ?? $pengajuan->nama_lengkap ?? '-',
             'nik' => $user->nik ?? $pengajuan->nik ?? '-',
             'tempat_lahir' => $user->tempat_lahir ?? '-',
@@ -228,7 +268,7 @@ class SuratController extends Controller
             'tempat_kehilangan' => $data['tempat_kehilangan'] ?? '-',
             'waktu_kehilangan' => $data['waktu_kehilangan'] ?? '-',
             'keterangan_waktu' => $data['keterangan_waktu'] ?? '-',
-            'keperluan' => $data['keperluan'] ?? '-'
+            'keperluan' => $pengajuan->keperluan ?? $data['keperluan'] ?? '-'
         ];
 
         // Generate PDF
@@ -318,7 +358,7 @@ class SuratController extends Controller
         // Data dummy untuk testing
         $pdfData = [
             'nomor_surat' => '470/08/2025/001',
-            'tanggal_surat' => now()->format('d F Y'),
+            'tanggal_surat' => now()->translatedFormat('d F Y'),
             'nama_pemohon' => 'John Doe',
             'nik' => '1234567890123456',
             'tempat_lahir' => 'Jakarta',
@@ -345,6 +385,9 @@ class SuratController extends Controller
     // Generate Surat Keterangan Bersih Diri
     public function generateSuratBersihDiri(Request $request)
     {
+        // Get kepala desa data
+        $kepalaDesa = $this->getKepalaDesa();
+        
         // Data default atau dari request
         $data = [
             'nomor_surat' => $request->nomor_surat ?? '90/170505/05/05/SKBD/KTB/V/2025',
@@ -370,8 +413,8 @@ class SuratController extends Controller
 
             'tempat_surat' => $request->tempat_surat ?? 'Ketapang Baru',
             'tanggal_surat' => $request->tanggal_surat ?? '07 Mei 2025',
-            'nama_kepala' => $request->nama_kepala ?? 'Zultan Alhara',
-            'nip' => $request->nip ?? 'NIP. -',
+            'nama_kepala' => $request->nama_kepala ?? $kepalaDesa['kepala_desa_nama'],
+            'nip' => $request->nip ?? $kepalaDesa['nip'],
 
             'nama_camat' => $request->nama_camat ?? 'Nama Camat',
             'nip_camat' => $request->nip_camat ?? '........................',
@@ -405,45 +448,53 @@ class SuratController extends Controller
         // Use nomor surat from database if available, otherwise generate default
         $nomorSurat = $pengajuan->no_surat ?: ('90/' . date('m') . '/' . date('Y') . '/' . $pengajuanId);
 
-        // Generate QR Code for verification
-        $qrCodeService = new \App\Services\QrCodeService();
-        $verificationUrl = $qrCodeService->generateVerificationUrl($pengajuan->tracking_number);
-        $qrCodeBase64 = base64_encode(\SimpleSoftwareIO\QrCode\Facades\QrCode::format('png')->size(200)->generate($verificationUrl));
-
-        // Prepare TTD data - always use image TTD for bersih diri
-        $ttdImagePath = public_path('assets/images/ttd.png');
-
-        // Generate QR Code from TTD image
+        // Prepare TTD data based on jenis_ttd - SIMPLE LOGIC
         $ttdData = [];
-        if (file_exists($ttdImagePath)) {
-            try {
-                // Generate QR code with TTD overlay
-                $qrTtdBase64 = $qrCodeService->generateQrCodeFromTtd($verificationUrl, 200);
-                $ttdData = [
-                    'jenis_ttd' => 'qrcode',
-                    'qr_ttd_base64' => 'data:image/png;base64,' . $qrTtdBase64,
-                    'verification_url' => $verificationUrl
-                ];
-            } catch (\Exception $e) {
-                // Fallback to regular TTD if QR generation fails
-                $ttdData = [
-                    'jenis_ttd' => 'gambar',
-                    'ttd_image_path' => $ttdImagePath
-                ];
-            }
-        } else {
-            // Fallback if TTD image doesn't exist
+        $qrCodeBase64 = null; // QR code verifikasi surat - hanya untuk tracking, bukan TTD
+
+        if ($pengajuan->jenis_ttd === 'gambar') {
+            // Gambar TTD - convert ke base64 langsung
+            $ttdImagePath = public_path('assets/images/ttd.png');
+            $ttdBase64 = file_exists($ttdImagePath) ? base64_encode(file_get_contents($ttdImagePath)) : null;
+
             $ttdData = [
                 'jenis_ttd' => 'gambar',
-                'ttd_image_path' => null
+                'ttd_base64' => $ttdBase64
             ];
-        }
+        } elseif ($pengajuan->jenis_ttd === 'qrcode') {
+            // QR Code TTD - convert gambar TTD ke QR code
+            $ttdImagePath = public_path('assets/images/ttd.png');
+            if (file_exists($ttdImagePath)) {
+                try {
+                    $qrCodeService = new \App\Services\QrCodeService();
+                    $ttdBase64 = $qrCodeService->generateSuratQrCode($pengajuan);
+                } catch (\Exception $e) {
+                    \Log::error('Failed to generate QR TTD: ' . $e->getMessage());
+                    $ttdBase64 = null;
+                }
+            } else {
+                \Log::error('TTD image not found at: ' . $ttdImagePath);
+                $ttdBase64 = null;
+            }
+
+            $ttdData = [
+                'jenis_ttd' => 'qrcode',
+                'qr_ttd_base64' => $ttdBase64
+            ];
+        } else {
+            // Manual TTD - kosong
+            $ttdData = [
+                'jenis_ttd' => 'manual',
+                'ttd_base64' => null
+            ];
+        }// QR Code verifikasi surat dihapus - tidak diperlukan untuk surat bersih diri
+        $qrCodeBase64 = null;
 
         // Prepare data for PDF using actual form data
         $pdfData = [
             'nomor_surat' => $nomorSurat,
-            'tanggal_surat' => now()->format('d F Y'),
-            'qr_base64' => $qrCodeBase64,
+            'tanggal_surat' => now()->translatedFormat('d F Y'),
+            // 'qr_base64' => $qrCodeBase64, // Dihapus - tidak diperlukan
             'nama_ayah' => $data['nama_ayah'] ?? '-',
             'umur_ayah' => $data['umur_ayah'] ?? '-',
             'agama_ayah' => $data['agama_ayah'] ?? '-',
@@ -461,9 +512,9 @@ class SuratController extends Controller
             'agama_anak' => $data['agama'] ?? '-',
             'pekerjaan_anak' => $data['pekerjaan'] ?? '-',
             'alamat_anak' => $pengajuan->alamat ?? '-',
+            'keperluan' => $data['keperluan'] ?? $pengajuan->keperluan ?? 'Administrasi',
             'tempat_surat' => 'Ketapang Baru',
-            'nama_kepala' => 'Zultan Alhara',
-            'nip' => 'NIP. -',
+        ] + $this->getKepalaDesa() + [
             'nama_camat' => 'Nama Camat',
             'nip_camat' => '........................',
             'nama_danramil' => 'Nama Danramil',
@@ -496,54 +547,69 @@ class SuratController extends Controller
         // Use nomor surat from database if available, otherwise generate default
         $nomorSurat = $pengajuan->no_surat ?: sprintf('%03d', $pengajuanId);
 
-        // Get QR Code service untuk TTD dan tracking
-        $qrCodeService = app(\App\Services\QrCodeService::class);
-
-        // Generate tracking QR code
-        $trackingQrCode = null;
-        if ($pengajuan->tracking_number) {
-            $verifyUrl = url('/verify/' . $pengajuan->tracking_number);
-            $trackingQrCode = $qrCodeService->generateSimpleQrCode($verifyUrl);
-        }
-
-        // Prepare TTD data
+        // Prepare TTD data based on jenis_ttd
         $ttdData = [];
-        $ttdPath = null;
-        $qrCode = null;
+        $qrTtdBase64 = null;
+        $ttdBase64 = null;
 
-        if ($pengajuan->jenis_ttd === 'qrcode') {
-            // Generate QR Code untuk TTD
-            $qrData = [
-                'type' => 'ttd',
-                'pengajuan_id' => $pengajuan->id,
-                'nama' => $pengajuan->nama_lengkap,
-                'jenis_surat' => 'SPPD',
-                'tanggal' => now()->format('Y-m-d H:i:s')
+        if ($pengajuan->jenis_ttd === 'gambar') {
+            // Gambar TTD - convert ke base64
+            $ttdImagePath = public_path('assets/images/ttd.png');
+            if (file_exists($ttdImagePath)) {
+                $ttdBase64 = base64_encode(file_get_contents($ttdImagePath));
+            }
+            $ttdData = [
+                'jenis_ttd' => 'gambar',
+                'ttd_base64' => $ttdBase64
             ];
-            $qrCode = $qrCodeService->generateSimpleQrCode(json_encode($qrData));
-        } elseif ($pengajuan->jenis_ttd === 'gambar') {
-            // Path ke file TTD gambar
-            $ttdPath = 'ttd/kepala-desa.png'; // Sesuaikan dengan path TTD yang ada
+        } elseif ($pengajuan->jenis_ttd === 'qrcode') {
+            // QR Code TTD
+            try {
+                $qrCodeService = new \App\Services\QrCodeService();
+                $qrTtdBase64 = $qrCodeService->generateSuratQrCode($pengajuan);
+            } catch (\Exception $e) {
+                \Log::error('Failed to generate QR TTD: ' . $e->getMessage());
+                $qrTtdBase64 = null;
+            }
+            $ttdData = [
+                'jenis_ttd' => 'qrcode',
+                'qr_ttd_base64' => $qrTtdBase64
+            ];
+        } else {
+            $ttdData = [
+                'jenis_ttd' => 'manual'
+            ];
         }
 
-        // Prepare data for PDF
+        // Hitung total biaya perjalanan (jika ada)
+        $biayaItems = $data['biaya'] ?? [];
+        $totalBiaya = 0;
+        if (is_array($biayaItems)) {
+            foreach ($biayaItems as $row) {
+                $totalBiaya += isset($row['jumlah']) ? (float) $row['jumlah'] : 0;
+            }
+        }
+
+        // Prepare data for PDF - use correct field names from form
         $pdfData = [
             'nomor_surat' => $nomorSurat,
+            'nama_lengkap' => $pengajuan->nama_lengkap ?? '-',
+            'nik' => $pengajuan->nik ?? '-',
+            'alamat' => $pengajuan->alamat ?? '-',
             'personel' => $data['personel'] ?? [],
-            'tujuan' => $data['tujuan'] ?? '',
-            'keperluan' => $data['keperluan'] ?? '',
+            'tujuan' => $data['tujuan_perjalanan'] ?? $data['tujuan'] ?? '',
+            'keperluan' => $data['maksud_perjalanan'] ?? $pengajuan->keperluan ?? $data['keperluan'] ?? '',
             'tanggal_berangkat' => $data['tanggal_berangkat'] ?? '',
             'tanggal_kembali' => $data['tanggal_kembali'] ?? '',
-            'transportasi' => $data['transportasi'] ?? '',
+            'transportasi' => $data['kendaraan'] ?? $data['transportasi'] ?? '',
             'keterangan_tambahan' => $data['keterangan_tambahan'] ?? '',
-            'tembusan' => $data['tembusan'] ?? '', // Tambahkan tembusan
-            'kepala_desa_nama' => 'Zultan Alhara',
-            'jenis_ttd' => $pengajuan->jenis_ttd ?? 'manual',
-            'ttd_path' => $ttdPath,
-            'qr_code' => $qrCode,
-            'tracking_qr_code' => $trackingQrCode,
+            'tembusan' => $pengajuan->tembusan ?? '',
+            'biaya_items' => $biayaItems,
+            'biaya_total' => $totalBiaya,
+        ] + $this->getKepalaDesa() + [
+            'tracking_qr_code' => null,
             'tracking_number' => $pengajuan->tracking_number
-        ];
+        ] + $ttdData;
 
         // Generate PDF dengan template SPPD
         $pdf = Pdf::loadView('surat-templates.sppd', $pdfData)
@@ -556,7 +622,7 @@ class SuratController extends Controller
                 'enable-local-file-access' => true
             ]);
 
-        return $pdf->download('SPPD-' . date('Y-m-d') . '-' . $pengajuan->id . '.pdf');
+        return $pdf->stream('SPPD-' . date('Y-m-d') . '-' . $pengajuan->id . '.pdf');
     }
 
     public function handlePublicSuratOnline(Request $request)
@@ -588,12 +654,29 @@ class SuratController extends Controller
                     return $this->handleSuratDomisili($request);
                 case 'surat_kematian':
                     return $this->handleSuratKematian($request);
-                case 'surat_menikah':
+                case 'ket_menikah':
                     return $this->handleSuratMenikah($request);
-                case 'surat_miskin':
+                case 'ket_miskin_dtks':
                     return $this->handleSuratMiskin($request);
-                case 'surat_penghasilan_ortu':
+                case 'ket_penghasilan_ortu':
                     return $this->handleSuratPenghasilanOrtu($request);
+                case 'ket_usaha':
+                    return $this->handleSuratUsaha($request);
+                case 'surat_penduduk_desa':
+                    return $this->handleSuratPendudukDesa($request);
+                case 'izin_keramaian':
+                case 'pengantar_akta_kelahiran':
+                case 'pengantar_kk':
+                case 'pengantar_nikah':
+                    return $this->handlePengantarNikah($request);
+                case 'surat_hibah':
+                case 'perjanjian_perdamaian':
+                case 'sppd':
+                case 'surat_tidak_mampu':
+                case 'surat_undangan':
+                    return $this->handleGenericSurat($request, $request->jenis_surat);
+                case 'surat_pindah':
+                    return $this->handleSuratPindah($request);
                 default:
                     return response()->json([
                         'success' => false,
@@ -668,8 +751,25 @@ class SuratController extends Controller
     private function handleSuratBersihDiri(Request $request)
     {
         $request->validate([
+            // Data Ayah
+            'nama_ayah' => 'required|string',
+            'umur_ayah' => 'required|integer',
+            'agama_ayah' => 'required|string',
+            'pekerjaan_ayah' => 'required|string',
+            'alamat_ayah' => 'required|string',
+            // Data Ibu
+            'nama_ibu' => 'required|string',
+            'umur_ibu' => 'required|integer',
+            'agama_ibu' => 'required|string',
+            'pekerjaan_ibu' => 'required|string',
+            'alamat_ibu' => 'required|string',
+            // Data Anak (optional, bisa dari user login)
+            'tempat_lahir' => 'nullable|string',
+            'tanggal_lahir' => 'nullable|date',
+            'kebangsaan' => 'nullable|string',
+            'agama' => 'nullable|string',
+            'pekerjaan' => 'nullable|string',
             'keperluan' => 'required|string',
-            'keterangan_tambahan' => 'nullable|string',
             'lampiran' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120'
         ]);
 
@@ -689,8 +789,25 @@ class SuratController extends Controller
             'alamat' => ($user->alamat ?? '-') . ($user->rt_rw ? ', RT/RW ' . $user->rt_rw : '') . ($user->dusun ? ', Dusun ' . $user->dusun : ''),
             'jenis_surat' => 'surat_bersih_diri',
             'data_surat' => [
-                'keperluan' => $request->keperluan,
-                'keterangan_tambahan' => $request->keterangan_tambahan
+                // Data Ayah
+                'nama_ayah' => $request->nama_ayah,
+                'umur_ayah' => $request->umur_ayah,
+                'agama_ayah' => $request->agama_ayah,
+                'pekerjaan_ayah' => $request->pekerjaan_ayah,
+                'alamat_ayah' => $request->alamat_ayah,
+                // Data Ibu
+                'nama_ibu' => $request->nama_ibu,
+                'umur_ibu' => $request->umur_ibu,
+                'agama_ibu' => $request->agama_ibu,
+                'pekerjaan_ibu' => $request->pekerjaan_ibu,
+                'alamat_ibu' => $request->alamat_ibu,
+                // Data Anak - ambil dari user login jika tidak diisi
+                'tempat_lahir' => $request->tempat_lahir ?? $user->tempat_lahir ?? '-',
+                'tanggal_lahir' => $request->tanggal_lahir ?? ($user->tanggal_lahir ? $user->tanggal_lahir->format('Y-m-d') : '-'),
+                'kebangsaan' => $request->kebangsaan ?? 'Indonesia',
+                'agama' => $request->agama ?? $user->agama ?? '-',
+                'pekerjaan' => $request->pekerjaan ?? $user->mata_pencaharian ?? '-',
+                'keperluan' => $request->keperluan
             ],
             'keperluan' => $request->keperluan,
             'lampiran' => $lampiranPath,
@@ -718,7 +835,12 @@ class SuratController extends Controller
             'tanggal_berangkat' => 'required|date',
             'tanggal_kembali' => 'required|date|after_or_equal:tanggal_berangkat',
             'transportasi' => 'required|string',
-            'keterangan_tambahan' => 'nullable|string'
+            'keterangan_tambahan' => 'nullable|string',
+            // Rincian biaya perjalanan dinas (opsional, bisa lebih dari 4 baris)
+            'biaya' => 'nullable|array',
+            'biaya.*.uraian' => 'required_with:biaya|string|max:255',
+            'biaya.*.jumlah' => 'required_with:biaya|numeric|min:0',
+            'biaya.*.ket' => 'nullable|string|max:255',
         ]);
 
         $user = Auth::user();
@@ -730,14 +852,15 @@ class SuratController extends Controller
             'no_hp' => $user->no_hp,
             'alamat' => $user->alamat . ($user->rt_rw ? ', RT/RW ' . $user->rt_rw : '') . ($user->dusun ? ', Dusun ' . $user->dusun : ''),
             'jenis_surat' => 'sppd',
-            'data_surat' => [
+'data_surat' => [
                 'personel' => $request->personel,
                 'tujuan' => $request->tujuan,
                 'keperluan' => $request->keperluan,
                 'tanggal_berangkat' => $request->tanggal_berangkat,
                 'tanggal_kembali' => $request->tanggal_kembali,
                 'transportasi' => $request->transportasi,
-                'keterangan_tambahan' => $request->keterangan_tambahan
+                'keterangan_tambahan' => $request->keterangan_tambahan,
+                'biaya' => $request->biaya ?? [],
             ],
             'keperluan' => $request->keperluan,
             'lampiran' => null, // SPPD tidak memerlukan lampiran
@@ -757,15 +880,40 @@ class SuratController extends Controller
     /**
      * Verify surat using QR code tracking number
      */
-    public function verifySurat($trackingNumber)
+    public function verifySurat(Request $request, $trackingNumber)
     {
-        $pengajuan = PengajuanSurat::where('id', function($query) use ($trackingNumber) {
-            // Extract ID from tracking number format (SRT-YYYY-MM-XXXXX)
+        // Validate signature - hanya bisa akses lewat QR code
+        $signature = $request->query('sig');
+        if (!$signature) {
+            return view('verification.result', [
+                'success' => false,
+                'message' => 'Akses tidak valid. Silakan scan QR code pada surat untuk verifikasi.',
+                'trackingNumber' => $trackingNumber
+            ]);
+        }
+        
+        $qrService = new \App\Services\QrCodeService();
+        if (!$qrService->verifySignature($trackingNumber, $signature)) {
+            return view('verification.result', [
+                'success' => false,
+                'message' => 'Signature tidak valid. Pastikan Anda mengakses melalui QR code yang tertera pada surat.',
+                'trackingNumber' => $trackingNumber
+            ]);
+        }
+        
+        // Try to find by tracking_number column first
+        $pengajuan = PengajuanSurat::where('tracking_number', $trackingNumber)->first();
+        
+        // If not found, try to extract ID from old format (SRT-YYYY-MM-XXXXX)
+        if (!$pengajuan) {
             if (preg_match('/SRT-\d{4}-\d{2}-(\d+)/', $trackingNumber, $matches)) {
-                return $query->whereRaw('LPAD(id, 5, "0") = ?', [$matches[1]]);
+                $pengajuan = PengajuanSurat::find((int)$matches[1]);
             }
-            return $query->where('id', 0); // No match
-        })->first();
+            // Try new format TRK000001YYYYMMDD
+            elseif (preg_match('/TRK(\d{6})\d{8}/', $trackingNumber, $matches)) {
+                $pengajuan = PengajuanSurat::find((int)$matches[1]);
+            }
+        }
 
         if (!$pengajuan) {
             return view('verification.result', [
@@ -775,6 +923,13 @@ class SuratController extends Controller
             ]);
         }
 
+        // Get TTD image path
+        $ttdImagePath = public_path('assets/images/ttd.png');
+        $ttdBase64 = null;
+        if (file_exists($ttdImagePath)) {
+            $ttdBase64 = 'data:image/png;base64,' . base64_encode(file_get_contents($ttdImagePath));
+        }
+
         return view('verification.result', [
             'success' => true,
             'message' => 'Surat terverifikasi dengan valid.',
@@ -782,10 +937,14 @@ class SuratController extends Controller
             'pengajuan' => $pengajuan,
             'data' => [
                 'nama' => $pengajuan->nama_lengkap,
+                'nik' => $pengajuan->nik ?? '-',
                 'jenis_surat' => $pengajuan->jenis_surat,
                 'status' => $pengajuan->status,
-                'tanggal' => $pengajuan->created_at->format('d F Y'),
-                'waktu' => $pengajuan->created_at->format('H:i:s')
+                'tanggal_pengajuan' => $pengajuan->created_at->translatedFormat('d F Y'),
+                'tanggal_disetujui' => $pengajuan->approved_at ? \Carbon\Carbon::parse($pengajuan->approved_at)->format('d F Y H:i') : '-',
+                'waktu' => $pengajuan->created_at->format('H:i:s'),
+                'kepala_desa' => 'Zultan Alhara',
+                'ttd_base64' => $ttdBase64
             ]
         ]);
     }
@@ -815,17 +974,18 @@ class SuratController extends Controller
 
             // Create pengajuan surat
             $pengajuan = PengajuanSurat::create([
-                'nama_lengkap' => $user->name,
+                'nama_lengkap' => $user->nama_lengkap ?? $user->name,
+                'nik' => $user->nik ?? '',
                 'email' => $user->email,
-                'no_telepon' => $user->phone ?? $user->no_telepon ?? '',
-                'alamat' => $user->address ?? $user->alamat ?? '',
+                'no_telepon' => $user->no_hp ?? $user->phone ?? $user->no_telepon ?? '',
+                'alamat' => $user->alamat ?? $user->address ?? '',
                 'jenis_surat' => 'izin_keramaian',
                 'keperluan' => $request->keperluan_acara,
-                'lampiran_path' => $lampiranPath,
+                'lampiran' => $lampiranPath,
                 'data_surat' => [
                     'keperluan_acara' => $request->keperluan_acara,
                 ],
-                'status' => 'pending',
+                'status' => 'Diajukan',
                 'tracking_number' => $trackingNumber,
                 'user_id' => $user->id,
             ]);
@@ -856,7 +1016,7 @@ class SuratController extends Controller
         $nomorSurat = $pengajuan->no_surat ?: ('166/170505/05/05/SIK/' . date('m') . '/' . date('Y'));
 
         // Calculate age dari tanggal lahir user
-        $umur = 'N/A';
+        $umur = '-';
         if ($user && $user->tanggal_lahir) {
             $umur = \Carbon\Carbon::parse($user->tanggal_lahir)->age;
         }
@@ -872,28 +1032,48 @@ class SuratController extends Controller
         // Prepare TTD data based on jenis_ttd
         $ttdData = [];
         if ($pengajuan->jenis_ttd === 'qrcode') {
-            // Use QR Code TTD
+            // Use QR Code TTD - QR code yang berisi gambar TTD
+            $qrTtdBase64 = $pengajuan->data_surat['qr_ttd_base64'] ?? null;
+
+            // Jika QR code TTD belum ada, generate sekarang
+            if (!$qrTtdBase64) {
+                try {
+                    $qrCodeService = new \App\Services\QrCodeService();
+                    $qrTtdBase64 = $qrCodeService->generateSuratQrCode($pengajuan);
+                } catch (\Exception $e) {
+                    \Log::error('Failed to generate QR TTD: ' . $e->getMessage());
+                    $qrTtdBase64 = null;
+                }
+            }
+
             $ttdData = [
                 'jenis_ttd' => 'qrcode',
-                'qr_ttd_base64' => $pengajuan->data_surat['qr_ttd_base64'] ?? null,
+                'qr_ttd_base64' => $qrTtdBase64,
+                'verification_url' => $pengajuan->data_surat['verification_url'] ?? null
             ];
-        } else {
-            // Use regular TTD
+        } elseif ($pengajuan->jenis_ttd === 'gambar') {
+            // Use regular TTD - gambar TTD langsung
             $ttdData = [
                 'jenis_ttd' => 'gambar',
+                'ttd_base64' => file_exists(public_path('assets/images/ttd.png')) ? base64_encode(file_get_contents(public_path('assets/images/ttd.png'))) : null
+            ];
+        } else {
+            // Manual TTD - tidak ada gambar atau QR code
+            $ttdData = [
+                'jenis_ttd' => 'manual'
             ];
         }
 
         // Prepare data for PDF
         $pdfData = [
             'nomor_surat' => $nomorSurat,
-            'tanggal_surat' => now()->format('d F Y'),
-            'kepala_desa_nama' => 'Zultan Alhara',
+            'tanggal_surat' => now()->translatedFormat('d F Y'),
+        ] + $this->getKepalaDesa() + [
             'nama_pemohon' => $pengajuan->nama_lengkap ?? '-',
-            'nik_pemohon' => $user->nik ?? 'N/A',
+            'nik_pemohon' => $user->nik ?? '-',
             'umur_pemohon' => $umur,
             'alamat_pemohon' => $pengajuan->alamat ?? 'Desa Ketapang Baru, Kecamatan Semidang Alas Maras, Kabupaten Seluma',
-            'keperluan_acara' => $data['keperluan_acara'] ?? '',
+            'keperluan_acara' => $data['keperluan_acara'] ?? $pengajuan->keperluan ?? '',
             'tracking_number' => $pengajuan->tracking_number,
             'tracking_qr_code' => $trackingQrCode,
             'tembusan' => $pengajuan->tembusan ?? []
@@ -910,7 +1090,7 @@ class SuratController extends Controller
                 'enable-local-file-access' => true
             ]);
 
-        return $pdf->download('Surat-Izin-Keramaian-' . $pengajuan->nama_lengkap . '.pdf');
+        return $pdf->stream('Surat-Izin-Keramaian-' . $pengajuan->nama_lengkap . '.pdf');
     }
 
     public function handleSuratKeteranganBelumMenikah(Request $request)
@@ -944,11 +1124,11 @@ class SuratController extends Controller
                 'alamat' => $user->alamat ?? $user->address ?? '',
                 'jenis_surat' => 'ket_belum_menikah',
                 'keperluan' => $request->keperluan,
-                'lampiran_path' => $lampiranPath,
+                'lampiran' => $lampiranPath,
                 'data_surat' => [
                     'keperluan' => $request->keperluan,
                 ],
-                'status' => 'pending',
+                'status' => 'Diajukan',
                 'tracking_number' => $trackingNumber,
                 'user_id' => $user->id,
             ]);
@@ -989,44 +1169,65 @@ class SuratController extends Controller
         // Prepare TTD data based on jenis_ttd
         $ttdData = [];
         if ($pengajuan->jenis_ttd === 'qrcode') {
-            // Use QR Code TTD
+            // Use QR Code TTD - QR code yang berisi gambar TTD
+            $qrTtdBase64 = $pengajuan->data_surat['qr_ttd_base64'] ?? null;
+
+            // Jika QR code TTD belum ada, generate sekarang
+            if (!$qrTtdBase64) {
+                try {
+                    $qrCodeService = new \App\Services\QrCodeService();
+                    $qrTtdBase64 = $qrCodeService->generateSuratQrCode($pengajuan);
+                } catch (\Exception $e) {
+                    \Log::error('Failed to generate QR TTD: ' . $e->getMessage());
+                    $qrTtdBase64 = null;
+                }
+            }
+
             $ttdData = [
                 'jenis_ttd' => 'qrcode',
-                'qr_ttd_base64' => $pengajuan->data_surat['qr_ttd_base64'] ?? null,
+                'qr_ttd_base64' => $qrTtdBase64,
+                'verification_url' => $pengajuan->data_surat['verification_url'] ?? null
             ];
-        } else {
-            // Use regular TTD
+        } elseif ($pengajuan->jenis_ttd === 'gambar') {
+            // Use regular TTD - gambar TTD langsung
             $ttdData = [
                 'jenis_ttd' => 'gambar',
+                'ttd_base64' => file_exists(public_path('assets/images/ttd.png')) ? base64_encode(file_get_contents(public_path('assets/images/ttd.png'))) : null
+            ];
+        } else {
+            // Manual TTD - tidak ada gambar atau QR code
+            $ttdData = [
+                'jenis_ttd' => 'manual'
             ];
         }
 
         // Format jenis kelamin
-        $jenisKelamin = 'N/A';
+        $jenisKelamin = '-';
         if ($user && $user->jenis_kelamin) {
             $jenisKelamin = ($user->jenis_kelamin === 'L' || $user->jenis_kelamin === 'Laki-laki') ? 'Laki - Laki' : 'Perempuan';
         }
 
         // Format tanggal lahir
-        $tanggalLahir = 'N/A';
+        $tanggalLahir = '-';
         if ($user && $user->tanggal_lahir) {
-            $tanggalLahir = \Carbon\Carbon::parse($user->tanggal_lahir)->format('d F Y');
+            $tanggalLahir = \Carbon\Carbon::parse($user->tanggal_lahir)->translatedFormat('d F Y');
         }
 
         // Prepare data for PDF
         $pdfData = [
             'nomor_surat' => $nomorSurat,
-            'tanggal_surat' => now()->format('d F Y'),
-            'kepala_desa_nama' => 'Zultan Alhara',
+            'tanggal_surat' => now()->translatedFormat('d F Y'),
+        ] + $this->getKepalaDesa() + [
             'nama_pemohon' => $user->nama_lengkap ?? $pengajuan->nama_lengkap,
-            'nik_pemohon' => $user->nik ?? 'N/A',
-            'tempat_lahir' => $user->tempat_lahir ?? 'N/A',
+            'nik_pemohon' => $user->nik ?? '-',
+            'tempat_lahir' => $user->tempat_lahir ?? '-',
             'tanggal_lahir' => $tanggalLahir,
             'jenis_kelamin' => $jenisKelamin,
-            'agama' => $user->agama ?? 'N/A',
-            'pekerjaan' => $user->pekerjaan ?? 'N/A',
+            'agama' => $user->agama ?? '-',
+            'pekerjaan' => $user->pekerjaan ?? $user->mata_pencaharian ?? '-',
+            'status_perkawinan' => $user->status_perkawinan ?? 'Belum Menikah',
             'alamat' => $user->alamat ?? $pengajuan->alamat ?? 'Ketapang Baru, Kecamatan Semidang Alas Maras, Kabupaten Seluma.',
-            'keperluan' => $data['keperluan'] ?? '',
+            'keperluan' => $pengajuan->keperluan ?? $data['keperluan'] ?? '',
             'tracking_number' => $pengajuan->tracking_number,
             'tracking_qr_code' => $trackingQrCode,
             'tembusan' => $pengajuan->tembusan ?? []
@@ -1043,7 +1244,7 @@ class SuratController extends Controller
                 'enable-local-file-access' => true
             ]);
 
-        return $pdf->download('Surat-Keterangan-Belum-Menikah-' . $pengajuan->nama_lengkap . '.pdf');
+        return $pdf->stream('Surat-Keterangan-Belum-Menikah-' . $pengajuan->nama_lengkap . '.pdf');
     }
 
     public function handleSuratBerkelakuanBaik(Request $request)
@@ -1078,7 +1279,7 @@ class SuratController extends Controller
                 'jenis_surat' => 'surat_berkelakuan_baik',
                 'keperluan' => $request->keperluan,
                 'lampiran' => $lampiranPath,
-                'status' => 'pending',
+                'status' => 'Diajukan',
                 'tracking_number' => $trackingNumber,
                 'user_id' => $user->id,
             ]);
@@ -1131,7 +1332,7 @@ class SuratController extends Controller
                 'jenis_surat' => 'surat_domisili',
                 'keperluan' => $request->keperluan,
                 'lampiran' => $lampiranPath,
-                'status' => 'pending',
+                'status' => 'Diajukan',
                 'tracking_number' => $trackingNumber,
                 'user_id' => $user->id,
             ]);
@@ -1145,6 +1346,190 @@ class SuratController extends Controller
 
         } catch (\Exception $e) {
             Log::error('Error in handleSuratDomisili: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan sistem. Silakan coba lagi.'
+            ], 500);
+        }
+    }
+
+    public function handleSuratPindah(Request $request)
+    {
+        // Validasi data request
+        $request->validate([
+            'alasan_pindah' => 'required|string',
+            'tanggal_pindah' => 'required|date',
+            'alamat_tujuan' => 'required|string',
+            'jenis_pindah' => 'required|string',
+            'keperluan' => 'nullable|string',
+            'nama_camat' => 'nullable|string',
+            'nip_camat' => 'nullable|string',
+            'pengikut' => 'nullable|array',
+            'lampiran' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
+        ]);
+
+        try {
+            // Handle file upload
+            $lampiranPath = null;
+            if ($request->hasFile('lampiran')) {
+                $file = $request->file('lampiran');
+                $fileName = time() . '_' . $file->getClientOriginalName();
+                $lampiranPath = $file->storeAs('lampiran', $fileName, 'public');
+            }
+
+            // Generate tracking number
+            $trackingNumber = 'TRK' . strtoupper(uniqid());
+
+            // Get authenticated user
+            $user = $request->user();
+
+            // Build data_surat
+            $dataSurat = [
+                'alasan_pindah' => $request->alasan_pindah,
+                'tanggal_pindah' => $request->tanggal_pindah,
+                'alamat_tujuan' => $request->alamat_tujuan,
+                'jenis_pindah' => $request->jenis_pindah,
+                'keperluan' => $request->keperluan,
+                'nama_camat' => $request->nama_camat,
+                'nip_camat' => $request->nip_camat,
+                'pengikut' => $request->pengikut ?? [],
+            ];
+
+            // Create pengajuan surat
+            $pengajuan = PengajuanSurat::create([
+                'nama_lengkap' => $user->nama_lengkap ?? $user->name,
+                'email' => $user->email,
+                'no_telepon' => $user->no_hp ?? $user->phone ?? '',
+                'alamat' => $user->alamat ?? $user->address ?? '',
+                'jenis_surat' => 'surat_pindah',
+                'keperluan' => $request->keperluan ?? 'Untuk keperluan administrasi kependudukan',
+                'lampiran' => $lampiranPath,
+                'status' => 'Diajukan',
+                'tracking_number' => $trackingNumber,
+                'user_id' => $user->id,
+                'data_surat' => $dataSurat,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Pengajuan Surat Keterangan Pindah berhasil disubmit!',
+                'tracking_number' => $trackingNumber,
+                'pengajuan_id' => $pengajuan->id
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error in handleSuratPindah: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan sistem. Silakan coba lagi.'
+            ], 500);
+        }
+    }
+
+    public function handleSuratUsaha(Request $request)
+    {
+        // Validasi data request
+        $request->validate([
+            'nama_usaha' => 'required|string|max:255',
+            'jenis_usaha' => 'required|string|max:255',
+            'lampiran' => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120',
+        ]);
+
+        try {
+            // Handle file upload
+            $lampiranPath = null;
+            if ($request->hasFile('lampiran')) {
+                $file = $request->file('lampiran');
+                $fileName = time() . '_' . $file->getClientOriginalName();
+                $lampiranPath = $file->storeAs('lampiran', $fileName, 'public');
+            }
+
+            // Generate tracking number
+            $trackingNumber = 'TRK' . strtoupper(uniqid());
+
+            // Get authenticated user
+            $user = $request->user();
+
+            // Create pengajuan surat
+            $pengajuan = PengajuanSurat::create([
+                'nama_lengkap' => $user->nama_lengkap ?? $user->name,
+                'email' => $user->email,
+                'no_telepon' => $user->no_hp ?? $user->phone ?? '',
+                'alamat' => $user->alamat ?? $user->address ?? '',
+                'jenis_surat' => 'ket_usaha',
+                'keperluan' => 'Pengajuan Surat Keterangan Usaha - ' . $request->nama_usaha,
+                'lampiran' => $lampiranPath,
+                'status' => 'Diajukan',
+                'tracking_number' => $trackingNumber,
+                'user_id' => $user->id,
+                'data_surat' => [
+                    'nama_usaha' => $request->nama_usaha,
+                    'jenis_usaha' => $request->jenis_usaha,
+                ],
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Pengajuan Surat Keterangan Usaha berhasil disubmit!',
+                'tracking_number' => $trackingNumber,
+                'pengajuan_id' => $pengajuan->id
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error in handleSuratUsaha: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan sistem. Silakan coba lagi.'
+            ], 500);
+        }
+    }
+
+    public function handleSuratPendudukDesa(Request $request)
+    {
+        // Validasi data request
+        $request->validate([
+            'keperluan' => 'required|string|max:1000',
+            'lampiran' => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120',
+        ]);
+
+        try {
+            // Handle file upload
+            $lampiranPath = null;
+            if ($request->hasFile('lampiran')) {
+                $file = $request->file('lampiran');
+                $fileName = time() . '_' . $file->getClientOriginalName();
+                $lampiranPath = $file->storeAs('lampiran', $fileName, 'public');
+            }
+
+            // Generate tracking number
+            $trackingNumber = 'TRK' . strtoupper(uniqid());
+
+            // Get authenticated user
+            $user = $request->user();
+
+            // Create pengajuan surat
+            $pengajuan = PengajuanSurat::create([
+                'nama_lengkap' => $user->nama_lengkap ?? $user->name,
+                'email' => $user->email,
+                'no_telepon' => $user->no_hp ?? $user->phone ?? '',
+                'alamat' => $user->alamat ?? $user->address ?? '',
+                'jenis_surat' => 'surat_penduduk_desa',
+                'keperluan' => $request->keperluan,
+                'lampiran' => $lampiranPath,
+                'status' => 'Diajukan',
+                'tracking_number' => $trackingNumber,
+                'user_id' => $user->id,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Pengajuan Surat Keterangan Penduduk Desa berhasil disubmit!',
+                'tracking_number' => $trackingNumber,
+                'pengajuan_id' => $pengajuan->id
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error in handleSuratPendudukDesa: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Terjadi kesalahan sistem. Silakan coba lagi.'
@@ -1172,44 +1557,64 @@ class SuratController extends Controller
         // Prepare TTD data based on jenis_ttd
         $ttdData = [];
         if ($pengajuan->jenis_ttd === 'qrcode') {
-            // Use QR Code TTD
+            // Use QR Code TTD - QR code yang berisi gambar TTD
+            $qrTtdBase64 = $pengajuan->data_surat['qr_ttd_base64'] ?? null;
+
+            // Jika QR code TTD belum ada, generate sekarang
+            if (!$qrTtdBase64) {
+                try {
+                    $qrCodeService = new \App\Services\QrCodeService();
+                    $qrTtdBase64 = $qrCodeService->generateSuratQrCode($pengajuan);
+                } catch (\Exception $e) {
+                    \Log::error('Failed to generate QR TTD: ' . $e->getMessage());
+                    $qrTtdBase64 = null;
+                }
+            }
+
             $ttdData = [
                 'jenis_ttd' => 'qrcode',
-                'qr_ttd_base64' => $pengajuan->data_surat['qr_ttd_base64'] ?? null,
+                'qr_ttd_base64' => $qrTtdBase64,
+                'verification_url' => $pengajuan->data_surat['verification_url'] ?? null
             ];
-        } else {
-            // Use regular TTD
+        } elseif ($pengajuan->jenis_ttd === 'gambar') {
+            // Use regular TTD - gambar TTD langsung
             $ttdData = [
                 'jenis_ttd' => 'gambar',
+                'ttd_base64' => file_exists(public_path('assets/images/ttd.png')) ? base64_encode(file_get_contents(public_path('assets/images/ttd.png'))) : null
+            ];
+        } else {
+            // Manual TTD - tidak ada gambar atau QR code
+            $ttdData = [
+                'jenis_ttd' => 'manual'
             ];
         }
 
         // Format jenis kelamin
-        $jenisKelamin = 'N/A';
+        $jenisKelamin = '-';
         if ($user && $user->jenis_kelamin) {
             $jenisKelamin = ($user->jenis_kelamin === 'L' || $user->jenis_kelamin === 'Laki-laki') ? 'Laki-laki' : 'Perempuan';
         }
 
         // Format tanggal lahir
-        $tanggalLahir = 'N/A';
+        $tanggalLahir = '-';
         if ($user && $user->tanggal_lahir) {
-            $tanggalLahir = \Carbon\Carbon::parse($user->tanggal_lahir)->format('d F Y');
+            $tanggalLahir = \Carbon\Carbon::parse($user->tanggal_lahir)->translatedFormat('d F Y');
         }
 
         // Prepare data for PDF
         $pdfData = [
             'nomor_surat' => $nomorSurat,
-            'tanggal_surat' => now()->format('d F Y'),
-            'kepala_desa_nama' => 'Zultan Alhara',
+            'tanggal_surat' => now()->translatedFormat('d F Y'),
+        ] + $this->getKepalaDesa() + [
             'nama_pemohon' => $user->nama_lengkap ?? $pengajuan->nama_lengkap,
-            'nik_pemohon' => $user->nik ?? 'N/A',
-            'tempat_lahir' => $user->tempat_lahir ?? 'N/A',
+            'nik_pemohon' => $user->nik ?? '-',
+            'tempat_lahir' => $user->tempat_lahir ?? '-',
             'tanggal_lahir' => $tanggalLahir,
             'jenis_kelamin' => $jenisKelamin,
-            'agama' => $user->agama ?? 'N/A',
-            'pekerjaan' => $user->pekerjaan ?? 'N/A',
+            'agama' => $user->agama ?? '-',
+            'pekerjaan' => $user->pekerjaan ?? '-',
             'alamat' => $user->alamat ?? $pengajuan->alamat ?? 'Ketapang Baru, Kecamatan Semidang Alas Maras, Kabupaten Seluma.',
-            'keperluan' => $data['keperluan'] ?? '',
+            'keperluan' => $pengajuan->keperluan ?? $data['keperluan'] ?? '',
             'tracking_number' => $pengajuan->tracking_number,
             'tracking_qr_code' => $trackingQrCode,
             'tembusan' => $pengajuan->tembusan ?? []
@@ -1226,7 +1631,7 @@ class SuratController extends Controller
                 'enable-local-file-access' => true
             ]);
 
-        return $pdf->download('Surat-Keterangan-Berkelakuan-Baik-' . $pengajuan->nama_lengkap . '.pdf');
+        return $pdf->stream('Surat-Keterangan-Berkelakuan-Baik-' . $pengajuan->nama_lengkap . '.pdf');
     }
 
     public function generatePDFDomisili($pengajuanId)
@@ -1249,45 +1654,65 @@ class SuratController extends Controller
         // Prepare TTD data based on jenis_ttd
         $ttdData = [];
         if ($pengajuan->jenis_ttd === 'qrcode') {
-            // Use QR Code TTD
+            // Use QR Code TTD - QR code yang berisi gambar TTD
+            $qrTtdBase64 = $pengajuan->data_surat['qr_ttd_base64'] ?? null;
+
+            // Jika QR code TTD belum ada, generate sekarang
+            if (!$qrTtdBase64) {
+                try {
+                    $qrCodeService = new \App\Services\QrCodeService();
+                    $qrTtdBase64 = $qrCodeService->generateSuratQrCode($pengajuan);
+                } catch (\Exception $e) {
+                    \Log::error('Failed to generate QR TTD: ' . $e->getMessage());
+                    $qrTtdBase64 = null;
+                }
+            }
+
             $ttdData = [
                 'jenis_ttd' => 'qrcode',
-                'qr_ttd_base64' => $pengajuan->data_surat['qr_ttd_base64'] ?? null,
+                'qr_ttd_base64' => $qrTtdBase64,
+                'verification_url' => $pengajuan->data_surat['verification_url'] ?? null
             ];
-        } else {
-            // Use regular TTD
+        } elseif ($pengajuan->jenis_ttd === 'gambar') {
+            // Use regular TTD - gambar TTD langsung
             $ttdData = [
                 'jenis_ttd' => 'gambar',
+                'ttd_base64' => file_exists(public_path('assets/images/ttd.png')) ? base64_encode(file_get_contents(public_path('assets/images/ttd.png'))) : null
+            ];
+        } else {
+            // Manual TTD - tidak ada gambar atau QR code
+            $ttdData = [
+                'jenis_ttd' => 'manual'
             ];
         }
 
         // Format jenis kelamin
-        $jenisKelamin = 'N/A';
+        $jenisKelamin = '-';
         if ($user && $user->jenis_kelamin) {
             $jenisKelamin = ($user->jenis_kelamin === 'L' || $user->jenis_kelamin === 'Laki-laki') ? 'Laki-laki' : 'Perempuan';
         }
 
         // Format tanggal lahir
-        $tanggalLahir = 'N/A';
+        $tanggalLahir = '-';
         if ($user && $user->tanggal_lahir) {
-            $tanggalLahir = \Carbon\Carbon::parse($user->tanggal_lahir)->format('d F Y');
+            $tanggalLahir = \Carbon\Carbon::parse($user->tanggal_lahir)->translatedFormat('d F Y');
         }
 
         // Prepare data for PDF
         $pdfData = [
             'nomor_surat' => $nomorSurat,
-            'tanggal_surat' => now()->format('d F Y'),
-            'kepala_desa_nama' => 'Zultan Alhara',
+            'tanggal_surat' => now()->translatedFormat('d F Y'),
+        ] + $this->getKepalaDesa() + [
             'nama_pemohon' => $user->nama_lengkap ?? $pengajuan->nama_lengkap,
-            'nik_pemohon' => $user->nik ?? 'N/A',
-            'tempat_lahir' => $user->tempat_lahir ?? 'N/A',
+            'nik_pemohon' => $user->nik ?? '-',
+            'tempat_lahir' => $user->tempat_lahir ?? '-',
             'tanggal_lahir' => $tanggalLahir,
             'jenis_kelamin' => $jenisKelamin,
-            'agama' => $user->agama ?? 'N/A',
+            'agama' => $user->agama ?? '-',
             'status_perkawinan' => $user->status_perkawinan ?? 'Belum Kawin',
-            'pekerjaan' => $user->pekerjaan ?? 'N/A',
+            'pekerjaan' => $user->pekerjaan ?? '-',
             'alamat' => $user->alamat ?? $pengajuan->alamat ?? 'Karang Dapo, Kecamatan Semidang Alas Maras, Kabupaten Seluma.',
-            'keperluan' => $data['keperluan'] ?? '',
+            'keperluan' => $pengajuan->keperluan ?? $data['keperluan'] ?? '',
             'tracking_number' => $pengajuan->tracking_number,
             'tracking_qr_code' => $trackingQrCode,
             'tembusan' => $pengajuan->tembusan ?? []
@@ -1304,7 +1729,7 @@ class SuratController extends Controller
                 'enable-local-file-access' => true
             ]);
 
-        return $pdf->download('Surat-Keterangan-Domisili-' . $pengajuan->nama_lengkap . '.pdf');
+        return $pdf->stream('Surat-Keterangan-Domisili-' . $pengajuan->nama_lengkap . '.pdf');
     }
 
     public function generatePDFUsaha($pengajuanId)
@@ -1327,50 +1752,70 @@ class SuratController extends Controller
         // Prepare TTD data based on jenis_ttd
         $ttdData = [];
         if ($pengajuan->jenis_ttd === 'qrcode') {
-            // Use QR Code TTD
+            // Use QR Code TTD - QR code yang berisi gambar TTD
+            $qrTtdBase64 = $pengajuan->data_surat['qr_ttd_base64'] ?? null;
+
+            // Jika QR code TTD belum ada, generate sekarang
+            if (!$qrTtdBase64) {
+                try {
+                    $qrCodeService = new \App\Services\QrCodeService();
+                    $qrTtdBase64 = $qrCodeService->generateSuratQrCode($pengajuan);
+                } catch (\Exception $e) {
+                    \Log::error('Failed to generate QR TTD: ' . $e->getMessage());
+                    $qrTtdBase64 = null;
+                }
+            }
+
             $ttdData = [
                 'jenis_ttd' => 'qrcode',
-                'qr_ttd_base64' => $pengajuan->data_surat['qr_ttd_base64'] ?? null,
+                'qr_ttd_base64' => $qrTtdBase64,
+                'verification_url' => $pengajuan->data_surat['verification_url'] ?? null
             ];
-        } else {
-            // Use regular TTD
+        } elseif ($pengajuan->jenis_ttd === 'gambar') {
+            // Use regular TTD - gambar TTD langsung
             $ttdData = [
                 'jenis_ttd' => 'gambar',
+                'ttd_base64' => file_exists(public_path('assets/images/ttd.png')) ? base64_encode(file_get_contents(public_path('assets/images/ttd.png'))) : null
+            ];
+        } else {
+            // Manual TTD - tidak ada gambar atau QR code
+            $ttdData = [
+                'jenis_ttd' => 'manual'
             ];
         }
 
         // Format jenis kelamin
-        $jenisKelamin = 'N/A';
+        $jenisKelamin = '-';
         if ($user && $user->jenis_kelamin) {
             $jenisKelamin = ($user->jenis_kelamin === 'L' || $user->jenis_kelamin === 'Laki-laki') ? 'Laki-laki' : 'Perempuan';
         }
 
         // Format tanggal lahir
-        $tanggalLahir = 'N/A';
+        $tanggalLahir = '-';
         if ($user && $user->tanggal_lahir) {
-            $tanggalLahir = \Carbon\Carbon::parse($user->tanggal_lahir)->format('d F Y');
+            $tanggalLahir = \Carbon\Carbon::parse($user->tanggal_lahir)->translatedFormat('d F Y');
         }
 
         // Prepare data for PDF
         $pdfData = [
             'nomor_surat' => $nomorSurat,
-            'tanggal_surat' => now()->format('d F Y'),
-            'kepala_desa_nama' => 'Zultan Alhara',
+            'tanggal_surat' => now()->translatedFormat('d F Y'),
+        ] + $this->getKepalaDesa() + [
             'nama_pemohon' => $user->nama_lengkap ?? $pengajuan->nama_lengkap,
-            'nik_pemohon' => $user->nik ?? 'N/A',
-            'tempat_lahir' => $user->tempat_lahir ?? 'N/A',
+            'nik_pemohon' => $user->nik ?? '-',
+            'tempat_lahir' => $user->tempat_lahir ?? '-',
             'tanggal_lahir' => $tanggalLahir,
             'jenis_kelamin' => $jenisKelamin,
-            'agama' => $user->agama ?? 'N/A',
-            'pekerjaan' => $user->pekerjaan ?? 'N/A',
+            'agama' => $user->agama ?? '-',
+            'pekerjaan' => $user->pekerjaan ?? '-',
             'alamat' => 'Desa Ketapang Baru, Kec. Semidang Alas Maras Kab. Seluma.',
-            'nama_usaha' => $data['nama_usaha'] ?? 'N/A',
-            'jenis_usaha' => $data['jenis_usaha'] ?? 'N/A',
-            'alamat_usaha' => $data['alamat_usaha'] ?? 'N/A',
-            'modal_usaha' => $data['modal_usaha'] ?? 'N/A',
-            'mulai_usaha' => $data['mulai_usaha'] ?? 'N/A',
+            'nama_usaha' => $data['nama_usaha'] ?? '-',
+            'jenis_usaha' => $data['jenis_usaha'] ?? '-',
+            'alamat_usaha' => $data['alamat_usaha'] ?? '-',
+            'modal_usaha' => $data['modal_usaha'] ?? '-',
+            'mulai_usaha' => $data['mulai_usaha'] ?? '-',
             'jumlah_karyawan' => $data['jumlah_karyawan'] ?? null,
-            'keperluan' => $data['keperluan'] ?? '',
+            'keperluan' => $pengajuan->keperluan ?? $data['keperluan'] ?? '',
             'tracking_number' => $pengajuan->tracking_number,
             'tracking_qr_code' => $trackingQrCode,
             'tembusan' => $pengajuan->tembusan ?? []
@@ -1387,7 +1832,7 @@ class SuratController extends Controller
                 'enable-local-file-access' => true
             ]);
 
-        return $pdf->download('Surat-Keterangan-Usaha-' . $pengajuan->nama_lengkap . '.pdf');
+        return $pdf->stream('Surat-Keterangan-Usaha-' . $pengajuan->nama_lengkap . '.pdf');
     }
 
     public function generatePDFTidakMampu($pengajuanId)
@@ -1410,47 +1855,67 @@ class SuratController extends Controller
         // Prepare TTD data based on jenis_ttd
         $ttdData = [];
         if ($pengajuan->jenis_ttd === 'qrcode') {
-            // Use QR Code TTD
+            // Use QR Code TTD - QR code yang berisi gambar TTD
+            $qrTtdBase64 = $pengajuan->data_surat['qr_ttd_base64'] ?? null;
+
+            // Jika QR code TTD belum ada, generate sekarang
+            if (!$qrTtdBase64) {
+                try {
+                    $qrCodeService = new \App\Services\QrCodeService();
+                    $qrTtdBase64 = $qrCodeService->generateSuratQrCode($pengajuan);
+                } catch (\Exception $e) {
+                    \Log::error('Failed to generate QR TTD: ' . $e->getMessage());
+                    $qrTtdBase64 = null;
+                }
+            }
+
             $ttdData = [
                 'jenis_ttd' => 'qrcode',
-                'qr_ttd_base64' => $pengajuan->data_surat['qr_ttd_base64'] ?? null,
+                'qr_ttd_base64' => $qrTtdBase64,
+                'verification_url' => $pengajuan->data_surat['verification_url'] ?? null
             ];
-        } else {
-            // Use regular TTD
+        } elseif ($pengajuan->jenis_ttd === 'gambar') {
+            // Use regular TTD - gambar TTD langsung
             $ttdData = [
                 'jenis_ttd' => 'gambar',
+                'ttd_base64' => file_exists(public_path('assets/images/ttd.png')) ? base64_encode(file_get_contents(public_path('assets/images/ttd.png'))) : null
+            ];
+        } else {
+            // Manual TTD - tidak ada gambar atau QR code
+            $ttdData = [
+                'jenis_ttd' => 'manual'
             ];
         }
 
         // Format jenis kelamin
-        $jenisKelamin = 'N/A';
+        $jenisKelamin = '-';
         if ($user && $user->jenis_kelamin) {
             $jenisKelamin = ($user->jenis_kelamin === 'L' || $user->jenis_kelamin === 'Laki-laki') ? 'Laki-laki' : 'Perempuan';
         }
 
         // Format tanggal lahir
-        $tanggalLahir = 'N/A';
+        $tanggalLahir = '-';
         if ($user && $user->tanggal_lahir) {
-            $tanggalLahir = \Carbon\Carbon::parse($user->tanggal_lahir)->format('d F Y');
+            $tanggalLahir = \Carbon\Carbon::parse($user->tanggal_lahir)->translatedFormat('d F Y');
         }
 
         // Prepare data for PDF
         $pdfData = [
             'nomor_surat' => $nomorSurat,
-            'tanggal_surat' => now()->format('d F Y'),
-            'kepala_desa_nama' => 'Zultan Alhara',
+            'tanggal_surat' => now()->translatedFormat('d F Y'),
+        ] + $this->getKepalaDesa() + [
             'nama_pemohon' => $user->nama_lengkap ?? $pengajuan->nama_lengkap,
-            'nik_pemohon' => $user->nik ?? 'N/A',
-            'tempat_lahir' => $user->tempat_lahir ?? 'N/A',
+            'nik_pemohon' => $user->nik ?? '-',
+            'tempat_lahir' => $user->tempat_lahir ?? '-',
             'tanggal_lahir' => $tanggalLahir,
             'jenis_kelamin' => $jenisKelamin,
-            'agama' => $user->agama ?? 'N/A',
+            'agama' => $user->agama ?? '-',
             'status_perkawinan' => $user->status_perkawinan ?? 'Belum Kawin',
-            'pekerjaan' => $user->pekerjaan ?? 'N/A',
+            'pekerjaan' => $user->pekerjaan ?? '-',
             'alamat' => $user->alamat ?? $pengajuan->alamat ?? 'Ketapang Baru, Kecamatan Semidang Alas Maras, Kabupaten Seluma.',
             'penghasilan_perbulan' => $data['penghasilan_perbulan'] ?? null,
             'jumlah_tanggungan' => $data['jumlah_tanggungan'] ?? null,
-            'keperluan' => $data['keperluan'] ?? '',
+            'keperluan' => $pengajuan->keperluan ?? $data['keperluan'] ?? '',
             'tracking_number' => $pengajuan->tracking_number,
             'tracking_qr_code' => $trackingQrCode,
             'tembusan' => $pengajuan->tembusan ?? []
@@ -1467,7 +1932,7 @@ class SuratController extends Controller
                 'enable-local-file-access' => true
             ]);
 
-        return $pdf->download('Surat-Keterangan-Tidak-Mampu-' . $pengajuan->nama_lengkap . '.pdf');
+        return $pdf->stream('Surat-Keterangan-Tidak-Mampu-' . $pengajuan->nama_lengkap . '.pdf');
     }
 
     public function handleSuratKematian(Request $request)
@@ -1505,7 +1970,7 @@ class SuratController extends Controller
                 'alamat' => $user->alamat ?? $user->address ?? '',
                 'jenis_surat' => 'surat_kematian',
                 'keperluan' => 'Surat Keterangan Kematian untuk ' . $request->nama_almarhum,
-                'lampiran_path' => $lampiranPath,
+                'lampiran' => $lampiranPath,
                 'data_surat' => [
                     'nama_almarhum' => $request->nama_almarhum,
                     'hari_kematian' => $request->hari_kematian,
@@ -1513,7 +1978,7 @@ class SuratController extends Controller
                     'tempat_kematian' => $request->tempat_kematian,
                     'sebab_kematian' => $request->sebab_kematian,
                 ],
-                'status' => 'pending',
+                'status' => 'Diajukan',
                 'tracking_number' => $trackingNumber,
                 'user_id' => $user->id,
             ]);
@@ -1554,62 +2019,82 @@ class SuratController extends Controller
         // Prepare TTD data based on jenis_ttd
         $ttdData = [];
         if ($pengajuan->jenis_ttd === 'qrcode') {
-            // Use QR Code TTD
+            // Use QR Code TTD - QR code yang berisi gambar TTD
+            $qrTtdBase64 = $pengajuan->data_surat['qr_ttd_base64'] ?? null;
+
+            // Jika QR code TTD belum ada, generate sekarang
+            if (!$qrTtdBase64) {
+                try {
+                    $qrCodeService = new \App\Services\QrCodeService();
+                    $qrTtdBase64 = $qrCodeService->generateSuratQrCode($pengajuan);
+                } catch (\Exception $e) {
+                    \Log::error('Failed to generate QR TTD: ' . $e->getMessage());
+                    $qrTtdBase64 = null;
+                }
+            }
+
             $ttdData = [
                 'jenis_ttd' => 'qrcode',
-                'qr_ttd_base64' => $pengajuan->data_surat['qr_ttd_base64'] ?? null,
+                'qr_ttd_base64' => $qrTtdBase64,
+                'verification_url' => $pengajuan->data_surat['verification_url'] ?? null
             ];
-        } else {
-            // Use regular TTD
+        } elseif ($pengajuan->jenis_ttd === 'gambar') {
+            // Use regular TTD - gambar TTD langsung
             $ttdData = [
                 'jenis_ttd' => 'gambar',
+                'ttd_base64' => file_exists(public_path('assets/images/ttd.png')) ? base64_encode(file_get_contents(public_path('assets/images/ttd.png'))) : null
+            ];
+        } else {
+            // Manual TTD - tidak ada gambar atau QR code
+            $ttdData = [
+                'jenis_ttd' => 'manual'
             ];
         }
 
         // Format jenis kelamin
-        $jenisKelamin = 'N/A';
+        $jenisKelamin = '-';
         if ($user && $user->jenis_kelamin) {
             $jenisKelamin = ($user->jenis_kelamin === 'L' || $user->jenis_kelamin === 'Laki-laki') ? 'Laki-Laki' : 'Perempuan';
         }
 
         // Format tanggal lahir
-        $tanggalLahir = 'N/A';
+        $tanggalLahir = '-';
         if ($user && $user->tanggal_lahir) {
-            $tanggalLahir = \Carbon\Carbon::parse($user->tanggal_lahir)->format('d F Y');
+            $tanggalLahir = \Carbon\Carbon::parse($user->tanggal_lahir)->translatedFormat('d F Y');
         }
 
         // Calculate age
-        $umur = 'N/A';
+        $umur = '-';
         if ($user && $user->tanggal_lahir) {
             $umur = \Carbon\Carbon::parse($user->tanggal_lahir)->age;
         }
 
         // Format tanggal kematian
-        $tanggalKematian = 'N/A';
+        $tanggalKematian = '-';
         if (isset($data['tanggal_kematian'])) {
-            $tanggalKematian = \Carbon\Carbon::parse($data['tanggal_kematian'])->format('d F Y');
+            $tanggalKematian = \Carbon\Carbon::parse($data['tanggal_kematian'])->translatedFormat('d F Y');
         }
 
         // Prepare data for PDF
         $pdfData = [
             'nomor_surat' => $nomorSurat,
-            'tanggal_surat' => now()->format('d F Y'),
-            'kepala_desa_nama' => 'Zultan Alhara',
+            'tanggal_surat' => now()->translatedFormat('d F Y'),
+        ] + $this->getKepalaDesa() + [
             // Data Pemohon
             'nama_pemohon' => $user->nama_lengkap ?? $pengajuan->nama_lengkap,
-            'nik_pemohon' => $user->nik ?? 'N/A',
-            'nkk_pemohon' => $user->nkk ?? 'N/A',
+            'nik_pemohon' => $user->nik ?? '-',
+            'nkk_pemohon' => $user->nkk ?? '-',
             'jenis_kelamin_pemohon' => $jenisKelamin,
-            'tempat_lahir_pemohon' => $user->tempat_lahir ?? 'N/A',
+            'tempat_lahir_pemohon' => $user->tempat_lahir ?? '-',
             'tanggal_lahir_pemohon' => $tanggalLahir,
             'umur_pemohon' => $umur,
             'alamat_pemohon' => $user->alamat ?? $pengajuan->alamat ?? 'Desa Ketapang Baru, Kec. SAM, Kab. Seluma',
             // Data Almarhum/Almarhumah
-            'nama_almarhum' => $data['nama_almarhum'] ?? 'N/A',
-            'hari_kematian' => $data['hari_kematian'] ?? 'N/A',
+            'nama_almarhum' => $data['nama_almarhum'] ?? '-',
+            'hari_kematian' => $data['hari_kematian'] ?? '-',
             'tanggal_kematian' => $tanggalKematian,
-            'tempat_kematian' => $data['tempat_kematian'] ?? 'N/A',
-            'sebab_kematian' => $data['sebab_kematian'] ?? 'N/A',
+            'tempat_kematian' => $data['tempat_kematian'] ?? '-',
+            'sebab_kematian' => $data['sebab_kematian'] ?? '-',
             // Tracking
             'tracking_number' => $pengajuan->tracking_number,
             'tracking_qr_code' => $trackingQrCode,
@@ -1627,7 +2112,7 @@ class SuratController extends Controller
                 'enable-local-file-access' => true
             ]);
 
-        return $pdf->download('Surat-Keterangan-Kematian-' . $pengajuan->nama_lengkap . '.pdf');
+        return $pdf->stream('Surat-Keterangan-Kematian-' . $pengajuan->nama_lengkap . '.pdf');
     }
 
     public function handleSuratMenikah(Request $request)
@@ -1659,13 +2144,13 @@ class SuratController extends Controller
                 'email' => $user->email,
                 'no_telepon' => $user->no_hp ?? $user->phone ?? '',
                 'alamat' => $user->alamat ?? $user->address ?? '',
-                'jenis_surat' => 'surat_menikah',
+                'jenis_surat' => 'ket_menikah',
                 'keperluan' => 'Surat Keterangan Menikah',
-                'lampiran_path' => $lampiranPath,
+                'lampiran' => $lampiranPath,
                 'data_surat' => [
                     'tanggal_menikah' => $request->tanggal_menikah,
                 ],
-                'status' => 'pending',
+                'status' => 'Diajukan',
                 'tracking_number' => $trackingNumber,
                 'user_id' => $user->id,
             ]);
@@ -1706,38 +2191,58 @@ class SuratController extends Controller
         // Prepare TTD data based on jenis_ttd
         $ttdData = [];
         if ($pengajuan->jenis_ttd === 'qrcode') {
-            // Use QR Code TTD
+            // Use QR Code TTD - QR code yang berisi gambar TTD
+            $qrTtdBase64 = $pengajuan->data_surat['qr_ttd_base64'] ?? null;
+
+            // Jika QR code TTD belum ada, generate sekarang
+            if (!$qrTtdBase64) {
+                try {
+                    $qrCodeService = new \App\Services\QrCodeService();
+                    $qrTtdBase64 = $qrCodeService->generateSuratQrCode($pengajuan);
+                } catch (\Exception $e) {
+                    \Log::error('Failed to generate QR TTD: ' . $e->getMessage());
+                    $qrTtdBase64 = null;
+                }
+            }
+
             $ttdData = [
                 'jenis_ttd' => 'qrcode',
-                'qr_ttd_base64' => $pengajuan->data_surat['qr_ttd_base64'] ?? null,
+                'qr_ttd_base64' => $qrTtdBase64,
+                'verification_url' => $pengajuan->data_surat['verification_url'] ?? null
             ];
-        } else {
-            // Use regular TTD
+        } elseif ($pengajuan->jenis_ttd === 'gambar') {
+            // Use regular TTD - gambar TTD langsung
             $ttdData = [
                 'jenis_ttd' => 'gambar',
+                'ttd_base64' => file_exists(public_path('assets/images/ttd.png')) ? base64_encode(file_get_contents(public_path('assets/images/ttd.png'))) : null
+            ];
+        } else {
+            // Manual TTD - tidak ada gambar atau QR code
+            $ttdData = [
+                'jenis_ttd' => 'manual'
             ];
         }
 
         // Format jenis kelamin
-        $jenisKelamin = 'N/A';
+        $jenisKelamin = '-';
         if ($user && $user->jenis_kelamin) {
             $jenisKelamin = ($user->jenis_kelamin === 'L' || $user->jenis_kelamin === 'Laki-laki') ? 'Laki-Laki' : 'Perempuan';
         }
 
         // Format tanggal lahir
-        $tanggalLahir = 'N/A';
+        $tanggalLahir = '-';
         if ($user && $user->tanggal_lahir) {
-            $tanggalLahir = \Carbon\Carbon::parse($user->tanggal_lahir)->format('d F Y');
+            $tanggalLahir = \Carbon\Carbon::parse($user->tanggal_lahir)->translatedFormat('d F Y');
         }
 
         // Format tanggal menikah
-        $tanggalMenikah = 'N/A';
+        $tanggalMenikah = '-';
         if (isset($data['tanggal_menikah'])) {
-            $tanggalMenikah = \Carbon\Carbon::parse($data['tanggal_menikah'])->format('d F Y');
+            $tanggalMenikah = \Carbon\Carbon::parse($data['tanggal_menikah'])->translatedFormat('d F Y');
         }
 
         // Format dusun from users table
-        $dusun = 'N/A';
+        $dusun = '-';
         if ($user && $user->dusun) {
             $dusun = $user->dusun;
         }
@@ -1745,16 +2250,16 @@ class SuratController extends Controller
         // Prepare data for PDF
         $pdfData = [
             'nomor_surat' => $nomorSurat,
-            'tanggal_surat' => now()->format('d F Y'),
-            'kepala_desa_nama' => 'Zultan Alhara',
+            'tanggal_surat' => now()->translatedFormat('d F Y'),
+        ] + $this->getKepalaDesa() + [
             // Data User dari users table
             'nama' => $user->nama_lengkap ?? $pengajuan->nama_lengkap,
-            'nik' => $user->nik ?? 'N/A',
-            'tempat_lahir' => $user->tempat_lahir ?? 'N/A',
+            'nik' => $user->nik ?? '-',
+            'tempat_lahir' => $user->tempat_lahir ?? '-',
             'tanggal_lahir' => $tanggalLahir,
             'jenis_kelamin' => $jenisKelamin,
-            'agama' => $user->agama ?? 'N/A',
-            'pekerjaan' => $user->pekerjaan ?? 'N/A',
+            'agama' => $user->agama ?? '-',
+            'pekerjaan' => $user->pekerjaan ?? '-',
             'alamat' => $user->alamat ?? $pengajuan->alamat ?? 'Desa Ketapang Baru, Kec. SAM, Kab. Seluma',
             'dusun' => $dusun,
             // Data Surat
@@ -1776,7 +2281,7 @@ class SuratController extends Controller
                 'enable-local-file-access' => true
             ]);
 
-        return $pdf->download('Surat-Keterangan-Menikah-' . $pengajuan->nama_lengkap . '.pdf');
+        return $pdf->stream('Surat-Keterangan-Menikah-' . $pengajuan->nama_lengkap . '.pdf');
     }
 
     public function handleSuratMiskin(Request $request)
@@ -1808,13 +2313,13 @@ class SuratController extends Controller
                 'email' => $user->email,
                 'no_telepon' => $user->no_hp ?? $user->phone ?? '',
                 'alamat' => $user->alamat ?? $user->address ?? '',
-                'jenis_surat' => 'surat_miskin',
+                'jenis_surat' => 'ket_miskin_dtks',
                 'keperluan' => 'Surat Keterangan Miskin DTKS untuk ' . $request->keperluan,
-                'lampiran_path' => $lampiranPath,
+                'lampiran' => $lampiranPath,
                 'data_surat' => [
                     'keperluan' => $request->keperluan,
                 ],
-                'status' => 'pending',
+                'status' => 'Diajukan',
                 'tracking_number' => $trackingNumber,
                 'user_id' => $user->id,
             ]);
@@ -1862,6 +2367,7 @@ class SuratController extends Controller
         } else {
             $ttdData = [
                 'jenis_ttd' => 'gambar',
+                'ttd_base64' => file_exists(public_path('assets/images/ttd.png')) ? base64_encode(file_get_contents(public_path('assets/images/ttd.png'))) : null
             ];
         }
 
@@ -1881,22 +2387,22 @@ class SuratController extends Controller
         }
 
         // Format jenis kelamin
-        $jenisKelamin = 'N/A';
+        $jenisKelamin = '-';
         if ($user && $user->jenis_kelamin) {
             $jenisKelamin = ($user->jenis_kelamin === 'L' || $user->jenis_kelamin === 'Laki-laki') ? 'Laki-Laki' : 'Perempuan';
         }
 
         // Format tanggal lahir
-        $tanggalLahir = 'N/A';
+        $tanggalLahir = '-';
         if ($user && $user->tanggal_lahir) {
-            $tanggalLahir = \Carbon\Carbon::parse($user->tanggal_lahir)->format('d F Y');
+            $tanggalLahir = \Carbon\Carbon::parse($user->tanggal_lahir)->translatedFormat('d F Y');
         }
 
         // Prepare data for PDF
         $pdfData = [
             'nomor_surat' => $nomorSurat,
-            'tanggal_surat' => now()->format('d F Y'),
-            'kepala_desa_nama' => 'Zultan Alhara',
+            'tanggal_surat' => now()->translatedFormat('d F Y'),
+        ] + $this->getKepalaDesa() + [
             // Data dari admin input
             'nip' => $pengajuan->nip ?? null,
             'pangkat_golongan' => $pengajuan->pangkat_golongan ?? null,
@@ -1904,9 +2410,10 @@ class SuratController extends Controller
             'nip_camat' => $pengajuan->nip_camat ?? null,
             // Data User dari users table
             'nama' => $user->nama_lengkap ?? $pengajuan->nama_lengkap,
-            'tempat_lahir' => $user->tempat_lahir ?? 'N/A',
+            'tempat_lahir' => $user->tempat_lahir ?? '-',
             'tanggal_lahir' => $tanggalLahir,
             'jenis_kelamin' => $jenisKelamin,
+            'status_perkawinan' => $user->status_perkawinan ?? 'Belum Kawin',
             'agama' => $user->agama ?? 'Islam',
             'alamat' => $user->alamat ?? $pengajuan->alamat ?? 'Ketapang Baru, Kec. Semidang Alas Maras, Kab. Seluma',
             // Data Surat
@@ -1928,7 +2435,7 @@ class SuratController extends Controller
                 'enable-local-file-access' => true
             ]);
 
-        return $pdf->download('Surat-Keterangan-Miskin-' . $pengajuan->nama_lengkap . '.pdf');
+        return $pdf->stream('Surat-Keterangan-Miskin-' . $pengajuan->nama_lengkap . '.pdf');
     }
 
     public function handleSuratPenghasilanOrtu(Request $request)
@@ -1976,9 +2483,9 @@ class SuratController extends Controller
                 'email' => $user->email,
                 'no_telepon' => $user->no_hp ?? $user->phone ?? '',
                 'alamat' => $user->alamat ?? $user->address ?? '',
-                'jenis_surat' => 'surat_penghasilan_ortu',
+                'jenis_surat' => 'ket_penghasilan_ortu',
                 'keperluan' => 'Surat Keterangan Penghasilan Orang Tua untuk Keperluan Administrasi',
-                'lampiran_path' => $lampiranPath,
+                'lampiran' => $lampiranPath,
                 'data_surat' => [
                     // Data Ayah
                     'nama_ayah' => $request->nama_ayah,
@@ -1997,7 +2504,7 @@ class SuratController extends Controller
                     'penghasilan_ibu' => $request->penghasilan_ibu,
                     'alamat_ibu' => $request->alamat_ibu,
                 ],
-                'status' => 'pending',
+                'status' => 'Diajukan',
                 'tracking_number' => $trackingNumber,
                 'user_id' => $user->id,
             ]);
@@ -2045,59 +2552,60 @@ class SuratController extends Controller
         } else {
             $ttdData = [
                 'jenis_ttd' => 'gambar',
+                'ttd_base64' => file_exists(public_path('assets/images/ttd.png')) ? base64_encode(file_get_contents(public_path('assets/images/ttd.png'))) : null
             ];
         }
 
         // Format jenis kelamin
-        $jenisKelamin = 'N/A';
+        $jenisKelamin = '-';
         if ($user && $user->jenis_kelamin) {
             $jenisKelamin = ($user->jenis_kelamin === 'L' || $user->jenis_kelamin === 'Laki-laki') ? 'Laki-Laki' : 'Perempuan';
         }
 
         // Format tanggal lahir user
-        $tanggalLahir = 'N/A';
+        $tanggalLahir = '-';
         if ($user && $user->tanggal_lahir) {
-            $tanggalLahir = \Carbon\Carbon::parse($user->tanggal_lahir)->format('d F Y');
+            $tanggalLahir = \Carbon\Carbon::parse($user->tanggal_lahir)->translatedFormat('d F Y');
         }
 
         // Format tanggal lahir ayah
-        $tanggalLahirAyah = 'N/A';
+        $tanggalLahirAyah = '-';
         if (isset($data['tanggal_lahir_ayah'])) {
-            $tanggalLahirAyah = \Carbon\Carbon::parse($data['tanggal_lahir_ayah'])->format('d F Y');
+            $tanggalLahirAyah = \Carbon\Carbon::parse($data['tanggal_lahir_ayah'])->translatedFormat('d F Y');
         }
 
         // Format tanggal lahir ibu
-        $tanggalLahirIbu = 'N/A';
+        $tanggalLahirIbu = '-';
         if (isset($data['tanggal_lahir_ibu'])) {
-            $tanggalLahirIbu = \Carbon\Carbon::parse($data['tanggal_lahir_ibu'])->format('d F Y');
+            $tanggalLahirIbu = \Carbon\Carbon::parse($data['tanggal_lahir_ibu'])->translatedFormat('d F Y');
         }
 
         // Prepare data for PDF
         $pdfData = [
             'nomor_surat' => $nomorSurat,
-            'tanggal_surat' => now()->format('d F Y'),
-            'kepala_desa_nama' => 'Zultan Alhara',
+            'tanggal_surat' => now()->translatedFormat('d F Y'),
+        ] + $this->getKepalaDesa() + [
             // Data User (Anak)
             'nama' => $user->nama_lengkap ?? $pengajuan->nama_lengkap,
-            'tempat_lahir' => $user->tempat_lahir ?? 'N/A',
+            'tempat_lahir' => $user->tempat_lahir ?? '-',
             'tanggal_lahir' => $tanggalLahir,
             'jenis_kelamin' => $jenisKelamin,
             'pekerjaan' => $user->pekerjaan ?? 'Pelajar/Mahasiswi',
             'alamat' => $user->alamat ?? $pengajuan->alamat ?? 'Desa Ketapang Baru, Kec. Semidang Alas Maras, Kab. Seluma',
             // Data Ayah
-            'nama_ayah' => $data['nama_ayah'] ?? 'N/A',
-            'tempat_lahir_ayah' => $data['tempat_lahir_ayah'] ?? 'N/A',
+            'nama_ayah' => $data['nama_ayah'] ?? '-',
+            'tempat_lahir_ayah' => $data['tempat_lahir_ayah'] ?? '-',
             'tanggal_lahir_ayah' => $tanggalLahirAyah,
             'agama_ayah' => $data['agama_ayah'] ?? 'Islam',
-            'pekerjaan_ayah' => $data['pekerjaan_ayah'] ?? 'N/A',
+            'pekerjaan_ayah' => $data['pekerjaan_ayah'] ?? '-',
             'penghasilan_ayah' => $data['penghasilan_ayah'] ?? 0,
             'alamat_ayah' => $data['alamat_ayah'] ?? 'Desa Ketapang Baru, Kec. Semidang Alas Maras, Kab. Seluma',
             // Data Ibu
-            'nama_ibu' => $data['nama_ibu'] ?? 'N/A',
-            'tempat_lahir_ibu' => $data['tempat_lahir_ibu'] ?? 'N/A',
+            'nama_ibu' => $data['nama_ibu'] ?? '-',
+            'tempat_lahir_ibu' => $data['tempat_lahir_ibu'] ?? '-',
             'tanggal_lahir_ibu' => $tanggalLahirIbu,
             'agama_ibu' => $data['agama_ibu'] ?? 'Islam',
-            'pekerjaan_ibu' => $data['pekerjaan_ibu'] ?? 'N/A',
+            'pekerjaan_ibu' => $data['pekerjaan_ibu'] ?? '-',
             'penghasilan_ibu' => $data['penghasilan_ibu'] ?? 0,
             'alamat_ibu' => $data['alamat_ibu'] ?? 'Desa Ketapang Baru, Kec. Semidang Alas Maras, Kab. Seluma',
             // Tracking
@@ -2117,7 +2625,7 @@ class SuratController extends Controller
                 'enable-local-file-access' => true
             ]);
 
-        return $pdf->download('Surat-Keterangan-Penghasilan-Orang-Tua-' . $pengajuan->nama_lengkap . '.pdf');
+        return $pdf->stream('Surat-Keterangan-Penghasilan-Orang-Tua-' . $pengajuan->nama_lengkap . '.pdf');
     }
 
     public function searchOrangTua(Request $request)
@@ -2192,7 +2700,7 @@ class SuratController extends Controller
         $pemohonNama = $data['nama'] ?? ($user->nama_lengkap ?? '-');
         $pemohonNik = $data['nik'] ?? ($user->nik ?? '-');
         $pemohonJenisKelamin = $data['jenis_kelamin'] ?? ($user->jenis_kelamin === 'L' ? 'Laki-Laki' : 'Perempuan');
-        $pemohonTempatTanggal = $data['tempat_tanggal_lahir'] ?? ($user->tempat_lahir . ', ' . ($user->tanggal_lahir ? \Carbon\Carbon::parse($user->tanggal_lahir)->format('d F Y') : '-'));
+        $pemohonTempatTanggal = $data['tempat_tanggal_lahir'] ?? ($user->tempat_lahir . ', ' . ($user->tanggal_lahir ? \Carbon\Carbon::parse($user->tanggal_lahir)->translatedFormat('d F Y') : '-'));
         $pemohonWarga = $data['warga_negara'] ?? 'Indonesia';
         $pemohonAgama = $data['agama'] ?? ($user->agama ?? '-');
         $pemohonPekerjaan = $data['pekerjaan'] ?? ($user->mata_pencaharian ?? $user->pekerjaan ?? '-');
@@ -2205,7 +2713,7 @@ class SuratController extends Controller
         $ayahNama = $data['ayah_nama'] ?? ($data['nama_ayah'] ?? '-');
         $ayahNik = $data['ayah_nik'] ?? ($data['nik_ayah'] ?? '-');
         $ayahTempatTanggal = $data['ayah_tempat_tanggal_lahir'] ?? '-';
-        $ayahWarga = $data['ayah_warga_negara'] ?? '-';
+        $ayahWarga = $data['ayah_warga_negara'] ?? 'Indonesia';
         $ayahAgama = $data['ayah_agama'] ?? '-';
         $ayahPekerjaan = $data['ayah_pekerjaan'] ?? '-';
         $ayahAlamat = $data['ayah_alamat'] ?? '-';
@@ -2219,9 +2727,44 @@ class SuratController extends Controller
         $wanitaPekerjaan = $data['wanita_pekerjaan'] ?? '-';
         $wanitaAlamat = $data['wanita_alamat'] ?? '-';
 
+        // Prepare TTD data based on jenis_ttd
+        $ttdData = [];
+        if ($pengajuan->jenis_ttd === 'qrcode') {
+            // Use QR Code TTD - QR code yang berisi gambar TTD
+            $qrTtdBase64 = $pengajuan->data_surat['qr_ttd_base64'] ?? null;
+
+            // Jika QR code TTD belum ada, generate sekarang
+            if (!$qrTtdBase64) {
+                try {
+                    $qrCodeService = new \App\Services\QrCodeService();
+                    $qrTtdBase64 = $qrCodeService->generateSuratQrCode($pengajuan);
+                } catch (\Exception $e) {
+                    \Log::error('Failed to generate QR TTD: ' . $e->getMessage());
+                    $qrTtdBase64 = null;
+                }
+            }
+
+            $ttdData = [
+                'jenis_ttd' => 'qrcode',
+                'qr_ttd_base64' => $qrTtdBase64,
+                'verification_url' => $pengajuan->data_surat['verification_url'] ?? null
+            ];
+        } elseif ($pengajuan->jenis_ttd === 'gambar') {
+            // Use regular TTD - gambar TTD langsung
+            $ttdData = [
+                'jenis_ttd' => 'gambar',
+                'ttd_base64' => file_exists(public_path('assets/images/ttd.png')) ? base64_encode(file_get_contents(public_path('assets/images/ttd.png'))) : null
+            ];
+        } else {
+            // Manual TTD - tidak ada gambar atau QR code
+            $ttdData = [
+                'jenis_ttd' => 'manual'
+            ];
+        }
+
         $pdfData = [
             'nomor_surat' => $nomorSurat,
-            'tanggal_surat' => now()->format('d F Y'),
+            'tanggal_surat' => now()->translatedFormat('d F Y'),
             'nama' => $pemohonNama,
             'nik' => $pemohonNik,
             'jenis_kelamin' => $pemohonJenisKelamin,
@@ -2236,12 +2779,31 @@ class SuratController extends Controller
 
             'ayah_nama' => $ayahNama,
             'ayah_nik' => $ayahNik,
+            'ayah_bin' => $data['ayah_bin'] ?? '-',
             'ayah_tempat_tanggal_lahir' => $ayahTempatTanggal,
             'ayah_warga_negara' => $ayahWarga,
             'ayah_agama' => $ayahAgama,
             'ayah_pekerjaan' => $ayahPekerjaan,
             'ayah_alamat' => $ayahAlamat,
 
+            // Ibu Kandung - Data ibu dari pemohon (bukan calon istri)
+            // Admin form menggunakan field wanita_* untuk data ibu
+            'ibu_nama' => $data['ibu_nama'] ?? $data['wanita_nama'] ?? $data['nama_ibu'] ?? '-',
+            'ibu_nik' => $data['ibu_nik'] ?? $data['wanita_nik'] ?? $data['nik_ibu'] ?? '-',
+            'ibu_bin' => $data['ibu_bin'] ?? '-',
+            'ibu_tempat_tanggal_lahir' => $data['ibu_tempat_tanggal_lahir'] ?? $data['wanita_tempat_tanggal_lahir'] ??
+                (
+                    isset($data['tempat_lahir_ibu']) || isset($data['tanggal_lahir_ibu'])
+                    ? ($data['tempat_lahir_ibu'] ?? '-') . ', ' .
+                      ($data['tanggal_lahir_ibu'] ? \Carbon\Carbon::parse($data['tanggal_lahir_ibu'])->translatedFormat('d F Y') : '-')
+                    : '-'
+                ),
+            'ibu_warga_negara' => $data['ibu_warga_negara'] ?? $data['wanita_warga_negara'] ?? $data['kewarganegaraan_ibu'] ?? 'WNI',
+            'ibu_agama' => $data['ibu_agama'] ?? $data['wanita_agama'] ?? $data['agama_ibu'] ?? '-',
+            'ibu_pekerjaan' => $data['ibu_pekerjaan'] ?? $data['wanita_pekerjaan'] ?? $data['pekerjaan_ibu'] ?? '-',
+            'ibu_alamat' => $data['ibu_alamat'] ?? $data['wanita_alamat'] ?? $data['alamat_ibu'] ?? '-',
+
+            // Wanita (pasangan) - Legacy field untuk backward compatibility
             'wanita_nama' => $wanitaNama,
             'wanita_nik' => $wanitaNik,
             'wanita_tempat_tanggal_lahir' => $wanitaTempatTanggal,
@@ -2250,26 +2812,78 @@ class SuratController extends Controller
             'wanita_pekerjaan' => $wanitaPekerjaan,
             'wanita_alamat' => $wanitaAlamat,
 
-            'kepala_desa_nama' => 'Zultan Alhara',
+            // Calon Istri Data - Mapping dari form user (wanita_*) ke PDF (calon_istri_*)
+            'calon_istri_nama' => $data['calon_istri_nama'] ?? $data['wanita_nama'] ?? '-',
+            'calon_istri_bin' => $data['calon_istri_bin'] ?? $data['ibu_bin'] ?? '-',
+            'calon_istri_nik' => $data['calon_istri_nik'] ?? $data['wanita_nik'] ?? '-',
+            'calon_istri_tempat_tanggal_lahir' => $data['calon_istri_tempat_tanggal_lahir'] ?? $data['wanita_tempat_tanggal_lahir'] ?? '-',
+            'calon_istri_warga_negara' => $data['calon_istri_warga_negara'] ?? $data['wanita_warga_negara'] ?? 'Indonesia',
+            'calon_istri_agama' => $data['calon_istri_agama'] ?? $data['wanita_agama'] ?? '-',
+            'calon_istri_pekerjaan' => $data['calon_istri_pekerjaan'] ?? $data['wanita_pekerjaan'] ?? '-',
+            'calon_istri_alamat' => $data['calon_istri_alamat'] ?? $data['wanita_alamat'] ?? '-',
+        ] + $this->getKepalaDesa() + [
             'tembusan' => $pengajuan->tembusan ?? []
-        ];
+        ] + $ttdData;
 
         $pdf = Pdf::loadView('pdf.surat-pengantar-nikah', $pdfData)
             ->setPaper('A4', 'portrait')
             ->setOptions(['enable-local-file-access' => true]);
 
-        return $pdf->download('Surat-Pengantar-Nikah-' . Str::slug($pemohonNama) . '.pdf');
+        return $pdf->stream('Surat-Pengantar-Nikah-' . Str::slug($pemohonNama) . '.pdf');
     }
 
     public function generatePDFHibah($pengajuanId)
     {
         $pengajuan = PengajuanSurat::findOrFail($pengajuanId);
-        $data = json_decode($pengajuan->data_surat, true);
+        $data = $pengajuan->data_surat;
+
+        // Get QR Code service untuk tracking
+        $qrCodeService = app(\App\Services\QrCodeService::class);
+        $trackingQrCode = null;
+        if ($pengajuan->tracking_number) {
+            $verifyUrl = url('/verify/' . $pengajuan->tracking_number);
+            $trackingQrCode = $qrCodeService->generateSimpleQrCode($verifyUrl);
+        }
+
+        // Prepare TTD data based on jenis_ttd
+        $ttdData = [];
+        if ($pengajuan->jenis_ttd === 'qrcode') {
+            // Use QR Code TTD - QR code yang berisi gambar TTD
+            $qrTtdBase64 = $pengajuan->data_surat['qr_ttd_base64'] ?? null;
+
+            // Jika QR code TTD belum ada, generate sekarang
+            if (!$qrTtdBase64) {
+                try {
+                    $qrCodeService = new \App\Services\QrCodeService();
+                    $qrTtdBase64 = $qrCodeService->generateSuratQrCode($pengajuan);
+                } catch (\Exception $e) {
+                    \Log::error('Failed to generate QR TTD: ' . $e->getMessage());
+                    $qrTtdBase64 = null;
+                }
+            }
+
+            $ttdData = [
+                'jenis_ttd' => 'qrcode',
+                'qr_ttd_base64' => $qrTtdBase64,
+                'verification_url' => $pengajuan->data_surat['verification_url'] ?? null
+            ];
+        } elseif ($pengajuan->jenis_ttd === 'gambar') {
+            // Use regular TTD - gambar TTD langsung
+            $ttdData = [
+                'jenis_ttd' => 'gambar',
+                'ttd_base64' => file_exists(public_path('assets/images/ttd.png')) ? base64_encode(file_get_contents(public_path('assets/images/ttd.png'))) : null
+            ];
+        } else {
+            // Manual TTD - tidak ada gambar atau QR code
+            $ttdData = [
+                'jenis_ttd' => 'manual'
+            ];
+        }
 
         // Prepare data for PDF
         $pdfData = [
-            'nomor_surat' => $pengajuan->nomor_surat,
-            'tanggal_surat' => $pengajuan->created_at->format('d F Y'),
+            'nomor_surat' => $pengajuan->no_surat,
+            'tanggal_surat' => $pengajuan->created_at->translatedFormat('d F Y'),
 
             // Data Penghibah
             'nama_penghibah' => $data['nama_penghibah'] ?? '',
@@ -2296,26 +2910,26 @@ class SuratController extends Controller
             'saksi_1' => $data['saksi_1'] ?? '',
             'saksi_2' => $data['saksi_2'] ?? '',
             'saksi_3' => $data['saksi_3'] ?? '',
-
-            'kepala_desa_nama' => 'Zultan Alhara'
+        ] + $this->getKepalaDesa() + $ttdData + [
+            'qr_base64' => $trackingQrCode
         ];
 
         $pdf = Pdf::loadView('pdf.surat-hibah', $pdfData)
             ->setPaper('A4', 'portrait')
             ->setOptions(['enable-local-file-access' => true]);
 
-        return $pdf->download('Surat-Hibah-' . Str::slug($data['nama_penghibah'] ?? 'Penghibah') . '.pdf');
+        return $pdf->stream('Surat-Hibah-' . Str::slug($data['nama_penghibah'] ?? 'Penghibah') . '.pdf');
     }
 
     public function generatePDFPerjanjianPerdamaian($pengajuanId)
     {
         $pengajuan = PengajuanSurat::findOrFail($pengajuanId);
-        $data = json_decode($pengajuan->data_surat, true);
+        $data = $pengajuan->data_surat;
 
         // Prepare data for PDF
         $pdfData = [
-            'nomor_surat' => $pengajuan->nomor_surat,
-            'tanggal_surat' => $pengajuan->created_at->format('d F Y'),
+            'nomor_surat' => $pengajuan->no_surat,
+            'tanggal_surat' => $pengajuan->created_at->translatedFormat('d F Y'),
 
             // Data Pihak 1
             'pihak1_nama' => $data['pihak1_nama'] ?? '',
@@ -2346,21 +2960,20 @@ class SuratController extends Controller
             'saksi_2' => $data['saksi_2'] ?? '',
             'saksi_3' => $data['saksi_3'] ?? '',
             'saksi_4' => $data['saksi_4'] ?? '',
-
-            'kepala_desa_nama' => 'Zultan Alhara'
+        ] + $this->getKepalaDesa() + [
         ];
 
         $pdf = Pdf::loadView('pdf.surat-perjanjian-perdamaian', $pdfData)
             ->setPaper('A4', 'portrait')
             ->setOptions(['enable-local-file-access' => true]);
 
-        return $pdf->download('Surat-Perjanjian-Perdamaian-' . Str::slug($data['pihak1_nama'] ?? 'Perjanjian') . '.pdf');
+        return $pdf->stream('Surat-Perjanjian-Perdamaian-' . Str::slug($data['pihak1_nama'] ?? 'Perjanjian') . '.pdf');
     }
 
     public function generatePDFSuratPindah($pengajuanId)
     {
         $pengajuan = PengajuanSurat::findOrFail($pengajuanId);
-        $data = json_decode($pengajuan->data_surat, true);
+        $data = $pengajuan->data_surat;
 
         // Parse pengikut data if it exists
         $pengikut = [];
@@ -2370,52 +2983,106 @@ class SuratController extends Controller
             $pengikut = $data['pengikut'];
         }
 
+        // Get user data for fallback
+        $user = $pengajuan->user;
+        
+        // Build tempat_tanggal_lahir with proper null checks
+        $tempatLahir = $data['tempat_lahir'] ?? ($user->tempat_lahir ?? '');
+        $tanggalLahir = $data['tanggal_lahir'] ?? ($user->tanggal_lahir ?? null);
+        $tempat_tanggal_lahir = $tempatLahir;
+        if ($tanggalLahir) {
+            $tempat_tanggal_lahir .= '/' . \Carbon\Carbon::parse($tanggalLahir)->translatedFormat('d F Y');
+        }
+
+        // Build tanggal_pindah with proper null checks
+        $tanggalPindah = $data['tanggal_pindah'] ?? null;
+        $tanggalPindahFormatted = '';
+        if ($tanggalPindah) {
+            $tanggalPindahFormatted = \Carbon\Carbon::parse($tanggalPindah)->translatedFormat('d F Y');
+        }
+
+        // Prepare TTD data based on jenis_ttd
+        $ttdData = [];
+        if ($pengajuan->jenis_ttd === 'qrcode') {
+            // Use QR Code TTD
+            $qrTtdBase64 = $data['qr_ttd_base64'] ?? null;
+
+            // Jika QR code TTD belum ada, generate sekarang
+            if (!$qrTtdBase64) {
+                try {
+                    $qrCodeService = new \App\Services\QrCodeService();
+                    $qrTtdBase64 = $qrCodeService->generateSuratQrCode($pengajuan);
+                } catch (\Exception $e) {
+                    \Log::error('Failed to generate QR TTD for surat pindah: ' . $e->getMessage());
+                    $qrTtdBase64 = null;
+                }
+            }
+
+            $ttdData = [
+                'jenis_ttd' => 'qrcode',
+                'qr_ttd_base64' => $qrTtdBase64,
+                'verification_url' => $data['verification_url'] ?? null
+            ];
+        } elseif ($pengajuan->jenis_ttd === 'gambar') {
+            // Use regular TTD - gambar TTD langsung
+            $ttdData = [
+                'jenis_ttd' => 'gambar',
+                'ttd_base64' => file_exists(public_path('assets/images/ttd.png')) ? base64_encode(file_get_contents(public_path('assets/images/ttd.png'))) : null
+            ];
+        } else {
+            // Manual TTD - tidak ada gambar atau QR code
+            $ttdData = [
+                'jenis_ttd' => 'manual'
+            ];
+        }
+
         // Prepare data for PDF
         $pdfData = [
-            'nomor_surat' => $pengajuan->nomor_surat,
-            'tanggal_surat' => $pengajuan->created_at->format('d F Y'),
+            'nomor_surat' => $pengajuan->no_surat,
+            'tanggal_surat' => $pengajuan->created_at->translatedFormat('d F Y'),
 
-            // Data Pemohon
-            'nama' => $data['nama'] ?? ($pengajuan->user->nama_lengkap ?? ''),
-            'tempat_tanggal_lahir' => ($data['tempat_lahir'] ?? '') . '/' . ($data['tanggal_lahir'] ? \Carbon\Carbon::parse($data['tanggal_lahir'])->format('d F Y') : ''),
-            'jenis_kelamin' => $data['jenis_kelamin'] ?? '',
-            'agama' => $data['agama'] ?? '',
-            'status_perkawinan' => $data['status_perkawinan'] ?? '',
-            'pekerjaan' => $data['pekerjaan'] ?? '',
-            'pendidikan' => $data['pendidikan'] ?? '',
-            'kewarganegaraan' => $data['kewarganegaraan'] ?? 'WNI',
-            'alamat_asal' => $data['alamat_asal'] ?? ($pengajuan->user->alamat ?? ''),
+            // Data Pemohon - get from data_surat or fallback to user model
+            'nama' => $data['nama'] ?? ($user->nama_lengkap ?? ''),
+            'tempat_tanggal_lahir' => $tempat_tanggal_lahir,
+            'jenis_kelamin' => $data['jenis_kelamin'] ?? ($user->jenis_kelamin ?? ''),
+            'agama' => $data['agama'] ?? ($user->agama ?? ''),
+            'status_perkawinan' => $data['status_perkawinan'] ?? ($user->status_perkawinan ?? ''),
+            'pekerjaan' => $data['pekerjaan'] ?? ($user->mata_pencaharian ?? $user->pekerjaan ?? ''),
+            'pendidikan' => $data['pendidikan'] ?? ($user->pendidikan ?? ''),
+            'kewarganegaraan' => $data['kewarganegaraan'] ?? ($user->kewarganegaraan ?? 'WNI'),
+            'alamat_asal' => $data['alamat_asal'] ?? ($user->alamat ?? ''),
 
             // Data Pindah
             'alamat_tujuan' => $data['alamat_tujuan'] ?? '',
-            'tanggal_pindah' => $data['tanggal_pindah'] ? \Carbon\Carbon::parse($data['tanggal_pindah'])->format('d F Y') : '',
+            'tanggal_pindah' => $tanggalPindahFormatted,
             'alasan_pindah' => $data['alasan_pindah'] ?? '',
+            'jenis_pindah' => $data['jenis_pindah'] ?? '',
+            'keperluan' => $data['keperluan'] ?? '',
 
             // Data Pengikut (array)
             'pengikut' => $pengikut,
 
-            // TTD
+            // TTD Camat
             'nama_camat' => $data['nama_camat'] ?? '',
             'nip_camat' => $data['nip_camat'] ?? '',
-            'kepala_desa_nama' => 'Zultan Alhara'
-        ];
+        ] + $this->getKepalaDesa() + $ttdData;
 
         $pdf = Pdf::loadView('pdf.surat-pindah', $pdfData)
             ->setPaper('A4', 'portrait')
             ->setOptions(['enable-local-file-access' => true]);
 
-        return $pdf->download('Surat-Pindah-' . Str::slug($data['nama'] ?? 'Penduduk') . '.pdf');
+        return $pdf->stream('Surat-Pindah-' . Str::slug($data['nama'] ?? 'Penduduk') . '.pdf');
     }
 
     public function generatePDFRekomendasi($pengajuanId)
     {
         $pengajuan = PengajuanSurat::findOrFail($pengajuanId);
-        $data = json_decode($pengajuan->data_surat, true);
+        $data = $pengajuan->data_surat;
 
         // Prepare data for PDF
         $pdfData = [
-            'nomor_surat' => $pengajuan->nomor_surat,
-            'tanggal_surat' => $pengajuan->created_at->format('d F Y'),
+            'nomor_surat' => $pengajuan->no_surat,
+            'tanggal_surat' => $pengajuan->created_at->translatedFormat('d F Y'),
 
             // Data Pemohon
             'nama' => $data['nama'] ?? ($pengajuan->user->nama_lengkap ?? ''),
@@ -2440,33 +3107,72 @@ class SuratController extends Controller
             'kapasitas' => $data['kapasitas'] ?? null,
             'modal_usaha' => $data['modal_usaha'] ?? null,
             'penghasilan_bulanan' => $data['penghasilan_bulanan'] ?? null,
-
-            'kepala_desa_nama' => 'Zultan Alhara'
+        ] + $this->getKepalaDesa() + [
         ];
 
         $pdf = Pdf::loadView('pdf.surat-rekomendasi', $pdfData)
             ->setPaper('A4', 'portrait')
             ->setOptions(['enable-local-file-access' => true]);
 
-        return $pdf->download('Surat-Rekomendasi-' . Str::slug($data['nama'] ?? 'Rekomendasi') . '.pdf');
+        return $pdf->stream('Surat-Rekomendasi-' . Str::slug($data['nama'] ?? 'Rekomendasi') . '.pdf');
     }
 
     public function generatePDFUndangan($pengajuanId)
     {
         $pengajuan = PengajuanSurat::findOrFail($pengajuanId);
-        $data = json_decode($pengajuan->data_surat, true);
+        $data = $pengajuan->data_surat;
 
         // Convert tanggal ke format Indonesia
-        $tanggalSurat = isset($data['tanggal_surat']) ?
-            Carbon::parse($data['tanggal_surat'])->locale('id')->isoFormat('D MMMM Y') :
+        // Check if date is already in Indonesian format (contains month name in Indonesian)
+        $tanggalSurat = isset($data['tanggal_surat']) ? $this->formatIndonesianDate($data['tanggal_surat']) :
             Carbon::now()->locale('id')->isoFormat('D MMMM Y');
 
-        $tanggalTtd = isset($data['tanggal_ttd']) ?
-            Carbon::parse($data['tanggal_ttd'])->locale('id')->isoFormat('D MMMM Y') :
+        $tanggalTtd = isset($data['tanggal_ttd']) ? $this->formatIndonesianDate($data['tanggal_ttd']) :
             Carbon::now()->locale('id')->isoFormat('D MMMM Y');
+
+        // Prepare TTD data
+        $ttdData = [];
+        $jenisTtd = $pengajuan->jenis_ttd ?? 'manual';
+
+        if ($jenisTtd == 'qrcode') {
+            // Generate or get QR code for verification
+            if (empty($data['qr_ttd_base64'])) {
+                try {
+                    $qrCodeService = app(\App\Services\QrCodeService::class);
+                    $qrTtdBase64 = $qrCodeService->generateTtdQrCode($pengajuan);
+                    // Save to data_surat for future use
+                    $data['qr_ttd_base64'] = $qrTtdBase64;
+                    $pengajuan->data_surat = $data;
+                    $pengajuan->save();
+                } catch (\Exception $e) {
+                    $qrTtdBase64 = null;
+                }
+            } else {
+                $qrTtdBase64 = $data['qr_ttd_base64'];
+            }
+
+            $ttdData = [
+                'jenis_ttd' => 'qrcode',
+                'ttd_base64' => $qrTtdBase64,
+                'qr_ttd_base64' => $qrTtdBase64,
+            ];
+        } elseif ($jenisTtd == 'gambar') {
+            $ttdImagePath = public_path('assets/images/ttd.png');
+            if (file_exists($ttdImagePath)) {
+                $ttdBase64 = base64_encode(file_get_contents($ttdImagePath));
+                $ttdData = [
+                    'jenis_ttd' => 'gambar',
+                    'ttd_base64' => $ttdBase64,
+                ];
+            } else {
+                $ttdData = ['jenis_ttd' => 'manual'];
+            }
+        } else {
+            $ttdData = ['jenis_ttd' => 'manual'];
+        }
 
         $pdfData = [
-            'nomor_surat' => $pengajuan->nomor_surat ?? '09/SP/KTB/V/2025',
+            'nomor_surat' => $pengajuan->no_surat ?? '09/SP/KTB/V/2025',
             'lampiran' => $data['lampiran'] ?? '1 (satu) Berkas',
             'perihal' => $data['perihal'] ?? 'Panggilan Penting',
             'tanggal_surat' => $tanggalSurat,
@@ -2478,20 +3184,19 @@ class SuratController extends Controller
             'tempat' => $data['tempat'] ?? 'Gedung Perpustakaan/Kantor Desa Ketapang Baru',
             'penutup' => $data['penutup'] ?? 'Demikian panggilan ini kami sampaikan dan semoga Bapak/Ibu dapat menghadiri dengan tepat waktu, atas perhatiannya Kami ucapkan terimakasih.',
             'tanggal_ttd' => $tanggalTtd,
-            'kepala_desa' => $data['kepala_desa'] ?? 'Zultan Alhara',
-        ];
+        ] + $this->getKepalaDesa() + $ttdData;
 
         $pdf = Pdf::loadView('pdf.surat-undangan', $pdfData)
             ->setPaper('A4', 'portrait')
             ->setOptions(['enable-local-file-access' => true]);
 
-        return $pdf->download('Surat-Undangan-' . Str::slug($data['kepada'] ?? 'Undangan') . '.pdf');
+        return $pdf->stream('Surat-Undangan-' . Str::slug($data['kepada'] ?? 'Undangan') . '.pdf');
     }
 
     public function generatePDFPengantarKK($pengajuanId)
     {
         $pengajuan = PengajuanSurat::findOrFail($pengajuanId);
-        $data = json_decode($pengajuan->data_surat, true);
+        $data = $pengajuan->data_surat;
 
         // Persiapkan data anggota keluarga
         $anggotaKeluarga = [];
@@ -2525,13 +3230,13 @@ class SuratController extends Controller
             ->setPaper('A4', 'landscape') // Landscape karena tabel lebar
             ->setOptions(['enable-local-file-access' => true]);
 
-        return $pdf->download('Surat-Pengantar-KK-' . Str::slug($data['nama_kepala_keluarga'] ?? 'KartuKeluarga') . '.pdf');
+        return $pdf->stream('Surat-Pengantar-KK-' . Str::slug($data['nama_kepala_keluarga'] ?? 'KartuKeluarga') . '.pdf');
     }
 
     public function generatePDFPengantarAktaKelahiran($pengajuanId)
     {
         $pengajuan = PengajuanSurat::findOrFail($pengajuanId);
-        $data = json_decode($pengajuan->data_surat, true);
+        $data = $pengajuan->data_surat;
 
         $pdfData = [
             'kabupaten' => $data['kabupaten'] ?? 'Seluma',
@@ -2602,6 +3307,237 @@ class SuratController extends Controller
             ->setPaper('A4', 'portrait')
             ->setOptions(['enable-local-file-access' => true]);
 
-        return $pdf->download('Surat-Pengantar-Akta-Kelahiran-' . Str::slug($data['nama_bayi'] ?? 'AktaKelahiran') . '.pdf');
+    }
+
+    private function handlePengantarNikah(Request $request)
+    {
+        // Validasi data request
+        $request->validate([
+            // Status Perkawinan
+            'status_pria' => 'required|in:Jejaka,Duda,Beristri',
+            'beristri_ke' => 'nullable|integer|min:1',
+            'status_wanita' => 'required|in:Perawan,Janda',
+            'nama_pasangan_terdahulu' => 'nullable|string|max:255',
+
+            // Data Ayah
+            'ayah_nama' => 'required|string|max:255',
+            'ayah_bin' => 'nullable|string|max:255',
+            'ayah_nik' => 'required|string|max:16',
+            'ayah_tempat_tanggal_lahir' => 'required|string|max:255',
+            'ayah_agama' => 'required|string',
+            'ayah_pekerjaan' => 'required|string|max:255',
+            'ayah_alamat' => 'required|string',
+
+            // Data Ibu
+            'ibu_nama' => 'required|string|max:255',
+            'ibu_bin' => 'nullable|string|max:255',
+            'ibu_nik' => 'required|string|max:16',
+            'ibu_tempat_tanggal_lahir' => 'required|string|max:255',
+            'ibu_warga_negara' => 'required|string',
+            'ibu_agama' => 'required|string',
+            'ibu_pekerjaan' => 'required|string|max:255',
+            'ibu_alamat' => 'required|string',
+
+            // Data Calon Istri
+            'calon_istri_nama' => 'required|string|max:255',
+            'calon_istri_bin' => 'required|string|max:255',
+            'calon_istri_nik' => 'required|string|max:16',
+            'calon_istri_tempat_tanggal_lahir' => 'required|string|max:255',
+            'calon_istri_warga_negara' => 'required|string',
+            'calon_istri_agama' => 'required|string',
+            'calon_istri_pekerjaan' => 'required|string|max:255',
+            'calon_istri_alamat' => 'required|string',
+
+            // Lampiran
+            'lampiran' => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120',
+        ]);
+
+        try {
+            // Handle file upload
+            $lampiranPath = null;
+            if ($request->hasFile('lampiran')) {
+                $file = $request->file('lampiran');
+                $fileName = time() . '_' . $file->getClientOriginalName();
+                $lampiranPath = $file->storeAs('lampiran', $fileName, 'public');
+            }
+
+            // Generate tracking number
+            $trackingNumber = 'TRK' . strtoupper(uniqid());
+
+            // Get authenticated user
+            $user = $request->user();
+
+            // Create pengajuan surat
+            $pengajuan = PengajuanSurat::create([
+                'nama_lengkap' => $user->nama_lengkap ?? $user->name,
+                'email' => $user->email,
+                'no_telepon' => $user->no_hp ?? $user->phone ?? '',
+                'alamat' => $user->alamat ?? $user->address ?? '',
+                'jenis_surat' => 'pengantar_nikah',
+                'keperluan' => 'Pengantar Perkawinan',
+                'lampiran' => $lampiranPath,
+               'data_surat' => [
+                    // Data Pemohon (diambil dari user yang login)
+                    'nama' => $user->nama_lengkap ?? $user->name,
+                    'nik' => $user->nik ?? '',
+                    'jenis_kelamin' => $user->jenis_kelamin ?? 'Laki-Laki',
+                    'tempat_tanggal_lahir' => ($user->tempat_lahir ?? '') . ', ' . ($user->tanggal_lahir ? \Carbon\Carbon::parse($user->tanggal_lahir)->translatedFormat('d F Y') : ''),
+                    'warga_negara' => 'Indonesia',
+                    'agama' => $user->agama ?? 'Islam',
+                    'pekerjaan' => $user->pekerjaan ?? '-',
+                    'alamat' => $user->alamat ?? $user->address ?? '',
+
+                    // Status Perkawinan
+                    'status_pria' => $request->status_pria,
+                    'beristri_ke' => $request->beristri_ke ?? '',
+                    'status_wanita' => $request->status_wanita,
+                    'nama_pasangan_terdahulu' => $request->nama_pasangan_terdahulu ?? '',
+
+                    // Data Ayah
+                    'ayah_nama' => $request->ayah_nama,
+                    'ayah_bin' => $request->ayah_bin ?? '',
+                    'ayah_nik' => $request->ayah_nik,
+                    'ayah_tempat_tanggal_lahir' => $request->ayah_tempat_tanggal_lahir,
+                    'ayah_warga_negara' => 'Indonesia', // Default value
+                    'ayah_agama' => $request->ayah_agama,
+                    'ayah_pekerjaan' => $request->ayah_pekerjaan,
+                    'ayah_alamat' => $request->ayah_alamat,
+
+                    // Data Ibu
+                    'ibu_nama' => $request->ibu_nama,
+                    'ibu_bin' => $request->ibu_bin ?? '',
+                    'ibu_nik' => $request->ibu_nik,
+                    'ibu_tempat_tanggal_lahir' => $request->ibu_tempat_tanggal_lahir,
+                    'ibu_warga_negara' => $request->ibu_warga_negara,
+                    'ibu_agama' => $request->ibu_agama,
+                    'ibu_pekerjaan' => $request->ibu_pekerjaan,
+                    'ibu_alamat' => $request->ibu_alamat,
+
+                    // Data Calon Istri
+                    'calon_istri_nama' => $request->calon_istri_nama,
+                    'calon_istri_bin' => $request->calon_istri_bin,
+                    'calon_istri_nik' => $request->calon_istri_nik,
+                    'calon_istri_tempat_tanggal_lahir' => $request->calon_istri_tempat_tanggal_lahir,
+                    'calon_istri_warga_negara' => $request->calon_istri_warga_negara,
+                    'calon_istri_agama' => $request->calon_istri_agama,
+                    'calon_istri_pekerjaan' => $request->calon_istri_pekerjaan,
+                    'calon_istri_alamat' => $request->calon_istri_alamat,
+                ],
+                'status' => 'Diajukan',
+                'tracking_number' => $trackingNumber,
+                'user_id' => $user->id,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Pengajuan Surat Pengantar Nikah berhasil disubmit!',
+                'tracking_number' => $trackingNumber,
+                'pengajuan_id' => $pengajuan->id
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error in handlePengantarNikah: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan sistem. Silakan coba lagi.'
+            ], 500);
+        }
+    }
+
+    private function handleGenericSurat(Request $request, $jenisSurat)
+    {
+        // Generate tracking number
+        $trackingNumber = 'TRK' . strtoupper(uniqid());
+        $user = $request->user();
+        $keperluan = $request->keperluan ?? str_replace('_', ' ', ucwords($jenisSurat));
+
+        // Handle file upload generic
+        $lampiranPath = null;
+        if ($request->hasFile('lampiran')) {
+            $file = $request->file('lampiran');
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $lampiranPath = $file->storeAs('lampiran', $fileName, 'public');
+        }
+
+        // Prepare data_surat
+        $dataSurat = $request->except(['lampiran', '_token', 'jenis_surat']);
+
+        // AUTO-FILL DATA FOR SURAT HIBAH (from logged-in user)
+        if ($jenisSurat === 'surat_hibah') {
+            $dataSurat['nama_penghibah'] = $user->nama_lengkap ?? $user->name;
+            $dataSurat['umur_penghibah'] = $user->tanggal_lahir ? \Carbon\Carbon::parse($user->tanggal_lahir)->age : '-';
+            $dataSurat['pekerjaan_penghibah'] = $user->mata_pencaharian ?? $user->pekerjaan ?? '-';
+            $dataSurat['agama_penghibah'] = $user->agama ?? '-';
+            $dataSurat['alamat_penghibah'] = $user->alamat ?? '-';
+        }
+
+        // Create pengajuan surat
+        $pengajuan = PengajuanSurat::create([
+            'nama_lengkap' => $user->nama_lengkap ?? $user->name,
+            'email' => $user->email,
+            'no_telepon' => $user->no_hp ?? $user->phone ?? '',
+            'alamat' => $user->alamat ?? $user->address ?? '',
+            'jenis_surat' => $jenisSurat,
+            'keperluan' => $keperluan,
+            'lampiran' => $lampiranPath,
+            'data_surat' => $dataSurat,
+            'status' => 'Diajukan',
+            'tracking_number' => $trackingNumber,
+            'user_id' => $user->id,
+        ]);
+
+        // Generate informative message based on jenis_surat
+        $suratNames = [
+            'surat_hibah' => 'Surat Keterangan Hibah',
+            'perjanjian_perdamaian' => 'Surat Perjanjian Perdamaian',
+            'surat_rekomendasi' => 'Surat Rekomendasi',
+            'surat_tidak_mampu' => 'Surat Keterangan Tidak Mampu',
+            'surat_undangan' => 'Surat Undangan',
+        ];
+        
+        $suratName = $suratNames[$jenisSurat] ?? ucwords(str_replace('_', ' ', $jenisSurat));
+
+        return response()->json([
+            'success' => true,
+            'message' => "Pengajuan {$suratName} berhasil disubmit!",
+            'tracking_number' => $trackingNumber,
+            'pengajuan_id' => $pengajuan->id
+        ]);
+    }
+
+    /**
+     * Helper method to parse date safely
+     * If date is already in Indonesian format, return it as is
+     * Otherwise, parse it and format to Indonesian
+     */
+    private function formatIndonesianDate($date)
+    {
+        if (empty($date)) {
+            return Carbon::now()->locale('id')->isoFormat('D MMMM Y');
+        }
+
+        // Check if date is already in Indonesian format (contains Indonesian month names)
+        $indonesianMonths = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+        $containsIndonesianMonth = false;
+
+        foreach ($indonesianMonths as $month) {
+            if (strpos($date, $month) !== false) {
+                $containsIndonesianMonth = true;
+                break;
+            }
+        }
+
+        // If already in Indonesian format, return as is
+        if ($containsIndonesianMonth) {
+            return $date;
+        }
+
+        // Otherwise, parse and format to Indonesian
+        try {
+            return Carbon::parse($date)->locale('id')->isoFormat('D MMMM Y');
+        } catch (\Exception $e) {
+            // If parsing fails, return current date
+            return Carbon::now()->locale('id')->isoFormat('D MMMM Y');
+        }
     }
 }

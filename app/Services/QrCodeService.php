@@ -35,6 +35,11 @@ class QrCodeService
                 ->errorCorrection('M')
                 ->generate($data);
 
+            // Debug: Check if QR code is valid
+            if (empty($qrCode)) {
+                throw new \Exception('QR Code generation failed - empty result');
+            }
+
             // Create Image Manager
             $manager = new ImageManager(new Driver());
 
@@ -44,8 +49,16 @@ class QrCodeService
             // Resize TTD image to appropriate size (keep aspect ratio)
             $ttdImage->scale(height: $size * 0.6);
 
-            // Create QR code image from generated data
-            $qrImage = $manager->read($qrCode);
+            // Create QR code image from generated data - try different approach
+            try {
+                $qrImage = $manager->read($qrCode);
+            } catch (\Exception $e) {
+                // If direct read fails, try to save and read from file
+                $tempQrPath = storage_path('app/temp_qr_' . time() . '.png');
+                file_put_contents($tempQrPath, $qrCode);
+                $qrImage = $manager->read($tempQrPath);
+                unlink($tempQrPath); // Clean up temp file
+            }
 
             // Create a canvas that can fit both images
             $canvasWidth = max($qrImage->width(), $ttdImage->width()) + 40; // padding
@@ -103,14 +116,33 @@ class QrCodeService
     }
 
     /**
-     * Generate verification URL for QR code
+     * Generate verification URL for QR code with signature
      *
      * @param string $trackingNumber Tracking number of the surat
-     * @return string Verification URL
+     * @return string Verification URL with signature
      */
     public function generateVerificationUrl($trackingNumber)
     {
-        return url('/surat/verify/' . $trackingNumber);
+        // Generate signature using HMAC with app key
+        $signature = hash_hmac('sha256', $trackingNumber, config('app.key'));
+        $shortSig = substr($signature, 0, 16); // Use first 16 chars for shorter URL
+        
+        return url('/surat/verify/' . $trackingNumber . '?sig=' . $shortSig);
+    }
+    
+    /**
+     * Verify signature for tracking number
+     *
+     * @param string $trackingNumber
+     * @param string $signature
+     * @return bool
+     */
+    public function verifySignature($trackingNumber, $signature)
+    {
+        $expectedSig = hash_hmac('sha256', $trackingNumber, config('app.key'));
+        $shortSig = substr($expectedSig, 0, 16);
+        
+        return hash_equals($shortSig, $signature);
     }
 
     /**
@@ -147,16 +179,27 @@ class QrCodeService
      */
     public function generateSuratQrCode($pengajuanSurat)
     {
-        $verificationData = [
-            'tracking_number' => $pengajuanSurat->tracking_number,
-            'nama' => $pengajuanSurat->nama_lengkap,
-            'jenis_surat' => $pengajuanSurat->jenis_surat,
-            'tanggal' => $pengajuanSurat->created_at->format('Y-m-d'),
-            'verify_url' => $this->generateVerificationUrl($pengajuanSurat->tracking_number)
-        ];
+        // Generate tracking number if not exists
+        if (!$pengajuanSurat->tracking_number) {
+            $pengajuanSurat->tracking_number = 'TRK' . str_pad($pengajuanSurat->id, 6, '0', STR_PAD_LEFT) . date('Ymd');
+            $pengajuanSurat->save();
+        }
 
-        $qrData = json_encode($verificationData);
+        // Generate verification URL for QR code (not just plain text)
+        $verificationUrl = $this->generateVerificationUrl($pengajuanSurat->tracking_number);
 
-        return $this->generateQrCodeFromTtd($qrData);
+        // Generate simple QR code with verification URL
+        try {
+            $qrCode = QrCode::format('png')
+                ->size(200)
+                ->margin(2)
+                ->errorCorrection('M')
+                ->generate($verificationUrl);
+
+            return 'data:image/png;base64,' . base64_encode($qrCode);
+        } catch (\Exception $e) {
+            \Log::error('QR code generation failed: ' . $e->getMessage());
+            return null;
+        }
     }
 }

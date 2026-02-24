@@ -94,6 +94,17 @@
                                         @enderror
                                     </div>
 
+                                    <!-- NIP -->
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold text-gray-900">NIP</label>
+                                        <input type="text" name="nip" class="form-control form-control-solid @error('nip') is-invalid @enderror"
+                                               placeholder="Masukkan NIP (opsional)" value="{{ old('nip', $strukturOrganisasi->nip) }}">
+                                        <div class="form-text">Nomor Induk Pegawai (kosongkan jika tidak ada)</div>
+                                        @error('nip')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+
                                     <!-- Kategori -->
                                     <div class="col-md-6">
                                         <label class="required form-label fw-semibold text-gray-900">Kategori</label>
@@ -330,7 +341,7 @@
                         <div class="card shadow-sm">
                             <div class="card-body">
                                 <div class="d-flex flex-column gap-3">
-                                    <button type="submit" class="btn btn-primary btn-lg">
+                                    <button type="submit" class="btn btn-primary btn-lg" onclick="return handleFormSubmit(event)">
                                         <i class="fas fa-save me-2"></i>
                                         Update Struktur
                                     </button>
@@ -352,9 +363,141 @@
     </div>
 @endsection
 
-@push('scripts')
+@section('scripts')
 <script>
+// Global function for form submit - with SweetAlert confirmation and AJAX
+function handleFormSubmit(e) {
+    e.preventDefault();
+    console.log('handleFormSubmit called');
+    
+    const form = document.getElementById('kt_struktur_form');
+    const nama = document.querySelector('input[name="nama"]').value.trim();
+    const jabatan = document.querySelector('input[name="jabatan"]').value.trim();
+    const kategoriSelect = document.querySelector('select[name="kategori"]');
+    const levelSelect = document.querySelector('select[name="level"]');
+    const kategori = kategoriSelect ? kategoriSelect.value : '';
+    const level = levelSelect ? levelSelect.value : '';
+
+    console.log('Form data:', { nama, jabatan, kategori, level });
+
+    // Validation first
+    if (!nama || !jabatan || !kategori || !level) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Data Tidak Lengkap',
+            text: 'Mohon lengkapi semua field yang required (bertanda *)'
+        });
+        return false;
+    }
+    
+    // Show confirmation dialog
+    Swal.fire({
+        title: 'Konfirmasi Update',
+        text: 'Apakah Anda yakin ingin memperbarui data struktur organisasi ini?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Ya, Update!',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Show loading
+            Swal.fire({
+                title: 'Menyimpan...',
+                text: 'Mohon tunggu sebentar',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            
+            // Submit using AJAX
+            const formData = new FormData(form);
+            
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                if (response.redirected) {
+                    // Success - show notification and redirect
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: 'Struktur organisasi berhasil diperbarui.',
+                        timer: 2000,
+                        timerProgressBar: true,
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.href = response.url;
+                    });
+                    return null;
+                }
+                return response.json().catch(() => response.text());
+            })
+            .then(data => {
+                if (data === null) return; // Already handled redirect
+                
+                console.log('Response data:', data);
+                
+                if (typeof data === 'string' && data.includes('<!DOCTYPE')) {
+                    // HTML response means success with redirect
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: 'Struktur organisasi berhasil diperbarui.',
+                        timer: 2000,
+                        timerProgressBar: true,
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.href = '{{ route("admin.struktur-organisasi.index") }}';
+                    });
+                } else if (data && data.errors) {
+                    // Validation errors
+                    let errorMessages = Object.values(data.errors).flat().join('<br>');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Validasi Gagal',
+                        html: errorMessages
+                    });
+                } else {
+                    // Success
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: 'Struktur organisasi berhasil diperbarui.',
+                        timer: 2000,
+                        timerProgressBar: true,
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.href = '{{ route("admin.struktur-organisasi.index") }}';
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal!',
+                    text: 'Terjadi kesalahan saat menyimpan data. Silakan coba lagi.'
+                });
+            });
+        }
+    });
+    
+    return false;
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('Edit Struktur Organisasi script loaded');
+    
     // Add tugas functionality
     document.addEventListener('click', function(e) {
         if (e.target.classList.contains('add-tugas') || e.target.parentElement.classList.contains('add-tugas')) {
@@ -400,45 +543,65 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Form validation
     const form = document.getElementById('kt_struktur_form');
-    form.addEventListener('submit', function(e) {
-        const nama = document.querySelector('input[name="nama"]').value.trim();
-        const jabatan = document.querySelector('input[name="jabatan"]').value.trim();
-        const kategori = document.querySelector('select[name="kategori"]').value;
-        const level = document.querySelector('select[name="level"]').value;
+    if (form) {
+        console.log('Form found, attaching submit handler');
+        form.addEventListener('submit', function(e) {
+            const nama = document.querySelector('input[name="nama"]').value.trim();
+            const jabatan = document.querySelector('input[name="jabatan"]').value.trim();
+            
+            // Get Select2 values properly
+            const kategoriSelect = document.querySelector('select[name="kategori"]');
+            const levelSelect = document.querySelector('select[name="level"]');
+            const kategori = kategoriSelect ? kategoriSelect.value : '';
+            const level = levelSelect ? levelSelect.value : '';
 
-        if (!nama || !jabatan || !kategori || !level) {
-            e.preventDefault();
-            Swal.fire({
-                icon: 'error',
-                title: 'Data Tidak Lengkap',
-                text: 'Mohon lengkapi semua field yang required (bertanda *)'
-            });
-            return false;
-        }
-    });
+            console.log('Form validation:', { nama, jabatan, kategori, level });
+
+            if (!nama || !jabatan || !kategori || !level) {
+                e.preventDefault();
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Data Tidak Lengkap',
+                        text: 'Mohon lengkapi semua field yang required (bertanda *)'
+                    });
+                } else {
+                    alert('Data tidak lengkap. Mohon lengkapi semua field yang required.');
+                }
+                return false;
+            }
+            
+            // Form is valid, allow submit
+            console.log('Form is valid, submitting...');
+        });
+    } else {
+        console.error('Form kt_struktur_form not found!');
+    }
 
     // Handle foto removal
     const removeFotoCheckbox = document.querySelector('input[name="remove_foto"]');
     if (removeFotoCheckbox) {
         removeFotoCheckbox.addEventListener('change', function() {
             if (this.checked) {
-                Swal.fire({
-                    title: 'Konfirmasi',
-                    text: 'Foto akan dihapus saat form disimpan. Lanjutkan?',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#d33',
-                    cancelButtonColor: '#3085d6',
-                    confirmButtonText: 'Ya, hapus!',
-                    cancelButtonText: 'Batal'
-                }).then((result) => {
-                    if (!result.isConfirmed) {
-                        this.checked = false;
-                    }
-                });
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        title: 'Konfirmasi',
+                        text: 'Foto akan dihapus saat form disimpan. Lanjutkan?',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: 'Ya, hapus!',
+                        cancelButtonText: 'Batal'
+                    }).then((result) => {
+                        if (!result.isConfirmed) {
+                            this.checked = false;
+                        }
+                    });
+                }
             }
         });
     }
 });
 </script>
-@endpush
+@endsection

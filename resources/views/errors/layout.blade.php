@@ -136,15 +136,15 @@
         }
 
         .btn-success-custom {
-            background: linear-gradient(45px, #56ab2f, #a8e6cf);
-            color: white;
-            box-shadow: 0 4px 15px rgba(86, 171, 47, 0.4);
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: #ffffff !important;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);
         }
 
         .btn-success-custom:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(86, 171, 47, 0.6);
-            color: white;
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.6);
+            color: #ffffff !important;
         }
 
         .floating-shapes {
