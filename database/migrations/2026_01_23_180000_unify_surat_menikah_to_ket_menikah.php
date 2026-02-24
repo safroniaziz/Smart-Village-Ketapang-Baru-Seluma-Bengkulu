@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -10,8 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
+        $table = $this->getPengajuanSuratTable();
+        if (!$table) {
+            return;
+        }
+
         // Update surat_menikah to ket_menikah for consistent naming
-        DB::table('pengajuan_surat')
+        DB::table($table)
             ->where('jenis_surat', 'surat_menikah')
             ->update(['jenis_surat' => 'ket_menikah']);
     }
@@ -21,9 +27,27 @@ return new class extends Migration
      */
     public function down(): void
     {
+        $table = $this->getPengajuanSuratTable();
+        if (!$table) {
+            return;
+        }
+
         // Revert ket_menikah back to surat_menikah
-        DB::table('pengajuan_surat')
+        DB::table($table)
             ->where('jenis_surat', 'ket_menikah')
             ->update(['jenis_surat' => 'surat_menikah']);
+    }
+
+    private function getPengajuanSuratTable(): ?string
+    {
+        if (Schema::hasTable('pengajuan_surats')) {
+            return 'pengajuan_surats';
+        }
+
+        if (Schema::hasTable('pengajuan_surat')) {
+            return 'pengajuan_surat';
+        }
+
+        return null;
     }
 };
