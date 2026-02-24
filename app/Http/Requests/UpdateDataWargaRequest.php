@@ -101,8 +101,17 @@ class UpdateDataWargaRequest extends FormRequest
      */
     protected function prepareForValidation()
     {
+        $statusRumah = $this->input('status_rumah');
+        if (is_string($statusRumah)) {
+            $statusRumah = strtoupper(trim($statusRumah));
+            if ($statusRumah === 'SEWA') {
+                $statusRumah = 'SW';
+            }
+        }
+
         $this->merge([
             'is_kepala_keluarga' => $this->boolean('is_kepala_keluarga'),
+            'status_rumah' => $statusRumah,
         ]);
     }
 }

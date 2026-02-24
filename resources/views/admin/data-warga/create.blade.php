@@ -854,7 +854,7 @@ textarea:focus::placeholder {
                                             id="status_rumah" name="status_rumah" required>
                                         <option value="">-- Pilih Status --</option>
                                         <option value="MS" {{ old('status_rumah') == 'MS' ? 'selected' : '' }}>Milik Sendiri</option>
-                                        <option value="SEWA" {{ old('status_rumah') == 'SEWA' ? 'selected' : '' }}>Sewa</option>
+                                        <option value="SW" {{ in_array(old('status_rumah'), ['SW', 'SEWA']) ? 'selected' : '' }}>Sewa</option>
                                     </select>
                                     <label for="status_rumah" style="color: #7e8299; font-weight: 400;">Status Rumah <span style="color: #dc3545;">*</span></label>
                                     @error('status_rumah')
